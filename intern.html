@@ -196,6 +196,14 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 .sync-banner{background:var(--purple-pale);border-left:3px solid var(--purple);border-radius:9px;padding:10px 13px;font-size:12.5px;color:var(--purple);margin-bottom:10px;display:none}
 .sync-banner.show{display:block}
 
+/* KONTAKT BANNER */
+.kontakt-banner{display:flex;align-items:center;gap:8px;border-radius:8px;padding:10px 13px;font-size:13px;margin-bottom:12px;line-height:1.5}
+.kontakt-banner a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.k-email{background:#dbeafe;color:#1d4ed8;border-left:3px solid #3b82f6}
+.k-call{background:#dcfce7;color:#166534;border-left:3px solid #22c55e}
+.k-person{background:var(--yellow-pale);color:#92400e;border-left:3px solid var(--yellow)}
+.k-zettel{background:var(--gold-faint,rgba(184,137,42,.1));color:#92400e;border-left:3px solid var(--gold)}
+
 /* EMPTY / NOTICE */
 .empty{text-align:center;padding:36px 20px;color:var(--text-muted)}
 .empty-icon{font-size:38px;margin-bottom:8px}
@@ -379,6 +387,21 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
     <input type="text" id="bw-name" placeholder="z. B. Maria Müller">
     <label>Zimmer</label>
     <input type="text" id="bw-zimmer" placeholder="z. B. 14">
+    <label>Kontaktweg für Rückmeldungen</label>
+    <select id="bw-kontakt" onchange="toggleKontaktFelder()">
+      <option value="Türzettel">🖨 Türzettel (Standard)</option>
+      <option value="E-Mail">📧 E-Mail</option>
+      <option value="Anruf">📞 Telefonanruf</option>
+      <option value="Persönlich">🤝 Persönlicher Kontakt</option>
+    </select>
+    <div id="bw-email-wrap" style="display:none">
+      <label>E-Mail-Adresse</label>
+      <input type="email" id="bw-email" placeholder="name@beispiel.de">
+    </div>
+    <div id="bw-telefon-wrap" style="display:none">
+      <label>Telefonnummer</label>
+      <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
+    </div>
     <button class="btn btn-primary" id="bw-save-btn" onclick="saveBewohner()">Speichern</button>
     <button class="btn btn-ghost" onclick="ovClose('ov-bewohner')">Abbrechen</button>
     <button class="btn btn-danger" id="bw-delete-btn" onclick="deleteBewohnerRow()" style="margin-top:8px;display:none">Bewohnerin löschen</button>
@@ -836,10 +859,16 @@ function renderBewohner() {
       <div class="bw-zimmer">Zi.<br>${b.zimmer}</div>
       <div class="bw-info">
         <div class="bw-rname" style="${!b.aktiv ? 'color:var(--text-muted);text-decoration:line-through' : ''}">${b.name}</div>
-        <div class="bw-rmeta">Zimmer ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''}</div>
+        <div class="bw-rmeta">Zimmer ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''} · ${{Türzettel:'🖨',E-Mail:'📧',Anruf:'📞',Persönlich:'🤝'}[b.kontakt_art||'Türzettel']} ${b.kontakt_art||'Türzettel'}</div>
       </div>
       <button class="bw-toggle ${b.aktiv ? 'on' : 'off'}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}')"></button>
     </div>`).join('');
+}
+
+function toggleKontaktFelder() {
+  const art = document.getElementById('bw-kontakt').value;
+  document.getElementById('bw-email-wrap').style.display = art === 'E-Mail' ? 'block' : 'none';
+  document.getElementById('bw-telefon-wrap').style.display = art === 'Anruf' ? 'block' : 'none';
 }
 
 function openNewBw() {
@@ -847,6 +876,10 @@ function openNewBw() {
   document.getElementById('bw-modal-title').textContent = 'Neue Bewohnerin';
   document.getElementById('bw-name').value = '';
   document.getElementById('bw-zimmer').value = '';
+  document.getElementById('bw-kontakt').value = 'Türzettel';
+  document.getElementById('bw-email').value = '';
+  document.getElementById('bw-telefon').value = '';
+  toggleKontaktFelder();
   document.getElementById('bw-delete-btn').style.display = 'none';
   ovOpen('ov-bewohner');
   setTimeout(() => document.getElementById('bw-zimmer').focus(), 150);
@@ -859,6 +892,10 @@ function openEditBw(id) {
   document.getElementById('bw-modal-title').textContent = 'Bewohnerin bearbeiten';
   document.getElementById('bw-name').value = b.name;
   document.getElementById('bw-zimmer').value = b.zimmer;
+  document.getElementById('bw-kontakt').value = b.kontakt_art || 'Türzettel';
+  document.getElementById('bw-email').value = b.email || '';
+  document.getElementById('bw-telefon').value = b.telefon || '';
+  toggleKontaktFelder();
   document.getElementById('bw-delete-btn').style.display = 'block';
   ovOpen('ov-bewohner');
 }
@@ -871,16 +908,19 @@ async function saveBewohner() {
   const btn = document.getElementById('bw-save-btn');
   btn.textContent = 'Speichert …'; btn.disabled = true;
 
+  const kontakt_art = document.getElementById('bw-kontakt').value;
+  const email = document.getElementById('bw-email').value.trim() || null;
+  const telefon = document.getElementById('bw-telefon').value.trim() || null;
   try {
     if (editingBwId) {
       await sbReq(`bewohner?id=eq.${editingBwId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ name, zimmer })
+        body: JSON.stringify({ name, zimmer, kontakt_art, email, telefon })
       });
     } else {
       await sbReq('bewohner', {
         method: 'POST',
-        body: JSON.stringify({ name, zimmer, aktiv: true })
+        body: JSON.stringify({ name, zimmer, aktiv: true, kontakt_art, email, telefon })
       });
     }
     await loadBewohnerList();
@@ -1001,12 +1041,28 @@ function openDetail(id) {
         🟣 Gemeldet über Bewohner-App${s.name ? ' von ' + s.name : ''}${s.zimmer ? ', Zimmer ' + s.zimmer : ''}
       </div>` : '';
 
+  let kontaktBanner = '';
+  if (s.name) {
+    const bw = bewohnerListe.find(b => b.name === s.name);
+    if (bw) {
+      const art = bw.kontakt_art || 'Türzettel';
+      if (art === 'E-Mail' && bw.email)
+        kontaktBanner = `<div class="kontakt-banner k-email">📧 <strong>E-Mail</strong> &nbsp;·&nbsp; <a href="mailto:${bw.email}?subject=Ihre Meldung %23${s.nr||''} — ${encodeURIComponent(s.ort)}">${bw.email}</a></div>`;
+      else if (art === 'Anruf' && bw.telefon)
+        kontaktBanner = `<div class="kontakt-banner k-call">📞 <strong>Anruf</strong> &nbsp;·&nbsp; <a href="tel:${bw.telefon}">${bw.telefon}</a></div>`;
+      else if (art === 'Persönlich')
+        kontaktBanner = `<div class="kontakt-banner k-person">🤝 <strong>Persönlicher Kontakt</strong> — bitte direkt ansprechen</div>`;
+      else
+        kontaktBanner = `<div class="kontakt-banner k-zettel">🖨 <strong>Türzettel</strong> bevorzugt — Button unten</div>`;
+    }
+  }
+
   document.getElementById('detail-body').innerHTML = `
     <div class="modal-hdr">
       <h2>#${s.nr||'–'} — ${s.ort}</h2>
       <button class="modal-close" onclick="ovClose('ov-detail')">×</button>
     </div>
-    ${bewohnerInfo}
+    ${bewohnerInfo}${kontaktBanner}
     <div class="status-btns">
       <button class="status-btn${s.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
       <button class="status-btn${s.status==='In Prüfung'?' active':''}" onclick="setStatus('${id}','In Prüfung')">In Prüfung</button>
