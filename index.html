@@ -204,12 +204,43 @@ footer{max-width:600px;margin:0 auto;padding:16px 16px 28px;border-top:1px solid
 .season-items li::before{content:"·";position:absolute;left:3px;color:var(--burg);font-weight:700;font-size:15px;line-height:1.15}
 #jahresplan,#melden{scroll-margin-top:44px}
 html{scroll-behavior:smooth}
+/* AKTUELL-ARTIKEL */
+.aktuell-section{padding:22px 18px;background:var(--cream);border-top:1px solid var(--border)}
+.artikel-grid{display:flex;flex-direction:column;gap:12px}
+.artikel-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.artikel-head{background:var(--green);padding:10px 14px;display:flex;align-items:center;gap:8px}
+.artikel-ico{font-size:18px}
+.artikel-kat{font-family:var(--sans);font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.artikel-badge{margin-left:auto;background:rgba(184,137,42,.9);color:#fff;font-size:9px;padding:2px 8px;border-radius:20px;font-family:var(--sans);font-weight:600;letter-spacing:.3px}
+.artikel-body{padding:13px 14px}
+.artikel-titel{font-family:var(--serif);font-size:16px;color:var(--green);margin-bottom:9px;line-height:1.35}
+.artikel-text{font-size:13.5px;color:var(--ink-soft);line-height:1.72;margin-bottom:10px}
+.artikel-tipp{background:#F0EDE5;border-left:3px solid var(--gold);padding:7px 10px;border-radius:0 6px 6px 0;font-size:12px;color:var(--ink-soft)}
+.artikel-tipp::before{content:"Tipp: ";font-weight:600;color:var(--gold)}
+.artikel-dauer{margin-top:9px;font-size:11px;color:var(--stone);font-family:var(--sans)}
+.artikel-dauer::before{content:"📅 "}
+@media(prefers-color-scheme:dark){.artikel-tipp{background:var(--card)}}
+:root[data-theme="dark"] .artikel-tipp{background:var(--card)}
+/* MONATS-KACHELN */
+.mo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mo-tile{border-radius:10px;padding:10px 11px;background:var(--card);border:1px solid var(--border);position:relative}
+.mo-tile.mo-active{border:2px solid var(--gold);background:#FEFCF5}
+@media(prefers-color-scheme:dark){.mo-tile.mo-active{background:#1A1500}}
+:root[data-theme="dark"] .mo-tile.mo-active{background:#1A1500}
+.mo-now-badge{position:absolute;top:-8px;right:9px;background:var(--gold);color:#fff;font-size:8px;padding:2px 7px;border-radius:20px;letter-spacing:.5px;font-weight:700;font-family:var(--sans)}
+.mo-tile-name{font-size:12px;font-weight:600;color:var(--green);margin-bottom:3px;font-family:var(--sans)}
+.mo-tile-season{font-size:9px;color:var(--stone);margin-bottom:6px;font-family:var(--sans)}
+.mo-tasks{list-style:none;padding:0;display:flex;flex-direction:column;gap:2px}
+.mo-tasks li{font-size:10.5px;color:var(--ink-soft);line-height:1.4;padding-left:12px;position:relative;font-family:var(--sans)}
+.mo-tasks li::before{content:"·";position:absolute;left:2px;color:var(--burg);font-weight:700;font-size:14px;line-height:1.05}
+#aktuell{scroll-margin-top:44px}
 </style>
 </head>
 <body>
 
 <nav class="site-nav">
   <a href="#willkommen">Willkommen</a>
+  <a href="#aktuell">Aktuell</a>
   <a href="#jahresplan">Jahresplan</a>
   <a href="#melden">Etwas melden</a>
 </nav>
@@ -250,63 +281,16 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
+<section class="aktuell-section" id="aktuell">
+  <p class="section-eyebrow">Was machen wir gerade?</p>
+  <h2 class="section-heading">Aktuell im <span id="monat-name">…</span></h2>
+  <div class="artikel-grid" id="artikel-grid"></div>
+</section>
+
 <section class="jahres-section" id="jahresplan">
   <p class="section-eyebrow">Jahresplan Park & Garten</p>
-  <h2 class="section-heading">Was wir wann im Außenbereich tun</h2>
-  <div class="seasons-list">
-    <div class="season-card spring">
-      <div class="season-head">
-        <span class="season-emoji">🌱</span>
-        <span class="season-name">Frühling</span>
-        <span class="season-months">März – Mai</span>
-      </div>
-      <ul class="season-items">
-        <li>Frühjahrsputz — Laub und Winter wegräumen</li>
-        <li>Beete neu bepflanzen, Sträucher schneiden</li>
-        <li>Erste Rasenmahd der Saison</li>
-        <li>Gartenmöbel und Bänke aufstellen</li>
-      </ul>
-    </div>
-    <div class="season-card summer">
-      <div class="season-head">
-        <span class="season-emoji">☀️</span>
-        <span class="season-name">Sommer</span>
-        <span class="season-months">Juni – August</span>
-      </div>
-      <ul class="season-items">
-        <li>Regelmäßiges Mähen (wöchentlich)</li>
-        <li>Bewässerung bei Hitze und Trockenheit</li>
-        <li>Wege und Plätze sauber halten</li>
-        <li>Sicherheitscheck der Außenanlagen</li>
-      </ul>
-    </div>
-    <div class="season-card autumn">
-      <div class="season-head">
-        <span class="season-emoji">🍂</span>
-        <span class="season-name">Herbst</span>
-        <span class="season-months">September – November</span>
-      </div>
-      <ul class="season-items">
-        <li>Laubreinigung — täglich wenn nötig</li>
-        <li>Letzter Heckenschnitt der Saison</li>
-        <li>Gartenmöbel und Bänke einlagern</li>
-        <li>Wintervorbereitungen für Beete und Pflanzen</li>
-      </ul>
-    </div>
-    <div class="season-card winter">
-      <div class="season-head">
-        <span class="season-emoji">❄️</span>
-        <span class="season-name">Winter</span>
-        <span class="season-months">Dezember – Februar</span>
-      </div>
-      <ul class="season-items">
-        <li>Winterdienst — Schnee räumen und streuen</li>
-        <li>Alle Zugänge täglich sicher halten</li>
-        <li>Beleuchtung und Außenanlagen im Blick</li>
-        <li>Planung für das nächste Gartenjahr</li>
-      </ul>
-    </div>
-  </div>
+  <h2 class="section-heading">Alle Aufgaben auf einen Blick</h2>
+  <div class="mo-grid" id="mo-grid"></div>
 </section>
 
 <div class="main" id="melden">
@@ -678,6 +662,82 @@ function showOK(d,kat){
   document.getElementById('ok').classList.add('show');
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+const MONATE=[
+  {n:'Januar',s:'❄️ Hochwinter',a:['Bäume nach Sturmschäden prüfen','Obstbaumschnitt (frostfreie Tage)','Winterdienst: Streuen und Räumen','Jahresplanung, Saatgut bestellen']},
+  {n:'Februar',s:'❄️ Spätwinter',a:['Kernobst schneiden (Apfel, Birne)','Gartengeräte warten und schärfen','Erste Beetvorbereitung','Winterdienst weiterführen']},
+  {n:'März',s:'🌱 Frühling',a:['Erste Rasenmahd (ab 8 °C Bodentemp.)','Frühjahrsputz: Winterlaub entfernen','Stauden und Rosen zurückschneiden','Laubschutz von Beeten entfernen']},
+  {n:'April',s:'🌱 Frühling',a:['Rasen vertikutieren und nachsäen','Frühlings-Rasendünger (N-betont)','Bänke und Möbel aufstellen','Frühlingsblüher pflanzen']},
+  {n:'Mai',s:'🌱 Frühling',a:['Wöchentliche Rasenmahd beginnt','Heckenformschnitt (1. Runde)','Bewässerung prüfen und einrichten','Mulch auf Beete und Baumscheiben']},
+  {n:'Juni',s:'☀️ Frühsommer',a:['Kirschen ernten (je nach Sorte)','Wasserschosse an Obstbäumen kappen','Bewässerung bei Trockenheit','Wege: Moos und Unkraut entfernen']},
+  {n:'Juli',s:'☀️ Hochsommer',a:['Pflaumen und Mirabellen ernten','Rasen höher stehen lassen (Hitzeschutz)','Junge Bäume wässern (20–30 L/Stück)','Fallobst täglich aufsammeln']},
+  {n:'August',s:'☀️ Spätsommer',a:['Frühäpfel und Frühbirnen ernten','Steinobst nach Ernte schneiden','Fallobst täglich aufsammeln','Hecken: 2. Formschnitt (Hainbuche)','Rasen: Sommerdüngung','Junge Bäume bei Hitze wässern']},
+  {n:'September',s:'🍂 Frühherbst',a:['Äpfel und Birnen Haupternte','Rasen-Nachsaat (bester Zeitpunkt!)','Herbst-Rasendünger (Kalium-betont)','Aerifizieren und Vertikutieren','Letzter Heckenschnitt der Saison','Blumenzwiebeln pflanzen']},
+  {n:'Oktober',s:'🍂 Herbst',a:['Laubreinigung täglich','Spätäpfel und Quitten ernten','Gartenmöbel einlagern','Baumkontrolle: Standsicherheit']},
+  {n:'November',s:'🍂 Spätherbst',a:['Laubreinigung Hochsaison','Rasen in Ruhe lassen','Winterschutz empfindlicher Pflanzen','Streumittel auffüllen']},
+  {n:'Dezember',s:'❄️ Winter',a:['Winterdienst (Schnee und Eis)','Außenbeleuchtung kontrollieren','Bäume nach Sturm prüfen','Planung für nächste Saison']}
+];
+
+const ARTIKEL=[
+  {mo:1,ico:'✂️',kat:'Obstbäume',titel:'Obstbaumschnitt im Winter: Was, wann, wie?',text:'Kernobst (Apfel, Birne, Quitte) wird am besten zwischen Januar und März geschnitten, an frostfreien Tagen. Ohne Laub sieht man die Struktur des Baumes klarer und kann gezielter arbeiten. Ziel: Licht in die Krone bringen, Kreuzäste entfernen, altes Holz auslichten.',tipp:'Nie mehr als ein Drittel der Krone in einem Jahr entfernen.',dauer:'Januar – März'},
+  {mo:2,ico:'🔧',kat:'Vorbereitung',titel:'Gartengeräte: Jetzt schärfen und ölen lohnt sich',text:'Im Februar ist Gartenarbeit noch Mangelware — perfekt um die Geräte fit zu machen. Schaufeln und Spaten schärfen, Schnittwerkzeug reinigen und mit Öl behandeln, Sägeblätter prüfen. Ein scharfes Werkzeug arbeitet effizienter und hinterlässt sauberere Schnittstellen an Pflanzen.',tipp:'Reparaturbedarf jetzt bestellen — April und Mai sind die Stoßzeiten im Handel.',dauer:'Februar'},
+  {mo:3,ico:'🌱',kat:'Frühjahr',titel:'Frühjahrsputz: Warum das Winterlaub jetzt weg muss',text:'Laub das den Winter auf Beeten und unter Hecken lag, ist durchweicht und schimmlig. Pilzkrankheiten können sich daraus entwickeln und im Frühjahr auf Pflanzen überspringen. Außerdem blockiert es die ersten Triebe. Im März alles aufsammeln, bevor die Pflanzen richtig austreiben.',tipp:'Moos auf Wegen jetzt mit einem Schaber entfernen — im Sommer ist es doppelt so viel.',dauer:'März'},
+  {mo:4,ico:'🌿',kat:'Rasen',titel:'Vertikutieren: Was ist das und warum ist es so wichtig?',text:'Im Laufe des Winters bildet sich auf dem Rasen Rasenfilz — abgestorbenes Gras das sich verdichtet. Dieser verhindert, dass Wasser, Luft und Nährstoffe zu den Wurzeln gelangen. Das Vertikutiergerät schneidet diesen Filz auf und kratzt ihn heraus. Danach sieht der Rasen vorübergehend schlimm aus — erholt sich aber innerhalb von 2–3 Wochen eindrucksvoll.',tipp:'Nur bei Bodentemperatur über 8 °C vertikutieren — vorher schadet es mehr als es nützt.',dauer:'April'},
+  {mo:5,ico:'✂️',kat:'Hecken',titel:'Erster Heckenschnitt: Vor der Brutzeit — aber mit Augenmaß',text:'Der erste große Formschnitt des Jahres findet im Mai statt, bevor sich die meisten Vögel in Hecken einnisten. Gesetzlich ist Pflegeschnitt das ganze Jahr erlaubt, aber: Vor jedem Schnitt prüfen ob Nester vorhanden sind. Ist ein Nest aktiv besetzt, muss gewartet werden.',tipp:'Früh morgens schauen — Vögel sitzen dann noch auf dem Nest und sind leichter zu entdecken.',dauer:'Mai'},
+  {mo:6,ico:'🍒',kat:'Obstbäume',titel:'Kirschernte: Schnell handeln lohnt sich',text:'Kirschen sind reif, wenn sie tief dunkelrot und leicht nachgebend sind. Nach der Reife halten sie nur wenige Tage am Baum — dann platzen sie bei Regen auf. Deshalb möglichst in einem Durchgang ernten. Direkt danach kann der Sommerschnitt beginnen.',tipp:'Mit Stiel abpflücken — so halten die Kirschen länger frisch im Kühlschrank.',dauer:'Juni – Mitte Juli'},
+  {mo:7,ico:'🌿',kat:'Rasen',titel:'Rasen im Hochsommer: Höher lassen schützt die Wurzeln',text:'Bei extremer Hitze sollte der Rasen auf 5–6 cm stehen bleiben statt auf 3–4 cm. Die längeren Halme beschatten die Wurzeln und verringern die Bodenverdunstung deutlich. Mähen bei mehr als 30 °C stresst den Rasen zusätzlich — besser in die frühen Morgenstunden verlegen.',tipp:'Grasschnitt liegen lassen: Er wirkt als Mulch und düngt gleichzeitig.',dauer:'Juli – August'},
+  {mo:8,ico:'✂️',kat:'Hecken',titel:'Zweiter Heckenschnitt: Jetzt für ein ganzes Jahr in Form',text:'Hecken wie Hainbuche und Liguster brauchen nach dem ersten Schnitt im Frühjahr im Spätsommer einen zweiten Schnitt. Wer jetzt kürzt, gibt der Hecke noch Zeit zum Eindicken bevor die Wachstumsphase endet — und die Form bleibt den ganzen Winter erhalten. Schneidet man zu spät (nach Oktober), treibt die Hecke nicht mehr nach und der Schnitt sieht bis zum Frühjahr ungepflegt aus.',tipp:'Schnitt in Trapezform (oben schmaler) damit Licht die unteren Äste erreicht.',dauer:'August'},
+  {mo:8,ico:'🌳',kat:'Obstbäume',titel:'Sommerschnitt bei Pflaumen und Kirschen: Besser als im Winter',text:'Nach der Ernte ist der ideale Zeitpunkt für den Schnitt von Steinobst (Pflaumen, Zwetschgen, Kirschen). Im Sommer heilen die Wunden an warmen Tagen schnell zu — Pilze wie der Erreger der Silberkrankheit oder Monilia haben kaum eine Chance, einzudringen. Im Winter dagegen bleiben Schnittstellen wochenlang offen in der Kälte und Nässe.',tipp:'Nur nach der Ernte schneiden. Schnittstellen über 3 cm mit Baumwachs versiegeln.',dauer:'August – Mitte September'},
+  {mo:8,ico:'🍎',kat:'Fallobst',titel:'Fallobst täglich aufsammeln — drei gute Gründe',text:'Heruntergefallene Äpfel und Pflaumen auf Wegen sind eine echte Stolperfalle. Dazu kommen Wespen, die von vergärenden Früchten angezogen werden. Am wichtigsten: Fallobst ist der Hauptüberträger von Pilzkrankheiten wie Schorf und Monilia — liegt es liegen, übertragen sich die Sporen im nächsten Jahr auf den Baum.',tipp:'Fallobst nicht in den normalen Kompost — besser in den Restmüll oder separat entsorgen.',dauer:'August – Oktober'},
+  {mo:9,ico:'🌿',kat:'Rasen',titel:'September: Der wichtigste Monat für einen gesunden Rasen',text:'Der Rasen hat den Hochsommer hinter sich — jetzt ist die beste Zeit zum Regenerieren. Der Boden ist noch warm (ideal für Keimung), aber die Hitze lässt nach. Jetzt nachsäen, aerifizieren und mit Herbstdünger stärken. Was im September investiert wird, zahlt sich im nächsten Frühjahr aus.',tipp:'Nachgesäte Flächen 3–4 Wochen nicht betreten und gleichmäßig feucht halten.',dauer:'Ganzer September'},
+  {mo:9,ico:'💊',kat:'Rasen',titel:'Herbstdünger: Warum jetzt kein Stickstoff?',text:'Im Frühling bekommt der Rasen stickstoffreichen Dünger — der treibt das Wachstum an. Im Herbst ist das falsch: Stickstoff würde weiches, empfindliches Gras produzieren, das der erste Frost schädigt. Stattdessen braucht der Rasen Kalium: Das wirkt wie ein natürlicher Frostschutz in den Zellen und macht das Gras winterfest.',tipp:'Nur Herbst-Rasendünger verwenden — auf der Packung: Kalium-betont, wenig N.',dauer:'September'},
+  {mo:9,ico:'✂️',kat:'Hecken',titel:'Letzter Heckenschnitt 2026: Jetzt oder erst im März',text:'Ende September endet die gesetzliche Brutschutzzeit für Vögel. Der letzte Schnitt des Jahres sollte bis spätestens 30. September erfolgen. Danach wird nicht mehr geschnitten — die Hecke geht in natürlicher Form in den Winter. Nächste Möglichkeit: Ende März, wenn die neue Brutzeit noch nicht beginnt.',tipp:'Schnitt in den kühlen Morgenstunden — immer zuerst prüfen ob Vögel im Strauch sitzen.',dauer:'Bis 30. September'},
+  {mo:10,ico:'🍂',kat:'Laub',titel:'Laubreinigung: Täglich oder der Rasen leidet',text:'Eine geschlossene Laubschicht auf dem Rasen sperrt Licht und Luft — der Rasen beginnt darunter zu faulen. Auf Wegen ist nasses Laub rutschig und eine Unfallgefahr, besonders für ältere Bewohnerinnen. Laub auf Rasenflächen und Wegen täglich oder mindestens alle 2 Tage entfernen.',tipp:'Laub aus Obstbäumen nicht kompostieren — Pilzsporen überleben den normalen Kompost.',dauer:'Oktober – November'},
+  {mo:11,ico:'🛡️',kat:'Wintervorbereitung',titel:'Empfindliche Pflanzen schützen: Was muss eingepackt werden?',text:'Nicht alle Pflanzen überleben einen Berliner Winter ohne Hilfe. Kübelpflanzen kommen ins Lager. Stauden in Beeten bekommen eine Mulchschicht aus Laub oder Stroh. Winterharte Bäume und Sträucher brauchen in der Regel keinen Schutz — außer sie wurden erst in diesem Jahr gepflanzt.',tipp:'Junge Neupflanzungen (1. Winter) mit Jute-Vlies schützen.',dauer:'Oktober – November'},
+  {mo:12,ico:'❄️',kat:'Winterdienst',titel:'Winterdienst: Was ist Pflicht, was ist freiwillig?',text:'Schnee und Glatteis müssen werktags bis 7:00 Uhr, sonntags bis 9:00 Uhr geräumt und gestreut sein. Auf dem Stiftungsgelände gilt: Alle Zugänge, Wege und Treppen müssen sicher passierbar sein — das gilt besonders für ältere Bewohnerinnen, für die Glatteis eine ernste Gefahr ist.',tipp:'Streusplitt oder Sand bevorzugen — Salz schadet Bäumen, Rasen und Bodenplatten.',dauer:'Dezember – Februar'}
+];
+
+const MO_NAMEN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+function renderMoGrid(){
+  const g=document.getElementById('mo-grid');if(!g)return;
+  const mo=new Date().getMonth()+1;
+  g.innerHTML=MONATE.map((m,i)=>{
+    const idx=i+1,active=idx===mo;
+    return `<div class="mo-tile${active?' mo-active':''}">
+      ${active?'<div class="mo-now-badge">JETZT</div>':''}
+      <div class="mo-tile-name">${m.n}</div>
+      <div class="mo-tile-season">${m.s}</div>
+      <ul class="mo-tasks">${m.a.map(a=>`<li>${a}</li>`).join('')}</ul>
+    </div>`;
+  }).join('');
+}
+
+function renderArtikel(){
+  const g=document.getElementById('artikel-grid');
+  const mn=document.getElementById('monat-name');
+  if(!g)return;
+  const mo=new Date().getMonth()+1;
+  if(mn)mn.textContent=MO_NAMEN[mo-1];
+  const cur=ARTIKEL.filter(a=>a.mo===mo);
+  if(!cur.length){g.innerHTML=`<p style="color:var(--stone);font-size:14px;font-family:var(--sans)">Im ${MO_NAMEN[mo-1]} stehen keine besonderen Maßnahmen an.</p>`;return;}
+  g.innerHTML=cur.map(a=>`<div class="artikel-card">
+    <div class="artikel-head">
+      <span class="artikel-ico">${a.ico}</span>
+      <span class="artikel-kat">${a.kat}</span>
+      <span class="artikel-badge">${MO_NAMEN[a.mo-1]}</span>
+    </div>
+    <div class="artikel-body">
+      <div class="artikel-titel">${a.titel}</div>
+      <p class="artikel-text">${a.text}</p>
+      <div class="artikel-tipp">${a.tipp}</div>
+      <div class="artikel-dauer">${a.dauer}</div>
+    </div>
+  </div>`).join('');
+}
+
+renderArtikel();
+renderMoGrid();
 
 function resetAll(){
   location.reload();
