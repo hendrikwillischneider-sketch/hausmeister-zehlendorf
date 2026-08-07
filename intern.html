@@ -215,6 +215,19 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 .empty p{font-size:13.5px}
 .notice{padding:10px 13px;border-radius:9px;border-left:3px solid var(--yellow);background:var(--yellow-pale);font-size:12.5px;color:var(--yellow);margin-top:6px}
 
+/* NEU MODAL — KATEGORIE KACHELN */
+.n-kat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.n-kat-tile{padding:11px 10px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:left;transition:all .15s;display:flex;flex-direction:column;gap:3px;width:100%}
+.n-kat-tile:hover{border-color:var(--green-mid);background:var(--green-pale)}
+.n-kat-tile.active{border-color:var(--green-mid);background:var(--green-pale)}
+.nt-icon{font-size:20px;line-height:1}
+.nt-name{font-size:13px;font-weight:600;color:var(--text)}
+.nt-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+.n-kat-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.n-kat-hdr-icon{font-size:22px}
+.n-kat-hdr-title{font-size:15px;font-weight:600;color:var(--green-mid)}
+.n-back{background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:14px;text-decoration:underline;text-underline-offset:2px;font-family:inherit}
+
 /* PHOTO FS */
 .photo-fs{display:none;position:fixed;inset:0;background:#000;z-index:400;align-items:center;justify-content:center;cursor:pointer}
 .photo-fs.open{display:flex}
@@ -354,37 +367,117 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 <!-- FAB -->
 <button class="fab" id="fab" onclick="openNew()">+</button>
 
-<!-- NEUE SCHADENSMELDUNG MODAL -->
+<!-- NEUE MELDUNG MODAL -->
 <div class="overlay" id="ov-new" onclick="ovClose('ov-new',event)">
   <div class="modal">
     <div class="modal-hdr">
-      <h2>Neue Schadensmeldung</h2>
+      <h2 id="n-modal-title">Neuer Auftrag</h2>
       <button class="modal-close" onclick="ovClose('ov-new')">×</button>
     </div>
-    <label>Ort / Bereich</label>
-    <input type="text" id="n-ort" placeholder="z.B. Eingang Haus 1, Parkweg Nord …">
-    <label>Problem</label>
-    <textarea id="n-prob" placeholder="Was ist kaputt oder defekt?"></textarea>
-    <label>Priorität</label>
-    <select id="n-prio">
-      <option value="Hoch">🔴 Hoch — Sicherheitsrisiko</option>
-      <option value="Mittel" selected>🟡 Mittel — bald erledigen</option>
-      <option value="Niedrig">🟢 Niedrig — kann warten</option>
-    </select>
-    <label>Gemeldet von</label>
-    <select id="n-von">
-      <option value="Hendrik">Hendrik</option>
-      <option value="Frau Schwade">Frau Schwade</option>
-      <option value="Bewohner">Bewohnerin (direkt)</option>
-    </select>
-    <label>Fotos (optional)</label>
-    <div class="photo-zone" id="photo-zone">
-      📷 Foto aufnehmen oder auswählen
-      <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
+
+    <!-- SCHRITT 1: KATEGORIE -->
+    <div id="n-kat-picker">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Kategorie wählen:</div>
+      <div class="n-kat-grid">
+        <button class="n-kat-tile" onclick="setNewKat(this,'Schaden')">
+          <span class="nt-icon">🔧</span><span class="nt-name">Schaden melden</span>
+          <span class="nt-desc">Defekt, kaputt, nicht funktionierend</span>
+        </button>
+        <button class="n-kat-tile" onclick="setNewKat(this,'Möbel & Aufbau')">
+          <span class="nt-icon">🛋️</span><span class="nt-name">Möbel & Aufbau</span>
+          <span class="nt-desc">Aufbauen, abbauen, umstellen</span>
+        </button>
+        <button class="n-kat-tile" onclick="setNewKat(this,'Sperrmüll')">
+          <span class="nt-icon">🗑️</span><span class="nt-name">Sperrmüll</span>
+          <span class="nt-desc">Sperrige Gegenstände entsorgen</span>
+        </button>
+        <button class="n-kat-tile" onclick="setNewKat(this,'Kleiner Auftrag')">
+          <span class="nt-icon">🔨</span><span class="nt-name">Kleiner Auftrag</span>
+          <span class="nt-desc">Bild, Regal, Glühbirne …</span>
+        </button>
+      </div>
     </div>
-    <div class="photo-previews" id="photo-previews"></div>
-    <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Speichern</button>
-    <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
+
+    <!-- SCHRITT 2: FORMULAR -->
+    <div id="n-form" style="display:none">
+      <button class="n-back" onclick="backToKatPicker()">← Kategorie ändern</button>
+      <div class="n-kat-hdr">
+        <span class="n-kat-hdr-icon" id="n-kat-icon"></span>
+        <span class="n-kat-hdr-title" id="n-kat-title"></span>
+      </div>
+
+      <label>Bewohnerin <span style="text-transform:none;font-weight:400;font-size:11px">— optional, bei telefonischer Meldung</span></label>
+      <select id="n-bw"><option value="">Keine Zuordnung</option></select>
+
+      <!-- Schaden -->
+      <div id="nf-schaden" class="nf-cat">
+        <label>Wo ist das Problem?</label>
+        <input type="text" id="n-s-ort" placeholder="z. B. Treppenhaus, Eingang, Keller …">
+        <label>Was ist das Problem?</label>
+        <textarea id="n-s-prob" placeholder="So genau wie möglich beschreiben …"></textarea>
+      </div>
+
+      <!-- Möbel -->
+      <div id="nf-moebel" class="nf-cat" style="display:none">
+        <label>Was soll gemacht werden?</label>
+        <select id="n-m-art">
+          <option>Möbel aufbauen</option><option>Möbel abbauen</option>
+          <option>Möbel umstellen</option><option>Sonstiges</option>
+        </select>
+        <label>Was genau?</label>
+        <textarea id="n-m-was" placeholder="z. B. Kleiderschrank 2-türig, Kommode …"></textarea>
+        <label>Aktueller Standort</label>
+        <input type="text" id="n-m-wo" placeholder="z. B. Zimmer 3, Flur …">
+        <label>Neuer Standort <span style="text-transform:none;font-weight:400;font-size:11px">— falls umstellen</span></label>
+        <input type="text" id="n-m-ziel" placeholder="z. B. Wohnbereich, Schlafzimmer …">
+      </div>
+
+      <!-- Sperrmüll -->
+      <div id="nf-sperr" class="nf-cat" style="display:none">
+        <label>Was soll entsorgt werden?</label>
+        <textarea id="n-sp-was" placeholder="z. B. alter Sessel, ca. 80 cm breit …"></textarea>
+        <label>Wo steht es?</label>
+        <input type="text" id="n-sp-wo" placeholder="z. B. Zimmer 3, Keller, Flur …">
+        <label>Wunschtermin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+        <input type="text" id="n-sp-termin" placeholder="z. B. Ende August, KW 35 …">
+      </div>
+
+      <!-- Kleiner Auftrag -->
+      <div id="nf-auftrag" class="nf-cat" style="display:none">
+        <label>Was soll gemacht werden?</label>
+        <select id="n-a-art">
+          <option>Bild aufhängen</option><option>Regal montieren</option>
+          <option>Glühbirne wechseln</option><option>Gardine aufhängen</option>
+          <option>Sonstiges</option>
+        </select>
+        <label>Wo? (Zimmer / Bereich)</label>
+        <input type="text" id="n-a-wo" placeholder="z. B. Zimmer 3, Wohnzimmer …">
+        <label>Details <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+        <textarea id="n-a-details" placeholder="z. B. 3 Bilder, Haken vorhanden …"></textarea>
+      </div>
+
+      <!-- Gemeinsame Felder -->
+      <label>Priorität</label>
+      <select id="n-prio">
+        <option value="Hoch">🔴 Hoch — sofort erledigen</option>
+        <option value="Mittel" selected>🟡 Mittel — bald erledigen</option>
+        <option value="Niedrig">🟢 Niedrig — kann warten</option>
+      </select>
+      <label>Gemeldet von</label>
+      <select id="n-von">
+        <option value="Frau Schwade">Frau Schwade</option>
+        <option value="Hendrik">Hendrik</option>
+        <option value="Bewohner">Bewohnerin (direkt)</option>
+      </select>
+      <label>Foto <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+      <div class="photo-zone" id="photo-zone">
+        📷 Foto aufnehmen oder auswählen
+        <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
+      </div>
+      <div class="photo-previews" id="photo-previews"></div>
+      <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Auftrag speichern</button>
+      <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
+    </div>
   </div>
 </div>
 
@@ -615,7 +708,9 @@ function toSB(item) {
     kosten: item.kosten != null ? item.kosten : null,
     termin: item.termin || null,
     rueckmeldung: item.rueckmeldung || null,
-    kategorie: item.kategorie || null
+    kategorie: item.kategorie || null,
+    name: item.name || null,
+    zimmer: item.zimmer || null
   };
 }
 
@@ -983,17 +1078,59 @@ async function deleteBewohnerRow() {
 
 // ── NEUE MELDUNG ──────────────────────────────────────────────────────────────
 let newPhotos = [];
+let newKat = null;
+
 function openNew() {
   if (curView === 'bewohner') { openNewBw(); return; }
-
-  document.getElementById('n-ort').value = '';
-  document.getElementById('n-prob').value = '';
-  document.getElementById('n-prio').value = 'Mittel';
-  document.getElementById('n-von').value = 'Hendrik';
+  newKat = null;
   newPhotos = [];
   document.getElementById('photo-previews').innerHTML = '';
+  document.getElementById('n-prio').value = 'Mittel';
+  document.getElementById('n-von').value = 'Frau Schwade';
+  ['n-s-ort','n-s-prob','n-m-was','n-m-wo','n-m-ziel','n-sp-was','n-sp-wo','n-sp-termin','n-a-wo','n-a-details'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  // Bewohnerin-Dropdown befüllen
+  const dd = document.getElementById('n-bw');
+  dd.innerHTML = '<option value="">Keine Zuordnung</option>';
+  bewohnerListe.filter(b => b.aktiv)
+    .sort((a,b) => (parseInt(a.zimmer)||0)-(parseInt(b.zimmer)||0))
+    .forEach(b => {
+      const o = document.createElement('option');
+      o.value = b.name; o.textContent = `Zi. ${b.zimmer} — ${b.name}`;
+      dd.appendChild(o);
+    });
+  document.getElementById('n-kat-picker').style.display = 'block';
+  document.getElementById('n-form').style.display = 'none';
+  document.getElementById('n-modal-title').textContent = 'Neuer Auftrag';
+  document.querySelectorAll('.n-kat-tile').forEach(t => t.classList.remove('active'));
   ovOpen('ov-new');
-  setTimeout(() => document.getElementById('n-ort').focus(), 150);
+}
+
+function setNewKat(tile, kat) {
+  newKat = kat;
+  const icons = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
+  document.querySelectorAll('.n-kat-tile').forEach(t => t.classList.remove('active'));
+  tile.classList.add('active');
+  document.getElementById('n-kat-icon').textContent = icons[kat];
+  document.getElementById('n-kat-title').textContent = kat;
+  document.getElementById('n-modal-title').textContent = kat;
+  document.querySelectorAll('.nf-cat').forEach(el => el.style.display = 'none');
+  const map = {'Schaden':'nf-schaden','Möbel & Aufbau':'nf-moebel','Sperrmüll':'nf-sperr','Kleiner Auftrag':'nf-auftrag'};
+  document.getElementById(map[kat]).style.display = 'block';
+  document.getElementById('n-kat-picker').style.display = 'none';
+  document.getElementById('n-form').style.display = 'block';
+  setTimeout(() => {
+    const first = document.querySelector(`#${map[kat]} input[type=text], #${map[kat]} textarea`);
+    if (first) first.focus();
+  }, 150);
+}
+
+function backToKatPicker() {
+  newKat = null;
+  document.getElementById('n-kat-picker').style.display = 'block';
+  document.getElementById('n-form').style.display = 'none';
+  document.getElementById('n-modal-title').textContent = 'Neuer Auftrag';
 }
 
 function addPhotos(e) {
@@ -1015,9 +1152,36 @@ function renderPreviews() {
 function rmPhoto(i) { newPhotos.splice(i, 1); renderPreviews(); }
 
 async function saveNew() {
-  const ort = document.getElementById('n-ort').value.trim();
-  const prob = document.getElementById('n-prob').value.trim();
-  if (!ort || !prob) { alert('Bitte Ort und Problem angeben.'); return; }
+  if (!newKat) { alert('Bitte zuerst eine Kategorie wählen.'); return; }
+
+  let ort = '', prob = '';
+  if (newKat === 'Schaden') {
+    ort = document.getElementById('n-s-ort').value.trim();
+    prob = document.getElementById('n-s-prob').value.trim();
+    if (!ort || !prob) { alert('Bitte Ort und Problem angeben.'); return; }
+  } else if (newKat === 'Möbel & Aufbau') {
+    const art = document.getElementById('n-m-art').value;
+    const was = document.getElementById('n-m-was').value.trim();
+    const wo  = document.getElementById('n-m-wo').value.trim();
+    const ziel = document.getElementById('n-m-ziel').value.trim();
+    if (!was || !wo) { alert('Bitte Beschreibung und Standort angeben.'); return; }
+    ort = wo; prob = `${art}: ${was}${ziel ? ' → ' + ziel : ''}`;
+  } else if (newKat === 'Sperrmüll') {
+    const was = document.getElementById('n-sp-was').value.trim();
+    const wo  = document.getElementById('n-sp-wo').value.trim();
+    const ter = document.getElementById('n-sp-termin').value.trim();
+    if (!was || !wo) { alert('Bitte Gegenstand und Standort angeben.'); return; }
+    ort = wo; prob = was + (ter ? ` · Wunschtermin: ${ter}` : '');
+  } else if (newKat === 'Kleiner Auftrag') {
+    const art = document.getElementById('n-a-art').value;
+    const wo  = document.getElementById('n-a-wo').value.trim();
+    const det = document.getElementById('n-a-details').value.trim();
+    if (!wo) { alert('Bitte Ort/Zimmer angeben.'); return; }
+    ort = wo; prob = art + (det ? `: ${det}` : '');
+  }
+
+  const bwName = document.getElementById('n-bw').value;
+  const bwObj  = bewohnerListe.find(b => b.name === bwName);
 
   const btn = document.getElementById('save-btn');
   btn.textContent = 'Speichert …';
@@ -1029,8 +1193,11 @@ async function saveNew() {
     datum: td(),
     ort, prob,
     prio: document.getElementById('n-prio').value,
-    von: document.getElementById('n-von').value.trim() || 'Hendrik',
+    von: document.getElementById('n-von').value,
     status: 'Offen',
+    kategorie: newKat,
+    name: bwObj?.name || null,
+    zimmer: bwObj?.zimmer || null,
     erledigt: '', notiz: '',
     photos: [...newPhotos]
   };
