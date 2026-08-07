@@ -175,6 +175,20 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 .set-row .sub{font-size:12px;color:var(--text-muted)}
 .set-btn{padding:7px 15px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text)}
 
+/* BEWOHNER LIST */
+.bw-row{display:flex;align-items:center;gap:12px;padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.bw-row:last-child{border:none}
+.bw-row:active{background:var(--bg)}
+.bw-zimmer{width:42px;height:42px;border-radius:10px;background:var(--green-pale);color:var(--green-mid);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-align:center;line-height:1.2}
+.bw-info{flex:1;min-width:0}
+.bw-rname{font-size:14px;font-weight:500}
+.bw-rmeta{font-size:12px;color:var(--text-muted);margin-top:1px}
+.bw-toggle{width:40px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.bw-toggle.on{background:var(--green-mid)}
+.bw-toggle.off{background:var(--border)}
+.bw-toggle::after{content:'';position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.bw-toggle.on::after{left:19px}.bw-toggle.off::after{left:3px}
+
 /* SYNC BANNER */
 .sync-banner{background:var(--purple-pale);border-left:3px solid var(--purple);border-radius:9px;padding:10px 13px;font-size:12.5px;color:var(--purple);margin-bottom:10px;display:none}
 .sync-banner.show{display:block}
@@ -222,6 +236,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <button onclick="show('schaden',this)">Schäden</button>
   <button onclick="show('woche',this)">Wochenlog</button>
   <button onclick="show('plan',this)">Pflegeplan</button>
+  <button onclick="show('bewohner',this)">Bewohner</button>
   <button onclick="show('settings',this)">Einstellungen</button>
 </nav>
 
@@ -262,6 +277,16 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <div class="stat-row" id="pl-stats"></div>
   <div class="prog-wrap" id="pl-prog"></div>
   <div class="card" id="pl-list"></div>
+</div>
+
+<!-- BEWOHNER -->
+<div class="view" id="view-bewohner">
+  <div class="stat-row" id="bw-stats"></div>
+  <div class="sec">Bewohnerliste</div>
+  <div class="card" id="bw-list">
+    <div class="empty"><div class="empty-icon">⏳</div><p>Wird geladen …</p></div>
+  </div>
+  <div class="notice" style="margin-top:10px">Bewohner werden im öffentlichen Meldeformular zur Auswahl angezeigt. Inaktive Bewohner sind dort ausgeblendet.</div>
 </div>
 
 <!-- EINSTELLUNGEN -->
@@ -332,6 +357,23 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
     <div class="photo-previews" id="photo-previews"></div>
     <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Speichern</button>
     <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- BEWOHNER MODAL -->
+<div class="overlay" id="ov-bewohner" onclick="ovClose('ov-bewohner',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="bw-modal-title">Neue Bewohnerin</h2>
+      <button class="modal-close" onclick="ovClose('ov-bewohner')">×</button>
+    </div>
+    <label>Name</label>
+    <input type="text" id="bw-name" placeholder="z. B. Maria Müller">
+    <label>Zimmer</label>
+    <input type="text" id="bw-zimmer" placeholder="z. B. 14">
+    <button class="btn btn-primary" id="bw-save-btn" onclick="saveBewohner()">Speichern</button>
+    <button class="btn btn-ghost" onclick="ovClose('ov-bewohner')">Abbrechen</button>
+    <button class="btn btn-danger" id="bw-delete-btn" onclick="deleteBewohnerRow()" style="margin-top:8px;display:none">Bewohnerin löschen</button>
   </div>
 </div>
 
@@ -577,7 +619,7 @@ function show(id, btn) {
   document.getElementById('view-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
   curView = id;
-  document.getElementById('fab').style.display = (id==='schaden'||id==='dashboard') ? 'flex' : 'none';
+  document.getElementById('fab').style.display = (id==='schaden'||id==='dashboard'||id==='bewohner') ? 'flex' : 'none';
   render(id);
 }
 
@@ -590,6 +632,7 @@ function render(id) {
   if (id==='schaden') renderSchaden();
   if (id==='woche') renderWoche();
   if (id==='plan') renderPlan();
+  if (id==='bewohner') renderBewohner();
   if (id==='settings') updateLastSyncDisplay();
 }
 
@@ -732,9 +775,131 @@ function renderPlan() {
 }
 function selM(m) { planM = m; renderPlan(); }
 
+// ── BEWOHNER ──────────────────────────────────────────────────────────────────
+let bewohnerListe = [];
+let editingBwId = null;
+
+async function loadBewohnerList() {
+  try {
+    const res = await sbReq('bewohner?order=zimmer.asc&select=*');
+    if (!res.ok) throw new Error(res.status);
+    bewohnerListe = await res.json();
+  } catch {
+    bewohnerListe = JSON.parse(localStorage.getItem('hm_bewohner_cache') || '[]');
+  }
+  localStorage.setItem('hm_bewohner_cache', JSON.stringify(bewohnerListe));
+}
+
+function renderBewohner() {
+  const aktiv = bewohnerListe.filter(b => b.aktiv).length;
+  const inaktiv = bewohnerListe.length - aktiv;
+  document.getElementById('bw-stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${bewohnerListe.length}</div><div class="stat-lbl">Gesamt</div></div>
+    <div class="stat"><div class="stat-val">${aktiv}</div><div class="stat-lbl">Aktiv</div></div>
+    <div class="stat"><div class="stat-val">${inaktiv}</div><div class="stat-lbl">Inaktiv</div></div>`;
+
+  if (!bewohnerListe.length) {
+    document.getElementById('bw-list').innerHTML =
+      '<div class="empty"><div class="empty-icon">👥</div><p>Noch keine Bewohner angelegt.<br>Tippe auf + um zu beginnen.</p></div>';
+    return;
+  }
+
+  // Sort: aktive zuerst, dann nach Zimmernummer
+  const sorted = [...bewohnerListe].sort((a, b) => {
+    if (a.aktiv !== b.aktiv) return a.aktiv ? -1 : 1;
+    return (parseInt(a.zimmer) || 0) - (parseInt(b.zimmer) || 0) || a.zimmer.localeCompare(b.zimmer);
+  });
+
+  document.getElementById('bw-list').innerHTML = sorted.map(b => `
+    <div class="bw-row" onclick="openEditBw('${b.id}')">
+      <div class="bw-zimmer">Zi.<br>${b.zimmer}</div>
+      <div class="bw-info">
+        <div class="bw-rname" style="${!b.aktiv ? 'color:var(--text-muted);text-decoration:line-through' : ''}">${b.name}</div>
+        <div class="bw-rmeta">Zimmer ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''}</div>
+      </div>
+      <button class="bw-toggle ${b.aktiv ? 'on' : 'off'}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}')"></button>
+    </div>`).join('');
+}
+
+function openNewBw() {
+  editingBwId = null;
+  document.getElementById('bw-modal-title').textContent = 'Neue Bewohnerin';
+  document.getElementById('bw-name').value = '';
+  document.getElementById('bw-zimmer').value = '';
+  document.getElementById('bw-delete-btn').style.display = 'none';
+  ovOpen('ov-bewohner');
+  setTimeout(() => document.getElementById('bw-zimmer').focus(), 150);
+}
+
+function openEditBw(id) {
+  const b = bewohnerListe.find(x => x.id === id);
+  if (!b) return;
+  editingBwId = id;
+  document.getElementById('bw-modal-title').textContent = 'Bewohnerin bearbeiten';
+  document.getElementById('bw-name').value = b.name;
+  document.getElementById('bw-zimmer').value = b.zimmer;
+  document.getElementById('bw-delete-btn').style.display = 'block';
+  ovOpen('ov-bewohner');
+}
+
+async function saveBewohner() {
+  const name = document.getElementById('bw-name').value.trim();
+  const zimmer = document.getElementById('bw-zimmer').value.trim();
+  if (!name || !zimmer) { alert('Name und Zimmer angeben.'); return; }
+
+  const btn = document.getElementById('bw-save-btn');
+  btn.textContent = 'Speichert …'; btn.disabled = true;
+
+  try {
+    if (editingBwId) {
+      await sbReq(`bewohner?id=eq.${editingBwId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ name, zimmer })
+      });
+    } else {
+      await sbReq('bewohner', {
+        method: 'POST',
+        body: JSON.stringify({ name, zimmer, aktiv: true })
+      });
+    }
+    await loadBewohnerList();
+    renderBewohner();
+    ovClose('ov-bewohner');
+  } catch { alert('Fehler beim Speichern.'); }
+
+  btn.textContent = 'Speichern'; btn.disabled = false;
+}
+
+async function toggleBwAktiv(id) {
+  const b = bewohnerListe.find(x => x.id === id);
+  if (!b) return;
+  try {
+    await sbReq(`bewohner?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ aktiv: !b.aktiv })
+    });
+    await loadBewohnerList();
+    renderBewohner();
+  } catch { alert('Fehler beim Aktualisieren.'); }
+}
+
+async function deleteBewohnerRow() {
+  if (!editingBwId) return;
+  const b = bewohnerListe.find(x => x.id === editingBwId);
+  if (!confirm(`"${b?.name}" wirklich löschen?`)) return;
+  try {
+    await sbReq(`bewohner?id=eq.${editingBwId}`, { method: 'DELETE' });
+    await loadBewohnerList();
+    renderBewohner();
+    ovClose('ov-bewohner');
+  } catch { alert('Fehler beim Löschen.'); }
+}
+
 // ── NEUE MELDUNG ──────────────────────────────────────────────────────────────
 let newPhotos = [];
 function openNew() {
+  if (curView === 'bewohner') { openNewBw(); return; }
+
   document.getElementById('n-ort').value = '';
   document.getElementById('n-prob').value = '';
   document.getElementById('n-prio').value = 'Mittel';
@@ -930,6 +1095,7 @@ function clearLocal() {
 function init() {
   renderDash();
   loadFromSupabase();
+  loadBewohnerList();
 }
 
 // Check auth on page load
