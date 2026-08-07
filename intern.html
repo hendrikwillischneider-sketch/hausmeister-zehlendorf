@@ -282,6 +282,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <button onclick="show('bewohner',this)">Bewohner</button>
   <button onclick="show('settings',this)">Einstellungen</button>
   <button onclick="show('artikel',this)">Artikel</button>
+  <button onclick="show('baumkataster',this)">Baumkataster</button>
 </nav>
 
 <!-- ÜBERSICHT -->
@@ -461,6 +462,155 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
       <div style="display:flex;gap:8px;margin-top:4px">
         <button onclick="saveArtikel()" style="flex:1;background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">Speichern</button>
         <button onclick="closeArtikelForm()" style="padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:14px">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- BAUMKATASTER -->
+<div class="view" id="view-baumkataster">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)">Baumkataster</div>
+    <button onclick="openBaumForm(null)" style="background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer">+ Neuer Baum</button>
+  </div>
+
+  <!-- Filter -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="baum-bereich-filter"></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="baum-prio-filter"></div>
+
+  <!-- Summary-Zeile -->
+  <div id="baum-summary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:13px"></div>
+
+  <!-- Liste -->
+  <div id="baum-list"><p style="color:var(--text-muted);font-size:14px">Wird geladen …</p></div>
+</div>
+
+<!-- BAUM FORM MODAL -->
+<div class="overlay" id="baum-modal" style="display:none">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="baum-modal-title">Neuer Baum</div>
+      <button class="modal-close" onclick="closeBaumForm()">✕</button>
+    </div>
+    <div style="padding:14px;display:grid;gap:10px;max-height:70vh;overflow-y:auto">
+      <input type="hidden" id="baum-id">
+
+      <!-- Zeile 1: Nr + Art -->
+      <div style="display:grid;grid-template-columns:100px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Nr *</label>
+          <input type="text" id="baum-nr" class="inp" placeholder="B-016">
+        </div>
+        <div>
+          <label class="lbl">Deutscher Name *</label>
+          <input type="text" id="baum-name-de" class="inp" placeholder="z.B. Sand-Birke">
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Lateinischer Name</label>
+        <input type="text" id="baum-name-lat" class="inp" placeholder="Betula pendula">
+      </div>
+
+      <!-- Standort -->
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Bereich</label>
+          <select id="baum-bereich" class="inp">
+            <option value="Park">Park</option>
+            <option value="Innenhof">Innenhof</option>
+            <option value="Eingang">Eingang</option>
+            <option value="Parkrand">Parkrand</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Standort-Beschreibung</label>
+          <input type="text" id="baum-standort" class="inp" placeholder="Park, Nordseite nahe Eingang">
+        </div>
+      </div>
+
+      <!-- Maße -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Höhe (m)</label>
+          <input type="number" id="baum-hoehe" class="inp" step="0.5" placeholder="12">
+        </div>
+        <div>
+          <label class="lbl">Stamm-Ø (cm)</label>
+          <input type="number" id="baum-umfang" class="inp" placeholder="85">
+        </div>
+        <div>
+          <label class="lbl">Krone (m)</label>
+          <input type="number" id="baum-krone" class="inp" step="0.5" placeholder="6">
+        </div>
+        <div>
+          <label class="lbl">Alter (J.)</label>
+          <input type="number" id="baum-alter" class="inp" placeholder="40">
+        </div>
+      </div>
+
+      <!-- Zustand -->
+      <div style="display:grid;grid-template-columns:160px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Vitalität</label>
+          <select id="baum-vital" class="inp">
+            <option value="1">1 — Vital / gut</option>
+            <option value="2">2 — Leicht geschwächt</option>
+            <option value="3">3 — Stark geschwächt</option>
+            <option value="4">4 — Abgestorben</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Maßnahmen-Priorität</label>
+          <select id="baum-prio" class="inp">
+            <option value="keine">Keine</option>
+            <option value="beobachten">Beobachten</option>
+            <option value="dringend">Dringend</option>
+            <option value="sofort">Sofort</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Zustand / Schäden</label>
+        <textarea id="baum-zustand" class="inp" rows="2" style="resize:vertical" placeholder="Beschreibung von Schäden, Auffälligkeiten …"></textarea>
+      </div>
+
+      <!-- Maßnahmen -->
+      <div>
+        <label class="lbl">Nächste Maßnahme</label>
+        <input type="text" id="baum-naechste-massnahme" class="inp" placeholder="z.B. Kronenbegehung durch Fachbetrieb">
+      </div>
+      <div>
+        <label class="lbl">Letzte Maßnahme</label>
+        <input type="text" id="baum-letzte-massnahme" class="inp" placeholder="Was wurde zuletzt gemacht?">
+      </div>
+
+      <!-- Prüfdaten -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Letzte Prüfung</label>
+          <input type="date" id="baum-letzte-pruefung" class="inp">
+        </div>
+        <div>
+          <label class="lbl">Nächste Prüfung</label>
+          <input type="date" id="baum-naechste-pruefung" class="inp">
+        </div>
+      </div>
+
+      <!-- Sonstiges -->
+      <div>
+        <label class="lbl">Notizen</label>
+        <textarea id="baum-notizen" class="inp" rows="2" style="resize:vertical" placeholder="Interne Notizen …"></textarea>
+      </div>
+      <div>
+        <label class="lbl">Bild-Dateiname</label>
+        <input type="text" id="baum-bild" class="inp" placeholder="DSC00866b.jpg">
+      </div>
+
+      <div id="baum-err" style="color:var(--red);font-size:13px;display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="saveBaum()" style="flex:1;background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">Speichern</button>
+        <button onclick="closeBaumForm()" style="padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:14px">Abbrechen</button>
       </div>
     </div>
   </div>
@@ -944,6 +1094,7 @@ function render(id) {
   if (id==='dashboard') renderDash();
   if (id==='schaden') renderSchaden();
   if (id==='artikel') loadArtikel();
+  if (id==='baumkataster') loadBaeume();
   if (id==='woche') renderWoche();
   if (id==='plan') renderPlan();
   if (id==='bewohner') renderBewohner();
@@ -1721,6 +1872,190 @@ async function deleteArtikel(id) {
   loadArtikel();
 }
 
+
+// ── BAUMKATASTER ──────────────────────────────────────────────────────────────
+let _baumData = [], _baumBereich = 'Alle', _baumPrio = 'Alle';
+
+const VITAL_COL = {1:'#2d7a3a', 2:'#B8892A', 3:'#c0522a', 4:'#7A2430'};
+const VITAL_LBL = {1:'Vital', 2:'Geschwächt', 3:'Stark geschwächt', 4:'Abgestorben'};
+const PRIO_COL  = {keine:'var(--border)', beobachten:'#B8892A', dringend:'#c0522a', sofort:'#7A2430'};
+const PRIO_TXT  = {keine:'var(--text-muted)', beobachten:'#fff', dringend:'#fff', sofort:'#fff'};
+
+async function loadBaeume() {
+  try {
+    const r = await sbReq('baeume?order=baum_nr.asc&aktiv=eq.true');
+    _baumData = await r.json();
+    renderBaumFilters();
+    renderBaumSummary();
+    renderBaumList();
+  } catch(e) {
+    document.getElementById('baum-list').innerHTML = '<div class="empty"><p>Fehler beim Laden.</p></div>';
+  }
+}
+
+function renderBaumFilters() {
+  const bereiche = ['Alle', ...new Set(_baumData.map(b => b.standort_bereich).filter(Boolean))];
+  document.getElementById('baum-bereich-filter').innerHTML = bereiche.map(b =>
+    `<button class="chip${b===_baumBereich?' active':''}" onclick="setBaumBereich('${b}',this)">${b}</button>`
+  ).join('');
+  const prios = ['Alle','beobachten','dringend','sofort'];
+  document.getElementById('baum-prio-filter').innerHTML = prios.map(p =>
+    `<button class="chip${p===_baumPrio?' active':''}" onclick="setBaumPrio('${p}',this)"
+      style="${p!=='Alle'?`background:${PRIO_COL[p]};color:#fff;border-color:${PRIO_COL[p]}`:''}">
+      ${p==='Alle'?'Alle Prioritäten':p.charAt(0).toUpperCase()+p.slice(1)}</button>`
+  ).join('');
+}
+
+function renderBaumSummary() {
+  const total = _baumData.length;
+  const warn = _baumData.filter(b => b.massnahme_prioritaet !== 'keine').length;
+  const vital = _baumData.filter(b => b.vitalitaet >= 3).length;
+  document.getElementById('baum-summary').innerHTML =
+    `<span style="color:var(--text-muted)">🌳 ${total} Bäume erfasst</span>` +
+    (warn ? `<span style="color:#B8892A">⚠️ ${warn} mit Maßnahme</span>` : '') +
+    (vital ? `<span style="color:var(--red)">🔴 ${vital} geschwächt</span>` : '');
+}
+
+function setBaumBereich(b, btn) {
+  _baumBereich = b;
+  document.querySelectorAll('#baum-bereich-filter .chip').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderBaumList();
+}
+
+function setBaumPrio(p, btn) {
+  _baumPrio = p;
+  document.querySelectorAll('#baum-prio-filter .chip').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderBaumList();
+}
+
+function renderBaumList() {
+  let list = _baumData;
+  if (_baumBereich !== 'Alle') list = list.filter(b => b.standort_bereich === _baumBereich);
+  if (_baumPrio !== 'Alle') list = list.filter(b => b.massnahme_prioritaet === _baumPrio);
+  const el = document.getElementById('baum-list');
+  if (!list.length) { el.innerHTML = '<div class="empty"><p>Keine Einträge.</p></div>'; return; }
+  el.innerHTML = list.map(b => {
+    const vCol = VITAL_COL[b.vitalitaet] || '#888';
+    const pCol = PRIO_COL[b.massnahme_prioritaet] || 'var(--border)';
+    const pTxt = PRIO_TXT[b.massnahme_prioritaet] || 'var(--text-muted)';
+    const prioShow = b.massnahme_prioritaet && b.massnahme_prioritaet !== 'keine';
+    return `<div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+      <div style="min-width:48px;padding:4px 6px;border-radius:6px;background:var(--border);text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);margin-top:2px">${b.baum_nr}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${vCol};flex-shrink:0;display:inline-block"></span>
+          <span style="font-size:14px;font-weight:600;color:var(--text)">${b.name_de}</span>
+          ${prioShow ? `<span style="font-size:11px;padding:2px 7px;border-radius:8px;background:${pCol};color:${pTxt};font-weight:600">${b.massnahme_prioritaet}</span>` : ''}
+        </div>
+        <div style="font-size:12px;color:var(--text-muted)">${b.name_lat ? '<i>'+b.name_lat+'</i> · ' : ''}${b.standort_bereich||''}</div>
+        ${b.standort_beschreibung ? `<div style="font-size:12px;color:var(--text-muted);margin-top:1px">${b.standort_beschreibung}</div>` : ''}
+        ${b.zustand_notiz ? `<div style="font-size:12px;color:#B8892A;margin-top:3px">⚠️ ${b.zustand_notiz}</div>` : ''}
+        ${b.naechste_pruefung ? `<div style="font-size:11px;color:var(--text-muted);margin-top:3px">Nächste Prüfung: ${b.naechste_pruefung}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+        <button onclick='openBaumForm(${JSON.stringify(b).replace(/'/g,"\'")})'
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
+        <button onclick="deleteBaum('${b.id}')"
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openBaumForm(b) {
+  document.getElementById('baum-modal').style.display = 'flex';
+  document.getElementById('baum-modal-title').textContent = b ? 'Baum bearbeiten' : 'Neuer Baum';
+  document.getElementById('baum-err').style.display = 'none';
+  const f = (id, val) => { const el = document.getElementById(id); if(el) el.value = val||''; };
+  if (b) {
+    f('baum-id', b.id);
+    f('baum-nr', b.baum_nr);
+    f('baum-name-de', b.name_de);
+    f('baum-name-lat', b.name_lat);
+    f('baum-bereich', b.standort_bereich || 'Park');
+    f('baum-standort', b.standort_beschreibung);
+    f('baum-hoehe', b.hoehe_m);
+    f('baum-umfang', b.stamm_umfang_cm);
+    f('baum-krone', b.krone_dm_m);
+    f('baum-alter', b.alter_jahre);
+    f('baum-vital', b.vitalitaet || 1);
+    f('baum-prio', b.massnahme_prioritaet || 'keine');
+    f('baum-zustand', b.zustand_notiz);
+    f('baum-naechste-massnahme', b.naechste_massnahme);
+    f('baum-letzte-massnahme', b.letzte_massnahme);
+    f('baum-letzte-pruefung', b.letzte_pruefung);
+    f('baum-naechste-pruefung', b.naechste_pruefung);
+    f('baum-notizen', b.notizen);
+    f('baum-bild', b.bild);
+  } else {
+    ['baum-id','baum-nr','baum-name-de','baum-name-lat','baum-standort',
+     'baum-hoehe','baum-umfang','baum-krone','baum-alter','baum-zustand',
+     'baum-naechste-massnahme','baum-letzte-massnahme','baum-notizen','baum-bild',
+     'baum-letzte-pruefung','baum-naechste-pruefung'].forEach(id => f(id,''));
+    document.getElementById('baum-vital').value = '1';
+    document.getElementById('baum-prio').value = 'keine';
+    document.getElementById('baum-bereich').value = 'Park';
+    document.getElementById('baum-letzte-pruefung').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+function closeBaumForm() { document.getElementById('baum-modal').style.display = 'none'; }
+
+async function saveBaum() {
+  const nameDE = document.getElementById('baum-name-de').value.trim();
+  const nr = document.getElementById('baum-nr').value.trim();
+  if (!nameDE || !nr) {
+    const e = document.getElementById('baum-err');
+    e.textContent = 'Baum-Nr und Name sind Pflichtfelder.';
+    e.style.display = 'block';
+    return;
+  }
+  const id = document.getElementById('baum-id').value;
+  const g = id => document.getElementById(id).value.trim();
+  const num = id => { const v = parseFloat(g(id)); return isNaN(v) ? null : v; };
+  const payload = {
+    baum_nr: nr,
+    name_de: nameDE,
+    name_lat: g('baum-name-lat') || null,
+    standort_bereich: g('baum-bereich'),
+    standort_beschreibung: g('baum-standort') || null,
+    hoehe_m: num('baum-hoehe'),
+    stamm_umfang_cm: parseInt(g('baum-umfang')) || null,
+    krone_dm_m: num('baum-krone'),
+    alter_jahre: parseInt(g('baum-alter')) || null,
+    vitalitaet: parseInt(g('baum-vital')),
+    massnahme_prioritaet: g('baum-prio'),
+    zustand_notiz: g('baum-zustand') || null,
+    naechste_massnahme: g('baum-naechste-massnahme') || null,
+    letzte_massnahme: g('baum-letzte-massnahme') || null,
+    letzte_pruefung: g('baum-letzte-pruefung') || null,
+    naechste_pruefung: g('baum-naechste-pruefung') || null,
+    notizen: g('baum-notizen') || null,
+    bild: g('baum-bild') || null,
+    aktiv: true,
+  };
+  try {
+    if (id) {
+      await sbReq(`baeume?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
+    } else {
+      await sbReq('baeume', {method:'POST', body:JSON.stringify(payload)});
+    }
+    closeBaumForm();
+    loadBaeume();
+  } catch(e) {
+    const err = document.getElementById('baum-err');
+    err.textContent = 'Fehler: ' + e.message;
+    err.style.display = 'block';
+  }
+}
+
+async function deleteBaum(id) {
+  if (!confirm('Baum aus dem Kataster löschen?')) return;
+  await sbReq(`baeume?id=eq.${id}`, {method:'DELETE'});
+  loadBaeume();
+}
 </script>
 </body>
 </html>
