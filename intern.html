@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3c2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Hausmeister Intern — Sidonie-Scharfe-Stiftung</title>
+<style>
+:root{--green:#1a3c2e;--green-mid:#2d6a4f;--green-light:#40916c;--green-pale:#d8f3dc;--accent:#52b788;--red:#c1121f;--red-pale:#ffe5e5;--yellow:#e9a720;--yellow-pale:#fff3cd;--purple:#6b46c1;--purple-pale:#ede9fe;--gray:#6c757d;--bg:#f4f6f4;--card:#fff;--border:#dde5dd;--text:#1a2e1a;--text-muted:#607060;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.07),0 1px 8px rgba(0,0,0,.04)}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1a0f;--card:#162018;--border:#243326;--text:#e0ede0;--text-muted:#6a8f6a;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--purple-pale:#1e1535;--shadow:0 1px 4px rgba(0,0,0,.4)}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
+
+/* PASSWORD GATE */
+.pw-gate{position:fixed;inset:0;background:var(--green);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.pw-gate.hidden{display:none}
+.pw-box{background:var(--card);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.pw-box h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.pw-box p{font-size:13px;color:var(--text-muted);margin-bottom:18px}
+.pw-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:17px;background:var(--bg);color:var(--text);font-family:inherit}
+.pw-input:focus{outline:none;border-color:var(--accent)}
+.pw-btn{display:block;width:100%;padding:13px;background:var(--green-mid);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
+.pw-err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.pw-err.show{display:block}
+
+/* HEADER */
+.hdr{background:var(--green);color:#fff;padding:13px 16px 11px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.hdr-sub{font-size:11px;opacity:.65;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--red);color:#fff;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;opacity:0;transition:opacity .2s}
+.hdr-badge.show{opacity:1}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#52b788;flex-shrink:0}
+.sync-dot.syncing{background:var(--yellow);animation:pulse .8s infinite}
+.sync-dot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* NAV */
+nav{background:var(--card);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1;min-width:72px;padding:11px 6px;border:none;background:none;color:var(--text-muted);font-size:12.5px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
+nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);font-weight:600}
+
+/* VIEWS */
+.view{display:none;padding:12px 12px 88px;max-width:680px;margin:0 auto}
+.view.active{display:block}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow)}
+.stat-val{font-size:22px;font-weight:700;color:var(--green-mid)}
+.stat-val.warn{color:var(--red)}
+.stat-lbl{font-size:11px;color:var(--text-muted);margin-top:1px}
+
+/* SECTION LABEL */
+.sec{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+
+/* FILTER CHIPS */
+.chips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:5px 13px;border-radius:20px;border:1px solid var(--border);font-size:12.5px;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--text-muted);transition:all .15s}
+.chip.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:500}
+
+/* SCHADEN ITEM */
+.si{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:background .1s}
+.si:last-child{border:none}
+.si:active{background:var(--bg)}
+.si-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.d-hoch{background:var(--red)}.d-mittel{background:var(--yellow)}.d-niedrig{background:var(--accent)}.d-done{background:var(--border)}
+.si-body{flex:1;min-width:0}
+.si-title{font-size:14px;font-weight:500;line-height:1.3}
+.si-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.si-thumb{width:40px;height:40px;border-radius:7px;object-fit:cover;flex-shrink:0}
+.si-right{text-align:right;flex-shrink:0}
+
+/* BADGES */
+.badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.b-offen{background:var(--red-pale);color:var(--red)}
+.b-laufend{background:var(--yellow-pale);color:var(--yellow)}
+.b-done{background:var(--green-pale);color:var(--green-mid)}
+.b-hoch{background:var(--red-pale);color:var(--red)}
+.b-mittel{background:var(--yellow-pale);color:var(--yellow)}
+.b-niedrig{background:var(--green-pale);color:var(--green-mid)}
+.b-bewohner{background:var(--purple-pale);color:var(--purple);font-size:9.5px;margin-left:4px;padding:1px 6px}
+
+/* TASK ITEM */
+.ti{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.ti:last-child{border:none}
+.ti-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--bg)}
+.ti-check.on{background:var(--green-mid);border-color:var(--green-mid)}
+.ti-check.on::after{content:'✓';color:#fff;font-size:12px;font-weight:800}
+.ti-info{flex:1;min-width:0}
+.ti-name{font-size:14px;line-height:1.3}
+.ti-name.done{text-decoration:line-through;color:var(--text-muted)}
+.ti-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.ti-right{flex-shrink:0;text-align:right;min-width:44px}
+.ti-h{font-size:13px;font-weight:600;color:var(--text-muted)}
+
+/* PROGRESS */
+.prog-wrap{margin:4px 0 12px}
+.prog-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px}
+.prog-row span:last-child{font-weight:600;color:var(--text)}
+.prog{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.prog-fill.warn{background:var(--red)}
+
+/* WEEK BAR */
+.week-bar{background:var(--card);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow);margin-bottom:10px}
+.week-bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.week-bar h3{font-size:14px;font-weight:600}
+.week-bar span{font-size:13px;color:var(--green-mid);font-weight:700}
+.week-prog{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.week-prog-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .4s}
+
+/* MONTH TABS */
+.mtabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;margin-bottom:10px}
+.mtabs::-webkit-scrollbar{display:none}
+.mtab{padding:6px 13px;border-radius:20px;border:1px solid var(--border);font-size:13px;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--text-muted);transition:all .15s}
+.mtab.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff}
+
+/* CAT HEADER */
+.cat-hdr{padding:7px 13px 5px;background:var(--bg);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:16px;width:54px;height:54px;border-radius:50%;background:var(--green-mid);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:200;display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s}
+.fab:active{transform:scale(.92)}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:680px;padding:20px 16px 40px;max-height:92vh;overflow-y:auto}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-hdr h2{font-size:17px;font-weight:700}
+.modal-close{background:var(--bg);border:none;width:30px;height:30px;border-radius:50%;font-size:18px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* FORM */
+label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.3px}
+input[type=text],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:15px;background:var(--bg);color:var(--text);font-family:inherit;transition:border-color .15s}
+textarea{min-height:80px;resize:vertical}
+input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.btn{display:block;width:100%;padding:13px;border-radius:11px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px;transition:opacity .15s}
+.btn:active{opacity:.85}
+.btn-primary{background:var(--green-mid);color:#fff}
+.btn-ghost{background:var(--bg);color:var(--text-muted);border:1.5px solid var(--border)}
+.btn-danger{background:var(--red-pale);color:var(--red);border:none}
+.btn-sm{display:inline-block;width:auto;padding:7px 15px;font-size:13px;border-radius:8px}
+
+/* PHOTO */
+.photo-zone{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:13px;margin-top:4px;transition:border-color .15s;position:relative;overflow:hidden}
+.photo-zone:hover{border-color:var(--accent)}
+.photo-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.photo-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photo-thumb-wrap{position:relative;width:72px;height:72px}
+.photo-thumb-wrap img{width:72px;height:72px;border-radius:8px;object-fit:cover}
+.photo-rm{position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* DETAIL */
+.detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;align-items:center}
+.detail-row:last-child{border:none}
+.detail-row .lbl{font-size:12.5px;color:var(--text-muted)}
+.status-btns{display:flex;gap:7px;margin-top:10px;margin-bottom:4px}
+.status-btn{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12.5px;cursor:pointer;text-align:center;transition:all .15s}
+.status-btn.active{border-color:var(--green-mid);background:var(--green-pale);color:var(--green-mid);font-weight:600}
+.detail-photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.detail-photos img{width:80px;height:80px;border-radius:9px;object-fit:cover;cursor:pointer}
+
+/* SETTINGS */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid var(--border)}
+.set-row:last-child{border:none}
+.set-row .lbl{font-size:14px}
+.set-row .sub{font-size:12px;color:var(--text-muted)}
+.set-btn{padding:7px 15px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text)}
+
+/* SYNC BANNER */
+.sync-banner{background:var(--purple-pale);border-left:3px solid var(--purple);border-radius:9px;padding:10px 13px;font-size:12.5px;color:var(--purple);margin-bottom:10px;display:none}
+.sync-banner.show{display:block}
+
+/* EMPTY / NOTICE */
+.empty{text-align:center;padding:36px 20px;color:var(--text-muted)}
+.empty-icon{font-size:38px;margin-bottom:8px}
+.empty p{font-size:13.5px}
+.notice{padding:10px 13px;border-radius:9px;border-left:3px solid var(--yellow);background:var(--yellow-pale);font-size:12.5px;color:var(--yellow);margin-top:6px}
+
+/* PHOTO FS */
+.photo-fs{display:none;position:fixed;inset:0;background:#000;z-index:400;align-items:center;justify-content:center;cursor:pointer}
+.photo-fs.open{display:flex}
+.photo-fs img{max-width:100%;max-height:100%;object-fit:contain}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div class="pw-gate" id="pw-gate">
+  <div class="pw-box">
+    <h2>🌿 Hausmeister Intern</h2>
+    <p>Sidonie-Scharfe-Stiftung · Zehlendorf</p>
+    <label for="pw-in" style="text-transform:none;font-size:14px;color:var(--text);margin-top:0">Passwort</label>
+    <input type="password" class="pw-input" id="pw-in" placeholder="Passwort eingeben …" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Anmelden</button>
+    <div class="pw-err" id="pw-err">Falsches Passwort.</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <h1>🌿 Hausmeister Intern</h1>
+    <div class="hdr-sub">Sidonie-Scharfe-Stiftung · Zehlendorf</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-badge" id="open-badge">0 offen</div>
+    <div class="sync-dot" id="sync-dot" title="Sync-Status"></div>
+  </div>
+</div>
+
+<nav>
+  <button class="active" onclick="show('dashboard',this)">Übersicht</button>
+  <button onclick="show('schaden',this)">Schäden</button>
+  <button onclick="show('woche',this)">Wochenlog</button>
+  <button onclick="show('plan',this)">Pflegeplan</button>
+  <button onclick="show('settings',this)">Einstellungen</button>
+</nav>
+
+<!-- ÜBERSICHT -->
+<div class="view active" id="view-dashboard">
+  <div class="sync-banner" id="sync-banner">⚠️ Offline-Modus — Keine Verbindung zu Supabase. Daten aus lokalem Speicher.</div>
+  <div class="stat-row" id="ds-stats"></div>
+  <div class="sec">Offene Schadensmeldungen</div>
+  <div class="card" id="ds-schaden"></div>
+  <div class="sec">Diese Woche — Aufgaben</div>
+  <div class="card" id="ds-tasks"></div>
+</div>
+
+<!-- SCHÄDEN -->
+<div class="view" id="view-schaden">
+  <div class="stat-row" id="sc-stats"></div>
+  <div class="chips" id="sc-filter">
+    <button class="chip active" onclick="setFilter('Alle',this)">Alle</button>
+    <button class="chip" onclick="setFilter('Offen',this)">Offen</button>
+    <button class="chip" onclick="setFilter('In Bearbeitung',this)">In Bearbeitung</button>
+    <button class="chip" onclick="setFilter('Erledigt',this)">Erledigt</button>
+    <button class="chip" onclick="setFilter('Bewohner',this)">🟣 Bewohner-App</button>
+  </div>
+  <div class="card" id="sc-list"></div>
+</div>
+
+<!-- WOCHENLOG -->
+<div class="view" id="view-woche">
+  <div id="wl-bar"></div>
+  <div class="sec" id="wl-label"></div>
+  <div class="card" id="wl-list"></div>
+  <div class="notice">Haken werden pro Woche gespeichert. Nächste Woche beginnt die Liste neu.</div>
+</div>
+
+<!-- PFLEGEPLAN -->
+<div class="view" id="view-plan">
+  <div class="mtabs" id="pl-tabs"></div>
+  <div class="stat-row" id="pl-stats"></div>
+  <div class="prog-wrap" id="pl-prog"></div>
+  <div class="card" id="pl-list"></div>
+</div>
+
+<!-- EINSTELLUNGEN -->
+<div class="view" id="view-settings">
+  <div class="sec">Bewohner-Formular</div>
+  <div class="card">
+    <div class="set-row">
+      <div><div class="lbl">Öffentliches Meldeformular</div><div class="sub" id="melden-url">hendrikwillischneider-sketch.github.io/hausmeister-zehlendorf/</div></div>
+      <button class="set-btn" onclick="window.open('https://hendrikwillischneider-sketch.github.io/hausmeister-zehlendorf/','_blank')">Öffnen</button>
+    </div>
+  </div>
+
+  <div class="sec">Supabase-Sync</div>
+  <div class="card">
+    <div class="set-row"><div><div class="lbl">Status</div><div class="sub" id="sb-status-text">Wird geprüft …</div></div><button class="set-btn" onclick="syncNow()">Jetzt sync</button></div>
+    <div class="set-row"><div class="lbl">Letzte Synchronisation</div><span style="color:var(--text-muted);font-size:13px" id="last-sync-text">–</span></div>
+  </div>
+
+  <div class="sec">Sicherheit</div>
+  <div class="card">
+    <div class="set-row"><div><div class="lbl">Passwort ändern</div><div class="sub">Gilt für diese App</div></div><button class="set-btn" onclick="changePw()">Ändern</button></div>
+    <div class="set-row"><div class="lbl">Abmelden</div></div><button class="set-btn" style="color:var(--red)" onclick="logout()">Abmelden</button></div>
+  </div>
+
+  <div class="sec">Daten</div>
+  <div class="card">
+    <div class="set-row"><div><div class="lbl">Export</div><div class="sub">JSON-Backup herunterladen</div></div><button class="set-btn" onclick="exportData()">Exportieren</button></div>
+    <div class="set-row"><div><div class="lbl">Import</div><div class="sub">JSON-Backup einspielen</div></div><button class="set-btn" onclick="document.getElementById('imp').click()">Importieren</button></div>
+    <div class="set-row"><div><div class="lbl" style="color:var(--red)">Lokale Daten löschen</div><div class="sub">Supabase-Daten bleiben erhalten</div></div><button class="set-btn" style="color:var(--red)" onclick="clearLocal()">Löschen</button></div>
+  </div>
+
+  <div class="sec">Info</div>
+  <div class="card">
+    <div class="set-row"><div class="lbl">Version</div><span style="color:var(--text-muted);font-size:13px">2.0 · Aug 2026</span></div>
+    <div class="set-row"><div class="lbl">Datenspeicher</div><span style="color:var(--text-muted);font-size:13px">Supabase + Browser-Cache</span></div>
+    <div class="set-row"><div class="lbl">Objekt</div><span style="color:var(--text-muted);font-size:13px">~2.000 m² Grünfläche</span></div>
+  </div>
+  <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(event)">
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openNew()">+</button>
+
+<!-- NEUE SCHADENSMELDUNG MODAL -->
+<div class="overlay" id="ov-new" onclick="ovClose('ov-new',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>Neue Schadensmeldung</h2>
+      <button class="modal-close" onclick="ovClose('ov-new')">×</button>
+    </div>
+    <label>Ort / Bereich</label>
+    <input type="text" id="n-ort" placeholder="z.B. Eingang Haus 1, Parkweg Nord …">
+    <label>Problem</label>
+    <textarea id="n-prob" placeholder="Was ist kaputt oder defekt?"></textarea>
+    <label>Priorität</label>
+    <select id="n-prio">
+      <option value="Hoch">🔴 Hoch — Sicherheitsrisiko</option>
+      <option value="Mittel" selected>🟡 Mittel — bald erledigen</option>
+      <option value="Niedrig">🟢 Niedrig — kann warten</option>
+    </select>
+    <label>Gemeldet von</label>
+    <input type="text" id="n-von" value="Hendrik">
+    <label>Fotos (optional)</label>
+    <div class="photo-zone" id="photo-zone">
+      📷 Foto aufnehmen oder auswählen
+      <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
+    </div>
+    <div class="photo-previews" id="photo-previews"></div>
+    <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Speichern</button>
+    <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="ov-detail" onclick="ovClose('ov-detail',event)">
+  <div class="modal" id="detail-body"></div>
+</div>
+
+<!-- FOTO FULLSCREEN -->
+<div class="photo-fs" id="photo-fs" onclick="this.classList.remove('open')">
+  <img id="photo-fs-img" src="" alt="">
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SB_URL = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
+const SB_KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+const LOCAL_KEY = 'hm_v2';
+const AUTH_KEY = 'hm_auth';
+const SYNC_KEY = 'hm_last_sync';
+
+let PW = localStorage.getItem('hm_pw') || 'Zehlendorf26';
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function checkPw() {
+  const val = document.getElementById('pw-in').value;
+  if (val === PW) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('pw-gate').classList.add('hidden');
+    init();
+  } else {
+    document.getElementById('pw-err').classList.add('show');
+    document.getElementById('pw-in').value = '';
+    document.getElementById('pw-in').focus();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+function changePw() {
+  const np = prompt('Neues Passwort:');
+  if (!np || np.length < 4) { alert('Passwort muss mindestens 4 Zeichen haben.'); return; }
+  PW = np;
+  localStorage.setItem('hm_pw', np);
+  alert('Passwort geändert. Merke es dir gut!');
+}
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+let S = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null') || {schaden: [], wlog: {}, nr: 1};
+const saveLocal = () => localStorage.setItem(LOCAL_KEY, JSON.stringify(S));
+
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+let sbOnline = false;
+let lastSync = localStorage.getItem(SYNC_KEY) || null;
+
+async function sbReq(path, opts = {}) {
+  return fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+}
+
+function setSyncStatus(state) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sb-status-text');
+  dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  if (txt) {
+    if (state === 'ok') txt.textContent = '✅ Verbunden · Supabase';
+    else if (state === 'error') txt.textContent = '❌ Offline · Lokaler Modus';
+    else txt.textContent = '🔄 Synchronisiere …';
+  }
+  document.getElementById('sync-banner').classList.toggle('show', state === 'error');
+  sbOnline = state === 'ok';
+}
+
+async function loadFromSupabase() {
+  setSyncStatus('syncing');
+  try {
+    const res = await sbReq('schaden?order=created_at.desc&limit=500&select=*');
+    if (!res.ok) throw new Error(res.status);
+    const remote = await res.json();
+    // Map Supabase records to local format
+    const remoteLocal = remote.map(r => fromSB(r));
+    // Merge: remote records replace local ones by sb_id; local-only records stay
+    const localOnlyIds = new Set(S.schaden.filter(s => !s.sb_id).map(s => s.id));
+    const localOnly = S.schaden.filter(s => localOnlyIds.has(s.id));
+    S.schaden = [...remoteLocal, ...localOnly];
+    // Update counter
+    const maxNr = S.schaden.reduce((m, s) => Math.max(m, s.nr || 0), 0);
+    if (maxNr >= S.nr) S.nr = maxNr + 1;
+    saveLocal();
+    setSyncStatus('ok');
+    lastSync = new Date().toISOString();
+    localStorage.setItem(SYNC_KEY, lastSync);
+    updateLastSyncDisplay();
+    render(curView);
+  } catch (e) {
+    console.warn('Supabase load failed:', e);
+    setSyncStatus('error');
+  }
+}
+
+async function syncNow() {
+  await loadFromSupabase();
+  // Also push local-only records to Supabase
+  const localOnly = S.schaden.filter(s => !s.sb_id);
+  for (const item of localOnly) {
+    await pushToSB(item);
+  }
+  render(curView);
+}
+
+async function pushToSB(item) {
+  try {
+    const payload = toSB(item);
+    const res = await sbReq('schaden', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) return;
+    const [created] = await res.json();
+    item.sb_id = created.id;
+    saveLocal();
+  } catch {}
+}
+
+async function updateSBStatus(item) {
+  if (!item.sb_id) return;
+  try {
+    await sbReq(`schaden?id=eq.${item.sb_id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: item.status,
+        erledigt_am: item.erledigt || null,
+        notiz: item.notiz || null,
+        prio: item.prio
+      })
+    });
+  } catch {}
+}
+
+async function deleteSBRecord(sbId) {
+  if (!sbId) return;
+  try {
+    await sbReq(`schaden?id=eq.${sbId}`, { method: 'DELETE' });
+  } catch {}
+}
+
+function fromSB(r) {
+  return {
+    id: r.id,
+    sb_id: r.id,
+    nr: r.nr || 0,
+    datum: r.datum || '',
+    ort: r.ort || '',
+    prob: r.problem || '',
+    prio: r.prio || 'Mittel',
+    von: r.von || 'Bewohner',
+    name: r.name || null,
+    zimmer: r.zimmer || null,
+    status: r.status || 'Offen',
+    erledigt: r.erledigt_am || '',
+    notiz: r.notiz || '',
+    photos: r.foto ? [r.foto] : [],
+    created_at: r.created_at
+  };
+}
+
+function toSB(item) {
+  return {
+    datum: item.datum || td(),
+    ort: item.ort,
+    problem: item.prob,
+    prio: item.prio,
+    von: item.von,
+    status: item.status,
+    erledigt_am: item.erledigt || null,
+    notiz: item.notiz || null,
+    foto: (item.photos && item.photos[0]) || null
+  };
+}
+
+function updateLastSyncDisplay() {
+  const el = document.getElementById('last-sync-text');
+  if (!el || !lastSync) return;
+  el.textContent = new Date(lastSync).toLocaleString('de-DE', {
+    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+  }) + ' Uhr';
+}
+
+// ── PFLEGEPLAN ────────────────────────────────────────────────────────────────
+const TASKS = [
+  {cat:'Rasen',name:'Rasen mähen',p:'P',m:[8,9,10,11],h:1.5,note:'Aug/Sep: 1–2×/Woche · Okt/Nov: alle 2 Wochen',occ:{8:3,9:4,10:2,11:1}},
+  {cat:'Rasen',name:'Rasenkanten trimmen',p:'P',m:[8,9,10],h:1,note:'Im Anschluss ans Mähen',occ:{8:1,9:2,10:2}},
+  {cat:'Rasen',name:'Bewässerung bei Hitze',p:'O',m:[8,9],h:1,note:'Morgens wässern',occ:{8:4,9:2}},
+  {cat:'Rasen',name:'Herbstdünger ausbringen',p:'P',m:[9],h:1,note:'Mitte September, Kalium-NPK',occ:{9:1}},
+  {cat:'Wege & Plätze',name:'Wege fegen & reinigen',p:'P',m:[8,9,10,11,12],h:1.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Wege & Plätze',name:'Abfälle aufsammeln',p:'P',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Wege & Plätze',name:'Eingangsbereich & Blumenbeete',p:'P',m:[8,9,10],h:0.5,note:'Gepflegtes Erscheinungsbild',occ:{8:4,9:4,10:2}},
+  {cat:'Wege & Plätze',name:'Unkraut in Fugen entfernen',p:'P',m:[8,9,10],h:1,note:'Gehwege und Pflaster',occ:{8:1,9:1,10:1}},
+  {cat:'Wege & Plätze',name:'Müllstandplatz kontrollieren',p:'P',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Hecken & Gehölze',name:'Heckenschnitt (letzter)',p:'P',m:[9],h:4,note:'Bis Ende September',occ:{9:1}},
+  {cat:'Hecken & Gehölze',name:'Strauchschnitt (leicht)',p:'O',m:[11],h:3,note:'Kein Starkschnitt',occ:{11:1}},
+  {cat:'Hecken & Gehölze',name:'Baumkontrolle nach Sturm',p:'P',m:[10,11,12],h:1,note:'Kranke Äste melden',occ:{10:1,11:1,12:1}},
+  {cat:'Beete',name:'Unkraut jäten',p:'P',m:[8,9,10],h:1,note:'Beete und Rahmenbepflanzung',occ:{8:2,9:2,10:2}},
+  {cat:'Beete',name:'Beete winterfest machen',p:'P',m:[10],h:3,note:'Stauden schneiden, Mulch',occ:{10:1}},
+  {cat:'Laub',name:'Laub entfernen und entsorgen',p:'P',m:[10,11,12],h:2,note:'⚠️ Nasses Laub = Rutschgefahr!',occ:{10:3,11:5,12:2}},
+  {cat:'Sitzbänke',name:'Bänke & Möbel reinigen',p:'P',m:[8,9,10,11],h:0.5,note:'Alle 2 Wochen',occ:{8:2,9:2,10:1,11:1}},
+  {cat:'Sitzbänke',name:'Bänke auf Schäden prüfen',p:'P',m:[8,9,10,11],h:0.5,note:'Risse, Schrauben, Splitter',occ:{8:1,9:1,10:1,11:1}},
+  {cat:'Sitzbänke',name:'Bänke und Möbel einlagern',p:'P',m:[11],h:1,note:'Vor Frost schützen',occ:{11:1}},
+  {cat:'Winterdienst',name:'Winterdienst vorbereiten',p:'P',m:[11],h:2,note:'Streugut und Geräte prüfen',occ:{11:1}},
+  {cat:'Winterdienst',name:'Schnee räumen & streuen',p:'P',m:[12],h:2,note:'Bis 7:00 Uhr werktags',occ:{12:4}},
+  {cat:'Kontrollen',name:'Bestandsaufnahme Parkanlage',p:'P',m:[8],h:4,note:'Erster Arbeitstag — dokumentieren & fotografieren',occ:{8:1}},
+  {cat:'Kontrollen',name:'Außenbeleuchtung kontrollieren',p:'P',m:[8,9,10,11,12],h:0.5,note:'Monatlich',occ:{8:1,9:1,10:1,11:1,12:1}},
+  {cat:'Kontrollen',name:'Spielgeräte Sichtkontrolle',p:'P',m:[8,9,10,11,12],h:1,note:'Mängel sofort melden',occ:{8:1,9:1,10:1,11:1,12:1}},
+  {cat:'Kontrollen',name:'Gartengeräte einlagern & warten',p:'P',m:[11],h:3,note:'Reinigen, ölen, trocken lagern',occ:{11:1}},
+];
+const WPM = {8:2.5,9:4,10:4,11:4,12:4};
+const MN = {8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const cm = () => new Date().getMonth() + 1;
+const td = () => new Date().toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+function wk() { const d=new Date(),dw=d.getDay()||7,m=new Date(d); m.setDate(d.getDate()-(dw-1)); return m.toISOString().slice(0,10); }
+function kw() { const d=new Date(),j4=new Date(d.getFullYear(),0,4),sw=new Date(j4); sw.setDate(j4.getDate()-(j4.getDay()||7)+1); return Math.ceil((d-sw)/(7*864e5))+1; }
+const dc = p => p==='Hoch'?'d-hoch':p==='Mittel'?'d-mittel':'d-niedrig';
+const bc = s => s==='Offen'?'b-offen':s==='In Bearbeitung'?'b-laufend':'b-done';
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+let curView = 'dashboard';
+function show(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  curView = id;
+  document.getElementById('fab').style.display = (id==='schaden'||id==='dashboard') ? 'flex' : 'none';
+  render(id);
+}
+
+function ovOpen(id) { document.getElementById(id).classList.add('open'); }
+function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(id) {
+  if (id==='dashboard') renderDash();
+  if (id==='schaden') renderSchaden();
+  if (id==='woche') renderWoche();
+  if (id==='plan') renderPlan();
+  if (id==='settings') updateLastSyncDisplay();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDash() {
+  const offen = S.schaden.filter(s => s.status==='Offen').length;
+  const laufend = S.schaden.filter(s => s.status==='In Bearbeitung').length;
+  const m = cm(), w = wk(), log = S.wlog[w] || {};
+  const mt = TASKS.filter(t => t.m.includes(m));
+  const done = mt.filter(t => log[t.name]).length;
+
+  const badge = document.getElementById('open-badge');
+  badge.textContent = offen + ' offen';
+  badge.className = 'hdr-badge' + (offen > 0 ? ' show' : '');
+
+  document.getElementById('ds-stats').innerHTML = `
+    <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Schäden offen</div></div>
+    <div class="stat"><div class="stat-val">${laufend}</div><div class="stat-lbl">In Bearbeitung</div></div>
+    <div class="stat"><div class="stat-val">${done}/${mt.length}</div><div class="stat-lbl">Aufgaben ✓</div></div>`;
+
+  const offenList = S.schaden.filter(s => s.status !== 'Erledigt').slice(0, 4);
+  document.getElementById('ds-schaden').innerHTML = offenList.length
+    ? offenList.map(s => siHTML(s)).join('')
+    : '<div class="empty"><div class="empty-icon">✅</div><p>Keine offenen Schäden</p></div>';
+
+  const weekTasks = mt.filter(t => t.p === 'P').slice(0, 6);
+  document.getElementById('ds-tasks').innerHTML = weekTasks.map(t => `
+    <div class="ti">
+      <div class="ti-check${log[t.name] ? ' on' : ''}" onclick="toggle('${t.name}')"></div>
+      <div class="ti-info"><div class="ti-name${log[t.name] ? ' done' : ''}">${t.name}</div><div class="ti-meta">${t.note}</div></div>
+    </div>`).join('');
+}
+
+function siHTML(s) {
+  const bewohnerBadge = s.von === 'Bewohner' ? '<span class="badge b-bewohner">Bewohner-App</span>' : '';
+  const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Zi. ' + s.zimmer : ''}` : '';
+  return `<div class="si" onclick="openDetail('${s.id}')">
+    <div class="si-dot ${s.status==='Erledigt'?'d-done':dc(s.prio)}"></div>
+    <div class="si-body">
+      <div class="si-title">${s.prob}${bewohnerBadge}</div>
+      <div class="si-meta">${s.ort} · ${s.datum || ''}${nameInfo}</div>
+    </div>
+    ${s.photos&&s.photos[0] ? `<img class="si-thumb" src="${s.photos[0]}" alt="">` : ''}
+    <div class="si-right"><span class="badge ${bc(s.status)}">${s.status}</span><div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">#${s.nr||'–'}</div></div>
+  </div>`;
+}
+
+// ── SCHADEN ───────────────────────────────────────────────────────────────────
+let schadenFilter = 'Alle';
+function setFilter(f, btn) {
+  schadenFilter = f;
+  document.querySelectorAll('.chips .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSchaden();
+}
+function renderSchaden() {
+  const offen = S.schaden.filter(s => s.status==='Offen').length;
+  const laufend = S.schaden.filter(s => s.status==='In Bearbeitung').length;
+  const done = S.schaden.filter(s => s.status==='Erledigt').length;
+  document.getElementById('sc-stats').innerHTML = `
+    <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Offen</div></div>
+    <div class="stat"><div class="stat-val">${laufend}</div><div class="stat-lbl">In Bearbeitung</div></div>
+    <div class="stat"><div class="stat-val">${done}</div><div class="stat-lbl">Erledigt</div></div>`;
+
+  const prio = {Hoch:0,Mittel:1,Niedrig:2};
+  let list = [...S.schaden].sort((a, b) => {
+    if (a.status==='Erledigt' && b.status!=='Erledigt') return 1;
+    if (b.status==='Erledigt' && a.status!=='Erledigt') return -1;
+    return (prio[a.prio]||2) - (prio[b.prio]||2);
+  });
+  if (schadenFilter === 'Bewohner') list = list.filter(s => s.von === 'Bewohner');
+  else if (schadenFilter !== 'Alle') list = list.filter(s => s.status === schadenFilter);
+
+  document.getElementById('sc-list').innerHTML = list.length
+    ? list.map(s => siHTML(s)).join('')
+    : '<div class="empty"><div class="empty-icon">🌿</div><p>Keine Einträge</p></div>';
+}
+
+// ── WOCHENLOG ─────────────────────────────────────────────────────────────────
+function renderWoche() {
+  const m = cm(), w = wk(), log = S.wlog[w] || {};
+  const mt = TASKS.filter(t => t.m.includes(m));
+  const done = mt.filter(t => log[t.name]).length;
+  const pct = mt.length ? Math.round(done / mt.length * 100) : 0;
+  const d = new Date(), dow = d.getDay() || 7;
+  const mon = new Date(d); mon.setDate(d.getDate() - (dow - 1));
+  const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+  const fmt = x => x.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit'});
+
+  document.getElementById('wl-bar').innerHTML = `
+    <div class="week-bar">
+      <div class="week-bar-top"><h3>KW ${kw()} · ${fmt(mon)}–${fmt(fri)}</h3><span>${done}/${mt.length} erledigt</span></div>
+      <div class="week-prog"><div class="week-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  document.getElementById('wl-label').textContent = MN[m] + ' 2026';
+
+  const by = {};
+  mt.forEach(t => { if (!by[t.cat]) by[t.cat] = []; by[t.cat].push(t); });
+  document.getElementById('wl-list').innerHTML = Object.entries(by).map(([cat, items]) => `
+    <div class="cat-hdr">${cat}</div>
+    ${items.map(t => `<div class="ti">
+      <div class="ti-check${log[t.name] ? ' on' : ''}" onclick="toggle('${t.name}')"></div>
+      <div class="ti-info"><div class="ti-name${log[t.name] ? ' done' : ''}">${t.name}</div><div class="ti-meta">${t.note}</div></div>
+      <div class="ti-right"><div class="ti-h">${(t.occ[m]||0)*t.h}h</div></div>
+    </div>`).join('')}`).join('');
+}
+
+function toggle(name) {
+  const w = wk();
+  if (!S.wlog[w]) S.wlog[w] = {};
+  S.wlog[w][name] = !S.wlog[w][name];
+  saveLocal();
+  render(curView);
+}
+
+// ── PFLEGEPLAN ────────────────────────────────────────────────────────────────
+let planM = Math.min(12, Math.max(8, cm()));
+function renderPlan() {
+  document.getElementById('pl-tabs').innerHTML = [8,9,10,11,12].map(m => `
+    <button class="mtab${m===planM?' active':''}" onclick="selM(${m})">${MN[m]}</button>`).join('');
+  const mt = TASKS.filter(t => t.m.includes(planM));
+  const ph = mt.reduce((s, t) => (t.occ[planM]||0)*t.h+s, 0) / (WPM[planM] || 4);
+  const pc = Math.round(ph / 40 * 100);
+  document.getElementById('pl-stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${ph.toFixed(1)}h</div><div class="stat-lbl">Park Ø/Woche</div></div>
+    <div class="stat"><div class="stat-val">${(40-ph).toFixed(1)}h</div><div class="stat-lbl">Gebäude Ø/Woche</div></div>
+    <div class="stat"><div class="stat-val">${mt.filter(t=>t.p==='P').length}</div><div class="stat-lbl">Pflichtaufgaben</div></div>`;
+  document.getElementById('pl-prog').innerHTML = `
+    <div class="prog-row"><span>Anteil Parkpflege</span><span>${pc}%</span></div>
+    <div class="prog"><div class="prog-fill${pc>70?' warn':''}" style="width:${Math.min(100,pc)}%"></div></div>`;
+  const by = {};
+  mt.forEach(t => { if (!by[t.cat]) by[t.cat] = []; by[t.cat].push(t); });
+  document.getElementById('pl-list').innerHTML = Object.entries(by).map(([cat, items]) => `
+    <div class="cat-hdr">${cat}</div>
+    ${items.map(t => { const occ=t.occ[planM]||0,tot=+(occ*t.h).toFixed(1); return `
+      <div class="ti" style="cursor:default">
+        <div class="ti-info"><div class="ti-name">${t.name}</div><div class="ti-meta">${t.note}</div></div>
+        <div class="ti-right"><div class="ti-h">${tot>0?tot+'h':'–'}</div><div style="font-size:10.5px;color:var(--text-muted)">${occ>1?occ+'×':occ===1?'1×':'–'}</div></div>
+      </div>`; }).join('')}`).join('');
+}
+function selM(m) { planM = m; renderPlan(); }
+
+// ── NEUE MELDUNG ──────────────────────────────────────────────────────────────
+let newPhotos = [];
+function openNew() {
+  document.getElementById('n-ort').value = '';
+  document.getElementById('n-prob').value = '';
+  document.getElementById('n-prio').value = 'Mittel';
+  document.getElementById('n-von').value = 'Hendrik';
+  newPhotos = [];
+  document.getElementById('photo-previews').innerHTML = '';
+  ovOpen('ov-new');
+  setTimeout(() => document.getElementById('n-ort').focus(), 150);
+}
+
+function addPhotos(e) {
+  const files = [...e.target.files];
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = ev => { newPhotos.push(ev.target.result); renderPreviews(); };
+    r.readAsDataURL(f);
+  });
+  e.target.value = '';
+}
+function renderPreviews() {
+  document.getElementById('photo-previews').innerHTML = newPhotos.map((p, i) => `
+    <div class="photo-thumb-wrap">
+      <img src="${p}" alt="">
+      <button class="photo-rm" onclick="rmPhoto(${i})">×</button>
+    </div>`).join('');
+}
+function rmPhoto(i) { newPhotos.splice(i, 1); renderPreviews(); }
+
+async function saveNew() {
+  const ort = document.getElementById('n-ort').value.trim();
+  const prob = document.getElementById('n-prob').value.trim();
+  if (!ort || !prob) { alert('Bitte Ort und Problem angeben.'); return; }
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Speichert …';
+  btn.disabled = true;
+
+  const item = {
+    id: Date.now().toString(),
+    nr: S.nr++,
+    datum: td(),
+    ort, prob,
+    prio: document.getElementById('n-prio').value,
+    von: document.getElementById('n-von').value.trim() || 'Hendrik',
+    status: 'Offen',
+    erledigt: '', notiz: '',
+    photos: [...newPhotos]
+  };
+
+  // Try Supabase first
+  if (sbOnline) {
+    try {
+      const payload = toSB(item);
+      const res = await sbReq('schaden', { method: 'POST', body: JSON.stringify(payload) });
+      if (res.ok) {
+        const [created] = await res.json();
+        item.id = created.id;
+        item.sb_id = created.id;
+        if (created.nr) item.nr = created.nr;
+      }
+    } catch {}
+  }
+
+  S.schaden.unshift(item);
+  saveLocal();
+  btn.textContent = 'Speichern';
+  btn.disabled = false;
+  ovClose('ov-new');
+  render(curView);
+}
+
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+function openDetail(id) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  const bewohnerInfo = s.von === 'Bewohner'
+    ? `<div style="background:var(--purple-pale);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--purple)">
+        🟣 Gemeldet über Bewohner-App${s.name ? ' von ' + s.name : ''}${s.zimmer ? ', Zimmer ' + s.zimmer : ''}
+      </div>` : '';
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="modal-hdr">
+      <h2>#${s.nr||'–'} — ${s.ort}</h2>
+      <button class="modal-close" onclick="ovClose('ov-detail')">×</button>
+    </div>
+    ${bewohnerInfo}
+    <div class="status-btns">
+      <button class="status-btn${s.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
+      <button class="status-btn${s.status==='In Bearbeitung'?' active':''}" onclick="setStatus('${id}','In Bearbeitung')">In Bearbeitung</button>
+      <button class="status-btn${s.status==='Erledigt'?' active':''}" onclick="setStatus('${id}','Erledigt')">Erledigt ✓</button>
+    </div>
+    <div style="margin-top:14px">
+      <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right">${s.prob}</span></div>
+      <div class="detail-row"><span class="lbl">Priorität</span><span class="badge b-${s.prio.toLowerCase()}">${s.prio}</span></div>
+      <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum}</span></div>
+      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' (' + s.name + ')' : ''}</span></div>
+      ${s.erledigt ? `<div class="detail-row"><span class="lbl">Erledigt am</span><span>${s.erledigt}</span></div>` : ''}
+    </div>
+    ${s.photos&&s.photos.length ? `<label>Fotos</label><div class="detail-photos">${s.photos.map((p,i) => `<img src="${p}" onclick="viewPhoto('${id}',${i})">`).join('')}</div>` : ''}
+    <label style="margin-top:16px">Fotos hinzufügen</label>
+    <div class="photo-zone">📷 Foto aufnehmen oder auswählen<input type="file" accept="image/*" multiple onchange="addDetailPhoto('${id}',event)"></div>
+    <label>Notiz</label>
+    <textarea id="d-notiz">${s.notiz||''}</textarea>
+    <button class="btn btn-primary" onclick="saveNotiz('${id}')">Notiz speichern</button>
+    <button class="btn btn-danger" style="margin-top:8px" onclick="delSchaden('${id}')">Meldung löschen</button>`;
+  ovOpen('ov-detail');
+}
+
+async function setStatus(id, status) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  s.status = status;
+  if (status === 'Erledigt') s.erledigt = td();
+  saveLocal();
+  if (sbOnline) updateSBStatus(s);
+  openDetail(id);
+  render(curView);
+}
+
+async function saveNotiz(id) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  s.notiz = document.getElementById('d-notiz').value;
+  saveLocal();
+  if (sbOnline) updateSBStatus(s);
+  ovClose('ov-detail');
+}
+
+function addDetailPhoto(id, e) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  if (!s.photos) s.photos = [];
+  const files = [...e.target.files];
+  let done = 0;
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = ev => {
+      s.photos.push(ev.target.result);
+      done++;
+      if (done === files.length) { saveLocal(); openDetail(id); }
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+async function delSchaden(id) {
+  if (!confirm('Meldung wirklich löschen?')) return;
+  const s = S.schaden.find(x => x.id === id);
+  if (s && s.sb_id && sbOnline) await deleteSBRecord(s.sb_id);
+  S.schaden = S.schaden.filter(x => x.id !== id);
+  saveLocal();
+  ovClose('ov-detail');
+  render(curView);
+}
+
+function viewPhoto(id, i) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('photo-fs-img').src = s.photos[i];
+  document.getElementById('photo-fs').classList.add('open');
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────────────────────────
+function exportData() {
+  const b = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'hausmeister-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+function importData(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (!d.schaden) throw 0;
+      if (!confirm(`Import: ${d.schaden.length} Meldungen. Aktuelle lokale Daten überschreiben?`)) return;
+      S = d; saveLocal(); render(curView);
+    } catch { alert('Ungültige Datei.'); }
+  };
+  r.readAsText(f);
+}
+function clearLocal() {
+  if (!confirm('Lokale Daten löschen? Supabase-Daten bleiben erhalten und werden neu geladen.')) return;
+  S = {schaden:[], wlog:{}, nr:1};
+  saveLocal();
+  loadFromSupabase();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init() {
+  renderDash();
+  loadFromSupabase();
+}
+
+// Check auth on page load
+if (sessionStorage.getItem(AUTH_KEY) === '1') {
+  document.getElementById('pw-gate').classList.add('hidden');
+  init();
+} else {
+  // Show password gate; focus input
+  setTimeout(() => document.getElementById('pw-in').focus(), 200);
+}
+</script>
+</body>
+</html>
