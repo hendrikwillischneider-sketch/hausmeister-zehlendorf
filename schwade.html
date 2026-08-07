@@ -129,6 +129,17 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 /* FAB */
 .fab{position:fixed;bottom:22px;right:16px;width:54px;height:54px;border-radius:50%;background:var(--green-mid);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:200;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .fab:active{transform:scale(.92)}
+/* BEWOHNER LIST */
+.bw-row{display:flex;align-items:center;gap:11px;padding:10px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.bw-row:last-child{border:none}
+.bw-row:active{background:var(--bg)}
+.bw-zimmer{width:44px;height:44px;border-radius:10px;background:var(--green-pale);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--green-mid);line-height:1.2;text-align:center}
+.bw-info{flex:1;min-width:0}
+.bw-rname{font-size:14px;font-weight:500}
+.bw-rmeta{font-size:12px;color:var(--text-muted);margin-top:1px}
+.bw-toggle{padding:5px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0}
+.bw-toggle.aktiv{background:var(--green-pale);border-color:var(--green-mid);color:var(--green-mid)}
+
 
 /* OVERLAY / MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
@@ -233,6 +244,7 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 <nav>
   <button class="active" onclick="show('auftraege',this)">Aufträge</button>
   <button onclick="show('wochenplan',this)">Wochenplan</button>
+  <button onclick="show('bewohner',this)">Bewohner</button>
   <button onclick="show('settings',this)">Einstellungen</button>
 </nav>
 
@@ -285,6 +297,16 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
   <div class="card" id="wp-list"></div>
 </div>
 
+
+<!-- BEWOHNER -->
+<div class="view" id="view-bewohner">
+  <div class="stat-row" id="bw-stats"></div>
+  <div class="sec">Bewohnerinnen</div>
+  <div class="card" id="bw-list">
+    <div class="empty"><div class="empty-icon">⏳</div><p>Wird geladen …</p></div>
+  </div>
+</div>
+
 <!-- EINSTELLUNGEN -->
 <div class="view" id="view-settings">
   <div class="sec">Konto</div>
@@ -330,7 +352,7 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
       <label>Was genau?</label>
       <textarea id="n-m-was" placeholder="z. B. Kleiderschrank 2-türig …"></textarea>
       <label>Aktueller Standort</label>
-      <input type="text" id="n-m-wo" placeholder="z. B. Zimmer 3, Flur …">
+      <input type="text" id="n-m-wo" placeholder="z. B. Suite 3, Flur …">
       <label>Neuer Standort <span style="text-transform:none;font-weight:400;font-size:11px">— falls umstellen</span></label>
       <input type="text" id="n-m-ziel" placeholder="optional">
     </div>
@@ -339,7 +361,7 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
       <label>Was soll entsorgt werden?</label>
       <textarea id="n-sp-was" placeholder="z. B. alter Sessel, ca. 80 cm breit …"></textarea>
       <label>Wo steht es?</label>
-      <input type="text" id="n-sp-wo" placeholder="z. B. Zimmer 3, Keller …">
+      <input type="text" id="n-sp-wo" placeholder="z. B. Suite 3, Keller …">
       <label>Wunschtermin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
       <input type="text" id="n-sp-termin" placeholder="z. B. Ende August …">
     </div>
@@ -348,7 +370,7 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
       <label>Was soll gemacht werden?</label>
       <select id="n-a-art"><option>Bild aufhängen</option><option>Regal montieren</option><option>Glühbirne wechseln</option><option>Gardine aufhängen</option><option>Sonstiges</option></select>
       <label>Wo? (Zimmer / Bereich)</label>
-      <input type="text" id="n-a-wo" placeholder="z. B. Zimmer 3 …">
+      <input type="text" id="n-a-wo" placeholder="z. B. Suite 3 …">
       <label>Details <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
       <textarea id="n-a-details" placeholder="z. B. 3 Bilder, Haken vorhanden …"></textarea>
     </div>
@@ -374,10 +396,43 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
   <div class="modal" id="detail-body"></div>
 </div>
 
+
+<!-- BEWOHNER MODAL -->
+<div class="overlay" id="ov-bw" onclick="ovClose('ov-bw',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="bw-modal-title">Bewohnerin</h2>
+      <button class="modal-close" onclick="ovClose('ov-bw')">×</button>
+    </div>
+    <label>Suite-Nummer</label>
+    <input type="text" id="bw-zimmer" placeholder="z. B. 7">
+    <label>Vorname</label>
+    <input type="text" id="bw-name" placeholder="z. B. Maria">
+    <label>Kontaktpräferenz</label>
+    <select id="bw-kontakt" onchange="toggleKontaktFelder()">
+      <option>Türzettel</option><option>E-Mail</option><option>Anruf</option><option>Persönlich</option>
+    </select>
+    <div id="bw-email-row" style="display:none">
+      <label>E-Mail-Adresse</label>
+      <input type="email" id="bw-email" placeholder="z. B. maria@email.de">
+    </div>
+    <div id="bw-tel-row" style="display:none">
+      <label>Telefonnummer</label>
+      <input type="text" id="bw-tel" placeholder="z. B. 030 123456">
+    </div>
+    <input type="hidden" id="bw-edit-id">
+    <button class="btn btn-primary" onclick="saveBewohner()" id="bw-save-btn">Speichern</button>
+    <button class="btn btn-ghost" id="bw-del-btn" style="display:none;color:var(--red)" onclick="deleteBewohnerRow()">Bewohnerin löschen</button>
+    <button class="btn btn-ghost" onclick="ovClose('ov-bw')">Abbrechen</button>
+  </div>
+</div>
+
 <!-- FOTO FULLSCREEN -->
 <div class="photo-fs" id="photo-fs" onclick="this.classList.remove('open')">
   <img id="photo-fs-img" src="" alt="">
 </div>
+
+<button class="fab" id="fab" onclick="openFab()">+</button>
 
 <script>
 const SB = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
@@ -389,6 +444,8 @@ let bewohnerListe = [];
 let curFilter = 'Alle';
 let curNewKat = null;
 let newPhotos = [];
+let curView = 'auftraege';
+let allBewohner = [];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 function checkPw() {
@@ -416,11 +473,13 @@ if (sessionStorage.getItem(AUTH_KEY)) {
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
 function show(id, btn) {
+  curView = id;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
   if (id === 'wochenplan') renderWochenplan();
+  if (id === 'bewohner') loadBewohnerList();
 }
 function ovOpen(id) { document.getElementById(id).classList.add('open'); }
 function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); }
@@ -511,7 +570,7 @@ const dc = p => p==='Hoch'?'d-hoch':p==='Mittel'?'d-mittel':'d-niedrig';
 function aiHTML(a) {
   const katBadge = a.kategorie && KAT_CSS[a.kategorie]
     ? `<span class="b-kat ${KAT_CSS[a.kategorie]}">${KAT_ICON[a.kategorie]} ${a.kategorie}</span>` : '';
-  const nameInfo = a.name ? ` · ${a.name}${a.zimmer ? ', Zi. ' + a.zimmer : ''}` : '';
+  const nameInfo = a.name ? ` · ${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}` : '';
   const kostenBadge = a.kosten != null ? `<span class="kosten-badge">· ${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
   const hbFlag = (a.rueckmeldung && a.status !== 'Erledigt')
     ? `<div class="hb-flag">⚠️ Rückmeldung von Herrn Schneider — bitte weitergeben</div>` : '';
@@ -549,7 +608,7 @@ function openDetail(id) {
         ${a.rueckmeldung}
       </div>
     </div>` : '';
-  const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Zimmer ' + a.zimmer : ''}</div></div>` : '';
+  const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}</div></div>` : '';
   const photoSection = a.photos && a.photos[0] ? `
     <div class="detail-section">
       <div class="detail-lbl">Foto</div>
@@ -597,7 +656,7 @@ function openNew(kat) {
   dd.innerHTML = '<option value="">Keine Zuordnung</option>';
   bewohnerListe.sort((a,b) => (parseInt(a.zimmer)||0)-(parseInt(b.zimmer)||0)).forEach(b => {
     const o = document.createElement('option'); o.value = b.name;
-    o.textContent = `Zi. ${b.zimmer} — ${b.name}`; dd.appendChild(o);
+    o.textContent = `Suite ${b.zimmer} — ${b.name}`; dd.appendChild(o);
   });
   // Show right category fields
   document.querySelectorAll('.nf-cat').forEach(el => el.style.display = 'none');
@@ -747,6 +806,127 @@ async function saveNew() {
   }
   btn.textContent = 'Auftrag speichern'; btn.disabled = false;
 }
+// ── BEWOHNER ──────────────────────────────────────────────────────────────────
+async function loadBewohnerList() {
+  setSyncDot('syncing');
+  try {
+    const r = await sbReq('bewohner?order=zimmer.asc&select=*');
+    allBewohner = r.ok ? await r.json() : [];
+    setSyncDot('ok');
+  } catch { setSyncDot('error'); allBewohner = []; }
+  renderBewohner();
+  renderBwStats();
+}
+
+function renderBwStats() {
+  const aktiv = allBewohner.filter(b => b.aktiv !== false).length;
+  const inaktiv = allBewohner.length - aktiv;
+  document.getElementById('bw-stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${allBewohner.length}</div><div class="stat-lbl">Gesamt</div></div>
+    <div class="stat"><div class="stat-val">${aktiv}</div><div class="stat-lbl">Aktiv</div></div>
+    <div class="stat"><div class="stat-val">${inaktiv}</div><div class="stat-lbl">Inaktiv</div></div>`;
+}
+
+const KONTAKT_ICON = {'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'};
+
+function renderBewohner() {
+  const el = document.getElementById('bw-list');
+  if (!allBewohner.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Noch keine Bewohnerinnen</p></div>';
+    return;
+  }
+  el.innerHTML = allBewohner.map(b => `
+    <div class="bw-row" onclick="openEditBw('${b.id}')">
+      <div class="bw-zimmer">S.<br>${b.zimmer||'?'}</div>
+      <div class="bw-info">
+        <div class="bw-rname">${b.name||'—'}</div>
+        <div class="bw-rmeta">Suite ${b.zimmer||'?'} · ${KONTAKT_ICON[b.kontakt_art]||'🖨'} ${b.kontakt_art||'Türzettel'}</div>
+      </div>
+      <button class="bw-toggle ${b.aktiv!==false?'aktiv':''}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}',${b.aktiv!==false})">${b.aktiv!==false?'Aktiv':'Inaktiv'}</button>
+    </div>`).join('');
+}
+
+function openNewBw() {
+  document.getElementById('bw-modal-title').textContent = 'Neue Bewohnerin';
+  document.getElementById('bw-zimmer').value = '';
+  document.getElementById('bw-name').value = '';
+  document.getElementById('bw-kontakt').value = 'Türzettel';
+  document.getElementById('bw-email').value = '';
+  document.getElementById('bw-tel').value = '';
+  document.getElementById('bw-edit-id').value = '';
+  document.getElementById('bw-del-btn').style.display = 'none';
+  toggleKontaktFelder();
+  ovOpen('ov-bw');
+}
+
+function openEditBw(id) {
+  const b = allBewohner.find(x => String(x.id) === String(id));
+  if (!b) return;
+  document.getElementById('bw-modal-title').textContent = 'Bewohnerin bearbeiten';
+  document.getElementById('bw-zimmer').value = b.zimmer || '';
+  document.getElementById('bw-name').value = b.name || '';
+  document.getElementById('bw-kontakt').value = b.kontakt_art || 'Türzettel';
+  document.getElementById('bw-email').value = b.email || '';
+  document.getElementById('bw-tel').value = b.telefon || '';
+  document.getElementById('bw-edit-id').value = b.id;
+  document.getElementById('bw-del-btn').style.display = 'block';
+  toggleKontaktFelder();
+  ovOpen('ov-bw');
+}
+
+function toggleKontaktFelder() {
+  const k = document.getElementById('bw-kontakt').value;
+  document.getElementById('bw-email-row').style.display = k === 'E-Mail' ? 'block' : 'none';
+  document.getElementById('bw-tel-row').style.display = k === 'Anruf' ? 'block' : 'none';
+}
+
+async function saveBewohner() {
+  const zimmer = document.getElementById('bw-zimmer').value.trim();
+  const name   = document.getElementById('bw-name').value.trim();
+  if (!zimmer || !name) { alert('Bitte Suite-Nummer und Vorname eingeben.'); return; }
+  const editId = document.getElementById('bw-edit-id').value;
+  const payload = {
+    zimmer, name,
+    kontakt_art: document.getElementById('bw-kontakt').value,
+    email: document.getElementById('bw-email').value.trim() || null,
+    telefon: document.getElementById('bw-tel').value.trim() || null,
+    aktiv: true
+  };
+  const btn = document.getElementById('bw-save-btn');
+  btn.textContent = 'Speichert …'; btn.disabled = true;
+  try {
+    const res = editId
+      ? await sbReq(`bewohner?id=eq.${editId}`, { method: 'PATCH', body: JSON.stringify(payload) })
+      : await sbReq('bewohner', { method: 'POST', body: JSON.stringify(payload) });
+    if (!res.ok) throw 0;
+    ovClose('ov-bw');
+    await Promise.all([loadBewohnerList(), init()]);
+  } catch { alert('Fehler beim Speichern.'); }
+  btn.textContent = 'Speichern'; btn.disabled = false;
+}
+
+async function toggleBwAktiv(id, isAktiv) {
+  await sbReq(`bewohner?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ aktiv: !isAktiv }) });
+  loadBewohnerList();
+}
+
+async function deleteBewohnerRow() {
+  const id = document.getElementById('bw-edit-id').value;
+  if (!id || !confirm('Bewohnerin wirklich löschen?')) return;
+  await sbReq(`bewohner?id=eq.${id}`, { method: 'DELETE' });
+  ovClose('ov-bw');
+  loadBewohnerList();
+}
+
+function openFab() {
+  if (curView === 'bewohner') openNewBw();
+  else {
+    const firstNavBtn = document.querySelector('nav button');
+    show('auftraege', firstNavBtn);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
 </script>
 </body>
 </html>
