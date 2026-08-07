@@ -255,6 +255,40 @@ html{scroll-behavior:smooth}
 .mo-tasks li{font-size:10.5px;color:var(--ink-soft);line-height:1.4;padding-left:12px;position:relative;font-family:var(--sans)}
 .mo-tasks li::before{content:"·";position:absolute;left:2px;color:var(--burg);font-weight:700;font-size:14px;line-height:1.05}
 #aktuell{scroll-margin-top:44px}
+
+/* ── Pflanzendatenbank ── */
+.park-section{padding:32px 18px 40px;background:var(--cream)}
+.park-search-wrap{position:relative;margin-bottom:16px}
+.park-search{width:100%;padding:11px 16px 11px 42px;border:1.5px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);font-size:15px;box-sizing:border-box;outline:none}
+.park-search:focus{border-color:var(--green)}
+.park-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.park-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.park-chip{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;font-size:13px;cursor:pointer;color:var(--text-muted);transition:.15s}
+.park-chip.active{background:var(--green);border-color:var(--green);color:#fff}
+.pflanzen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.pflanze-card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.pflanze-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.pflanze-img{width:100%;height:130px;object-fit:cover;background:var(--border)}
+.pflanze-img-ph{width:100%;height:130px;display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--border)}
+.pflanze-body{padding:11px 12px 14px}
+.pflanze-typ{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.pflanze-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:1px}
+.pflanze-lat{font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:8px}
+.pflanze-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-muted)}
+.pflanze-meta span{display:flex;align-items:center;gap:3px}
+/* Pflanze Detail Modal */
+#pfl-modal .modal-inner{padding:0 18px 28px}
+.pfl-hero{width:100%;height:180px;object-fit:cover;border-radius:0 0 0 0}
+.pfl-tags{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 6px}
+.pfl-tag{padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600}
+.pfl-tag.rot{background:#7A243022;color:#7A2430}
+.pfl-tag.gruen{background:#1C4A2E22;color:#1C4A2E}
+.pfl-tag.gold{background:#B8892A22;color:#B8892A}
+.pfl-dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;margin:10px 0 14px}
+.pfl-dl dt{color:var(--text-muted);font-weight:600;white-space:nowrap}
+.pfl-dl dd{color:var(--text);margin:0}
+.pfl-hint{background:var(--border);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text-muted);margin-top:10px}
+.pfl-hint strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -263,6 +297,7 @@ html{scroll-behavior:smooth}
   <a href="#willkommen">Willkommen</a>
   <a href="#aktuell">Aktuell</a>
   <a href="#jahresplan">Jahresplan</a>
+  <a href="#unser-park">Unser Park</a>
   <a href="#melden">Etwas melden</a>
 </nav>
 
@@ -313,6 +348,37 @@ html{scroll-behavior:smooth}
   <h2 class="section-heading">Alle Aufgaben auf einen Blick</h2>
   <div class="mo-grid" id="mo-grid"></div>
 </section>
+
+
+<!-- UNSER PARK -->
+<section class="park-section" id="unser-park">
+  <p class="section-eyebrow">Unsere Pflanzen &amp; Bäume</p>
+  <h2 class="section-heading">Unser Park</h2>
+  <div class="park-search-wrap">
+    <span class="park-search-icon">🔍</span>
+    <input class="park-search" id="pfl-search" type="search" placeholder="Pflanze suchen …" oninput="filterPflanzen()">
+  </div>
+  <div class="park-chips" id="pfl-chips"></div>
+  <div class="pflanzen-grid" id="pflanzen-grid">
+    <p style="color:var(--text-muted);font-size:14px">Wird geladen …</p>
+  </div>
+</section>
+
+<!-- PFLANZE DETAIL MODAL -->
+<div class="modal-ov" id="pfl-modal" style="display:none" onclick="if(event.target===this)closePfl()">
+  <div class="modal-box" style="max-width:480px;padding:0;overflow:hidden">
+    <div id="pfl-hero-wrap"></div>
+    <button onclick="closePfl()" style="position:absolute;top:12px;right:14px;background:rgba(0,0,0,.45);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:50%;cursor:pointer;line-height:1">✕</button>
+    <div class="modal-inner">
+      <div class="pfl-tags" id="pfl-tags"></div>
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px" id="pfl-name"></div>
+      <div style="font-size:14px;font-style:italic;color:var(--text-muted);margin-bottom:12px" id="pfl-lat"></div>
+      <dl class="pfl-dl" id="pfl-dl"></dl>
+      <div id="pfl-bewohner" style="display:none" class="pfl-hint"></div>
+      <div id="pfl-pflege" style="display:none" class="pfl-hint" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
 
 <div class="main" id="melden">
   <div class="pg-title">
@@ -793,6 +859,130 @@ renderMoGrid();
 function resetAll(){
   location.reload();
 }
+
+// ── Pflanzendatenbank ──────────────────────────────────────────
+const IMG_BASE2 = 'https://sidoniescharfestiftung.de/wp-content/uploads/2026/02/';
+const MN_SHORT = ['','Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const STANDORT_ICO = {'Sonne':'☀️','Halbschatten':'🌤️','Schatten':'🌥️'};
+let _pflData = [], _pflFilter = 'Alle', _pflSearch = '';
+
+async function loadPflanzen() {
+  try {
+    const r = await fetch(
+      'https://rzpsmvczwaeraupnhhkx.supabase.co/rest/v1/pflanzen?im_park=eq.true&aktiv=eq.true&order=name_de.asc',
+      {headers:{'apikey':'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem','Authorization':'Bearer sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem'}}
+    );
+    _pflData = await r.json();
+    buildPflChips();
+    renderPflanzen();
+  } catch(e) {
+    document.getElementById('pflanzen-grid').innerHTML = '<p style="color:var(--text-muted);font-size:14px">Konnte nicht laden.</p>';
+  }
+}
+
+function buildPflChips() {
+  const cats = ['Alle', ...new Set(_pflData.map(p => p.kategorie).filter(Boolean))].sort((a,b) => a==='Alle'?-1:b==='Alle'?1:a.localeCompare(b,'de'));
+  document.getElementById('pfl-chips').innerHTML = cats.map(c =>
+    `<button class="park-chip${c===_pflFilter?' active':''}" onclick="setPflFilter('${c}',this)">${c}</button>`
+  ).join('');
+}
+
+function setPflFilter(cat, btn) {
+  _pflFilter = cat;
+  document.querySelectorAll('.park-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPflanzen();
+}
+
+function filterPflanzen() {
+  _pflSearch = document.getElementById('pfl-search').value.toLowerCase();
+  renderPflanzen();
+}
+
+function renderPflanzen() {
+  const g = document.getElementById('pflanzen-grid');
+  let list = _pflData;
+  if (_pflFilter !== 'Alle') list = list.filter(p => p.kategorie === _pflFilter);
+  if (_pflSearch) list = list.filter(p =>
+    (p.name_de||'').toLowerCase().includes(_pflSearch) ||
+    (p.name_lat||'').toLowerCase().includes(_pflSearch) ||
+    (p.bewohner_info||'').toLowerCase().includes(_pflSearch)
+  );
+  if (!list.length) { g.innerHTML = '<p style="color:var(--text-muted);font-size:14px">Keine Treffer.</p>'; return; }
+
+  g.innerHTML = list.map((p,i) => {
+    const bluete = p.bluete_von && p.bluete_bis
+      ? `<span>🌸 ${MN_SHORT[p.bluete_von]}${p.bluete_von!==p.bluete_bis?'–'+MN_SHORT[p.bluete_bis]:''}</span>` : '';
+    const stand = (p.standort||[]).map(s => `<span>${STANDORT_ICO[s]||s}</span>`).join('');
+    const imgHtml = p.bild
+      ? `<img class="pflanze-img" src="${IMG_BASE2}${p.bild}" alt="${p.name_de}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        + `<div class="pflanze-img-ph" style="display:none">${pflTypeIco(p.typ)}</div>`
+      : `<div class="pflanze-img-ph">${pflTypeIco(p.typ)}</div>`;
+    const idx = _pflData.indexOf(p);
+    return `<div class="pflanze-card" onclick="openPfl(${idx})">
+      ${imgHtml}
+      <div class="pflanze-body">
+        <div class="pflanze-typ">${p.typ||''}</div>
+        <div class="pflanze-name">${p.name_de}</div>
+        <div class="pflanze-lat">${p.name_lat||''}</div>
+        <div class="pflanze-meta">${bluete}${stand}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function pflTypeIco(typ) {
+  const m = {'Baum':'🌳','Strauch':'🌿','Staude':'🌺','Einjährige':'🌸','Zwiebelpflanze':'🌷','Knollenpflanze':'🌻','Kletterpflanze':'🍃','Bodendecker':'🍀','Zweijährige':'🌼'};
+  return m[typ] || '🌱';
+}
+
+function openPfl(idx) {
+  const p = _pflData[idx];
+  const m = document.getElementById('pfl-modal');
+  m.style.display = 'flex';
+  // Hero Bild
+  const hw = document.getElementById('pfl-hero-wrap');
+  hw.innerHTML = p.bild
+    ? `<img src="${IMG_BASE2}${p.bild}" style="width:100%;height:200px;object-fit:cover" onerror="this.style.display='none'">`
+    : `<div style="width:100%;height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--border)">${pflTypeIco(p.typ)}</div>`;
+  // Name + Art
+  document.getElementById('pfl-name').textContent = p.name_de;
+  document.getElementById('pfl-lat').textContent = p.name_lat || '';
+  // Tags
+  const tagMap = {'giftig':'rot','bienenpflanze':'gruen','duftend':'gold','wintergrün':'gruen','formschnitt':'gold'};
+  const tags = (p.tags||[]).map(t => `<span class="pfl-tag ${tagMap[t]||'gruen'}">${t}</span>`).join('');
+  document.getElementById('pfl-tags').innerHTML = tags;
+  // Details
+  let dl = '';
+  if (p.typ) dl += `<dt>Typ</dt><dd>${p.typ}</dd>`;
+  if (p.kategorie) dl += `<dt>Kategorie</dt><dd>${p.kategorie}</dd>`;
+  if (p.standort?.length) dl += `<dt>Standort</dt><dd>${p.standort.map(s=>STANDORT_ICO[s]+' '+s).join(', ')}</dd>`;
+  if (p.wasser) dl += `<dt>Wasserbedarf</dt><dd>${p.wasser}</dd>`;
+  if (p.bluete_von) dl += `<dt>Blütezeit</dt><dd>${MN_SHORT[p.bluete_von]}${p.bluete_von!==p.bluete_bis?'–'+MN_SHORT[p.bluete_bis]:''}</dd>`;
+  if (p.bluetfarbe) dl += `<dt>Blütenfarbe</dt><dd>${p.bluetfarbe}</dd>`;
+  if (p.hoehe_max) dl += `<dt>Höhe</dt><dd>${p.hoehe_min?p.hoehe_min+' – ':''} ${p.hoehe_max} cm</dd>`;
+  if (p.park_standort) dl += `<dt>Im Park</dt><dd>${p.park_standort}</dd>`;
+  document.getElementById('pfl-dl').innerHTML = dl;
+  // Bewohner Info
+  const bEl = document.getElementById('pfl-bewohner');
+  if (p.bewohner_info) { bEl.style.display='block'; bEl.innerHTML=`<strong>Wussten Sie schon?</strong>${p.bewohner_info}`; }
+  else bEl.style.display='none';
+  // Pflegehinweis
+  const pfEl = document.getElementById('pfl-pflege');
+  if (p.pflegehinweise) { pfEl.style.display='block'; pfEl.innerHTML=`<strong>Pflege</strong>${p.pflegehinweise}`; }
+  else pfEl.style.display='none';
+}
+
+function closePfl() { document.getElementById('pfl-modal').style.display='none'; }
+
+// Laden wenn Park-Sektion ins Viewport scrollt
+const pflObserver = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && !_pflData.length) { loadPflanzen(); pflObserver.disconnect(); }
+}, {threshold: 0.1});
+document.addEventListener('DOMContentLoaded', () => {
+  const sec = document.getElementById('unser-park');
+  if (sec) pflObserver.observe(sec);
+});
 </script>
 </body>
 </html>
