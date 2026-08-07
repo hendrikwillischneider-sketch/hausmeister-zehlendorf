@@ -240,7 +240,9 @@ async function loadBewohner() {
       { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } }
     );
     if (!res.ok) throw new Error(res.status);
-    bewohnerListe = await res.json();
+    bewohnerListe = (await res.json()).sort((a,b) =>
+      (parseInt(a.zimmer)||0) - (parseInt(b.zimmer)||0) || a.zimmer.localeCompare(b.zimmer)
+    );
     fillDropdown();
   } catch {
     // Fallback: Freitext-Eingabe aktivieren
