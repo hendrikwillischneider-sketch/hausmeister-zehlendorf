@@ -89,6 +89,11 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .b-mittel{background:var(--yellow-pale);color:var(--yellow)}
 .b-niedrig{background:var(--green-pale);color:var(--green-mid)}
 .b-bewohner{background:var(--purple-pale);color:var(--purple);font-size:9.5px;margin-left:4px;padding:1px 6px}
+.b-kat{font-size:9.5px;padding:1px 6px;border-radius:20px;font-weight:600;margin-left:4px;display:inline-block}
+.b-kat-schaden{background:var(--red-pale);color:var(--red)}
+.b-kat-moebel{background:#dbeafe;color:#1d4ed8}
+.b-kat-sperr{background:#dcfce7;color:#166534}
+.b-kat-auftrag{background:var(--yellow-pale);color:#92400e}
 
 /* TASK ITEM */
 .ti{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
@@ -271,6 +276,13 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
     <button class="chip" onclick="setFilter('Handwerker beauftragt',this)">Beauftragt</button>
     <button class="chip" onclick="setFilter('Erledigt',this)">Erledigt</button>
     <button class="chip" onclick="setFilter('Bewohner',this)">🟣 Bewohner-App</button>
+  </div>
+  <div class="chips" id="sc-kat-filter">
+    <button class="chip active" onclick="setKatFilter('Alle',this)">Alle Kategorien</button>
+    <button class="chip" onclick="setKatFilter('Schaden',this)">🔧 Schaden</button>
+    <button class="chip" onclick="setKatFilter('Möbel & Aufbau',this)">🛋️ Möbel</button>
+    <button class="chip" onclick="setKatFilter('Sperrmüll',this)">🗑️ Sperrmüll</button>
+    <button class="chip" onclick="setKatFilter('Kleiner Auftrag',this)">🔨 Auftrag</button>
   </div>
   <div class="card" id="sc-list"></div>
 </div>
@@ -583,6 +595,7 @@ function fromSB(r) {
     kosten: r.kosten != null ? r.kosten : null,
     termin: r.termin || '',
     rueckmeldung: r.rueckmeldung || '',
+    kategorie: r.kategorie || null,
     photos: r.foto ? [r.foto] : [],
     created_at: r.created_at
   };
@@ -601,7 +614,8 @@ function toSB(item) {
     foto: (item.photos && item.photos[0]) || null,
     kosten: item.kosten != null ? item.kosten : null,
     termin: item.termin || null,
-    rueckmeldung: item.rueckmeldung || null
+    rueckmeldung: item.rueckmeldung || null,
+    kategorie: item.kategorie || null
   };
 }
 
@@ -708,14 +722,17 @@ function renderDash() {
     </div>`).join('');
 }
 
+const KAT_CSS = {'Schaden':'b-kat-schaden','Möbel & Aufbau':'b-kat-moebel','Sperrmüll':'b-kat-sperr','Kleiner Auftrag':'b-kat-auftrag'};
+const KAT_ICON = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
 function siHTML(s) {
   const bewohnerBadge = s.von === 'Bewohner' ? '<span class="badge b-bewohner">Bewohner-App</span>' : '';
+  const katBadge = s.kategorie && KAT_CSS[s.kategorie] ? `<span class="b-kat ${KAT_CSS[s.kategorie]}">${KAT_ICON[s.kategorie]} ${s.kategorie}</span>` : '';
   const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Zi. ' + s.zimmer : ''}` : '';
   const kostenInfo = s.kosten != null ? ` · <span style="color:var(--gold);font-weight:600">${Number(s.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
   return `<div class="si" onclick="openDetail('${s.id}')">
     <div class="si-dot ${s.status==='Erledigt'?'d-done':dc(s.prio)}"></div>
     <div class="si-body">
-      <div class="si-title">${s.prob}${bewohnerBadge}</div>
+      <div class="si-title">${s.prob}${bewohnerBadge}${katBadge}</div>
       <div class="si-meta">${s.ort} · ${s.datum || ''}${nameInfo}${kostenInfo}</div>
     </div>
     ${s.photos&&s.photos[0] ? `<img class="si-thumb" src="${s.photos[0]}" alt="">` : ''}
@@ -725,9 +742,16 @@ function siHTML(s) {
 
 // ── SCHADEN ───────────────────────────────────────────────────────────────────
 let schadenFilter = 'Alle';
+let schadenKatFilter = 'Alle';
 function setFilter(f, btn) {
   schadenFilter = f;
-  document.querySelectorAll('.chips .chip').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#sc-filter .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSchaden();
+}
+function setKatFilter(f, btn) {
+  schadenKatFilter = f;
+  document.querySelectorAll('#sc-kat-filter .chip').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderSchaden();
 }
@@ -749,6 +773,7 @@ function renderSchaden() {
   if (schadenFilter === 'Bewohner') list = list.filter(s => s.von === 'Bewohner');
   else if (schadenFilter === 'In Bearbeitung') list = list.filter(s => s.status === 'In Prüfung' || s.status === 'Handwerker beauftragt' || s.status === 'In Bearbeitung');
   else if (schadenFilter !== 'Alle') list = list.filter(s => s.status === schadenFilter);
+  if (schadenKatFilter !== 'Alle') list = list.filter(s => s.kategorie === schadenKatFilter);
 
   document.getElementById('sc-list').innerHTML = list.length
     ? list.map(s => siHTML(s)).join('')
@@ -859,7 +884,7 @@ function renderBewohner() {
       <div class="bw-zimmer">Zi.<br>${b.zimmer}</div>
       <div class="bw-info">
         <div class="bw-rname" style="${!b.aktiv ? 'color:var(--text-muted);text-decoration:line-through' : ''}">${b.name}</div>
-        <div class="bw-rmeta">Zimmer ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''} · ${{Türzettel:'🖨',E-Mail:'📧',Anruf:'📞',Persönlich:'🤝'}[b.kontakt_art||'Türzettel']} ${b.kontakt_art||'Türzettel'}</div>
+        <div class="bw-rmeta">Zimmer ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''} · ${{'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'}[b.kontakt_art||'Türzettel']} ${b.kontakt_art||'Türzettel'}</div>
       </div>
       <button class="bw-toggle ${b.aktiv ? 'on' : 'off'}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}')"></button>
     </div>`).join('');
