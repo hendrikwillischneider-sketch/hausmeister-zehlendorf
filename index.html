@@ -403,7 +403,7 @@ async function loadR(){
 function fillDD(){
   const s=document.getElementById('bw-dd');
   s.innerHTML='<option value="">Name wählen …</option>';
-  rs.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=`Zi. ${r.zimmer} — ${r.name}`;s.appendChild(o);});
+  rs.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=`Suite ${r.zimmer} — ${r.name}`;s.appendChild(o);});
 }
 function onDDChange(v){document.getElementById('bw-ok').style.display=v?'block':'none';}
 function confirmR(){
@@ -414,7 +414,7 @@ function confirmR(){
 function goAnon(){sel=null;document.getElementById('bw-card').style.display='none';}
 function showSeld(r){
   document.getElementById('bw-disp-name').textContent=r.name;
-  document.getElementById('bw-disp-room').textContent='Zimmer '+r.zimmer;
+  document.getElementById('bw-disp-room').textContent='Suite '+r.zimmer;
   document.getElementById('bw-sel').style.display='block';
   document.getElementById('bw-wrap').style.display='none';
 }
