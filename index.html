@@ -164,9 +164,55 @@ footer{max-width:600px;margin:0 auto;padding:16px 16px 28px;border-top:1px solid
 .f-lock{font-size:11px;color:var(--stone);text-decoration:none;opacity:.5;
   white-space:nowrap;display:flex;align-items:center;gap:5px;transition:opacity .15s}
 .f-lock:hover{opacity:1}
+/* SITE NAV */
+.site-nav{position:sticky;top:0;z-index:100;background:var(--green-d);display:flex;border-bottom:1px solid rgba(184,137,42,.2)}
+.site-nav a{flex:1;text-align:center;color:rgba(255,255,255,.72);text-decoration:none;padding:11px 6px;font-family:var(--sans);font-size:12.5px;letter-spacing:.3px;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.site-nav a:hover{color:var(--gold);border-bottom-color:var(--gold)}
+/* INFO + JAHRESPLAN */
+.info-section,.jahres-section{padding:22px 18px;background:var(--cream)}
+.jahres-section{border-top:1px solid var(--border)}
+.section-eyebrow{font-family:var(--sans);font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--burg);margin-bottom:7px}
+.section-heading{font-family:var(--serif);font-size:20px;color:var(--green);margin-bottom:11px;line-height:1.3}
+.section-text{font-size:14.5px;color:var(--ink-soft);line-height:1.78;margin-bottom:18px}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.svc-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
+.svc-card-icon{font-size:20px;margin-bottom:5px}
+.svc-card-name{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--green);margin-bottom:2px}
+.svc-card-desc{font-family:var(--sans);font-size:11px;color:var(--stone);line-height:1.45}
+.seasons-list{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.season-card{border-radius:12px;padding:13px 15px}
+.season-card.spring{background:#EEF5E8;border:1px solid #B2D4A0}
+.season-card.summer{background:#E6F0DE;border:1px solid #8CBD7A}
+.season-card.autumn{background:#F5EAD6;border:1px solid #C4955A}
+.season-card.winter{background:#EAD8E4;border:1px solid #B08898}
+@media(prefers-color-scheme:dark){
+  .season-card.spring{background:#182C12;border-color:#385A2A}
+  .season-card.summer{background:#162811;border-color:#2E5023}
+  .season-card.autumn{background:#2B1E10;border-color:#583A1A}
+  .season-card.winter{background:#22121E;border-color:#4A263C}
+}
+:root[data-theme="dark"] .season-card.spring{background:#182C12;border-color:#385A2A}
+:root[data-theme="dark"] .season-card.summer{background:#162811;border-color:#2E5023}
+:root[data-theme="dark"] .season-card.autumn{background:#2B1E10;border-color:#583A1A}
+:root[data-theme="dark"] .season-card.winter{background:#22121E;border-color:#4A263C}
+.season-head{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.season-emoji{font-size:19px}
+.season-name{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--green)}
+.season-months{font-family:var(--sans);font-size:10.5px;color:var(--stone);margin-left:auto}
+.season-items{list-style:none;padding:0;display:flex;flex-direction:column;gap:3px}
+.season-items li{font-family:var(--sans);font-size:12px;color:var(--ink-soft);line-height:1.5;padding-left:14px;position:relative}
+.season-items li::before{content:"·";position:absolute;left:3px;color:var(--burg);font-weight:700;font-size:15px;line-height:1.15}
+#jahresplan,#melden{scroll-margin-top:44px}
+html{scroll-behavior:smooth}
 </style>
 </head>
 <body>
+
+<nav class="site-nav">
+  <a href="#willkommen">Willkommen</a>
+  <a href="#jahresplan">Jahresplan</a>
+  <a href="#melden">Etwas melden</a>
+</nav>
 
 <div class="hero">
   <div class="portrait-frame">
@@ -176,7 +222,94 @@ footer{max-width:600px;margin:0 auto;padding:16px 16px 28px;border-top:1px solid
   <div class="hero-tag">Serviceportal · Wohnheim Zehlendorf</div>
 </div>
 
-<div class="main">
+<section class="info-section" id="willkommen">
+  <p class="section-eyebrow">Ihr Hausmeister</p>
+  <h2 class="section-heading">Damit Sie sich rundum wohlfühlen</h2>
+  <p class="section-text">Ich bin Hendrik, Ihr Hausmeister in der Sidonie-Scharfe-Stiftung. Von der Parkpflege bis zur schnellen Reparatur — ich kümmere mich darum, dass bei Ihnen alles in Ordnung ist. Sie können mich jederzeit über dieses Portal erreichen.</p>
+  <div class="svc-grid">
+    <div class="svc-card">
+      <div class="svc-card-icon">🔧</div>
+      <div class="svc-card-name">Reparaturen</div>
+      <div class="svc-card-desc">Schäden schnell melden und beheben lassen</div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-card-icon">🌳</div>
+      <div class="svc-card-name">Park & Garten</div>
+      <div class="svc-card-desc">Gepflegte Außenanlagen das ganze Jahr</div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-card-icon">📦</div>
+      <div class="svc-card-name">Sperrmüll & Möbel</div>
+      <div class="svc-card-desc">Hilfe beim Auf- und Abbau, Abholung</div>
+    </div>
+    <div class="svc-card">
+      <div class="svc-card-icon">💬</div>
+      <div class="svc-card-name">Kleine Wünsche</div>
+      <div class="svc-card-desc">Auch für kleinere Anliegen immer da</div>
+    </div>
+  </div>
+</section>
+
+<section class="jahres-section" id="jahresplan">
+  <p class="section-eyebrow">Jahresplan Park & Garten</p>
+  <h2 class="section-heading">Was wir wann im Außenbereich tun</h2>
+  <div class="seasons-list">
+    <div class="season-card spring">
+      <div class="season-head">
+        <span class="season-emoji">🌱</span>
+        <span class="season-name">Frühling</span>
+        <span class="season-months">März – Mai</span>
+      </div>
+      <ul class="season-items">
+        <li>Frühjahrsputz — Laub und Winter wegräumen</li>
+        <li>Beete neu bepflanzen, Sträucher schneiden</li>
+        <li>Erste Rasenmahd der Saison</li>
+        <li>Gartenmöbel und Bänke aufstellen</li>
+      </ul>
+    </div>
+    <div class="season-card summer">
+      <div class="season-head">
+        <span class="season-emoji">☀️</span>
+        <span class="season-name">Sommer</span>
+        <span class="season-months">Juni – August</span>
+      </div>
+      <ul class="season-items">
+        <li>Regelmäßiges Mähen (wöchentlich)</li>
+        <li>Bewässerung bei Hitze und Trockenheit</li>
+        <li>Wege und Plätze sauber halten</li>
+        <li>Sicherheitscheck der Außenanlagen</li>
+      </ul>
+    </div>
+    <div class="season-card autumn">
+      <div class="season-head">
+        <span class="season-emoji">🍂</span>
+        <span class="season-name">Herbst</span>
+        <span class="season-months">September – November</span>
+      </div>
+      <ul class="season-items">
+        <li>Laubreinigung — täglich wenn nötig</li>
+        <li>Letzter Heckenschnitt der Saison</li>
+        <li>Gartenmöbel und Bänke einlagern</li>
+        <li>Wintervorbereitungen für Beete und Pflanzen</li>
+      </ul>
+    </div>
+    <div class="season-card winter">
+      <div class="season-head">
+        <span class="season-emoji">❄️</span>
+        <span class="season-name">Winter</span>
+        <span class="season-months">Dezember – Februar</span>
+      </div>
+      <ul class="season-items">
+        <li>Winterdienst — Schnee räumen und streuen</li>
+        <li>Alle Zugänge täglich sicher halten</li>
+        <li>Beleuchtung und Außenanlagen im Blick</li>
+        <li>Planung für das nächste Gartenjahr</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="main" id="melden">
   <div class="pg-title">
     <div class="pg-eyebrow">Scharfestraße 4–6 · 14163 Berlin</div>
     <h1 class="pg-h1">Wie können wir helfen?</h1>
