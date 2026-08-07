@@ -204,6 +204,27 @@ footer{max-width:600px;margin:0 auto;padding:16px 16px 28px;border-top:1px solid
 .season-items li::before{content:"·";position:absolute;left:3px;color:var(--burg);font-weight:700;font-size:15px;line-height:1.15}
 #jahresplan,#melden{scroll-margin-top:44px}
 html{scroll-behavior:smooth}
+/* ARTIKEL-BILD + MODAL */
+.artikel-card{cursor:pointer;transition:transform .15s}
+.artikel-card:hover{transform:translateY(-2px)}
+.artikel-img{width:100%;height:155px;object-fit:cover;display:block;border-radius:11px 11px 0 0}
+.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);display:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-ov.open{display:block}
+.modal-box{background:var(--card);margin:0 auto;min-height:100vh;max-width:620px}
+.modal-close{position:fixed;top:12px;right:12px;z-index:600;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:24px;cursor:pointer;line-height:40px;text-align:center;padding:0;font-family:var(--sans)}
+.modal-hero{width:100%;height:230px;object-fit:cover;display:block}
+.modal-inner{padding:18px 18px 60px}
+.modal-kat-line{font-family:var(--sans);font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--burg);margin-bottom:7px}
+.modal-h1{font-family:var(--serif);font-size:21px;color:var(--green);margin-bottom:16px;line-height:1.3}
+.modal-h3{font-family:var(--serif);font-size:17px;color:var(--green);margin:18px 0 7px}
+.modal-p{font-size:14.5px;color:var(--ink-soft);line-height:1.78;margin-bottom:12px}
+.modal-tbox{background:#F0EDE5;border-left:3px solid var(--gold);padding:10px 13px;border-radius:0 8px 8px 0;font-size:13px;color:var(--ink-soft);margin:14px 0}
+.modal-tbox strong{color:var(--burg)}
+.modal-bew{background:var(--green);color:rgba(255,255,255,.9);padding:14px 16px;border-radius:10px;margin-top:18px;font-size:13.5px;line-height:1.7}
+.modal-bew-lbl{font-family:var(--sans);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+@media(prefers-color-scheme:dark){.modal-tbox{background:var(--card)}}
+:root[data-theme="dark"] .modal-tbox{background:var(--card)}
+
 /* AKTUELL-ARTIKEL */
 .aktuell-section{padding:22px 18px;background:var(--cream);border-top:1px solid var(--border)}
 .artikel-grid{display:flex;flex-direction:column;gap:12px}
@@ -479,6 +500,11 @@ html{scroll-behavior:smooth}
   </div>
 </div>
 
+<div class="modal-ov" id="art-ov">
+  <button class="modal-close" onclick="closeArtikel()">&#x2715;</button>
+  <div class="modal-box" id="art-box"></div>
+</div>
+
 <footer>
   <div class="f-addr">
     Sidonie-Scharfe-Stiftung · Scharfestraße 4–6 · 14163 Berlin-Zehlendorf<br>
@@ -663,41 +689,310 @@ function showOK(d,kat){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+const IMG_BASE='https://sidoniescharfestiftung.de/wp-content/uploads/2026/02/';
+
 const MONATE=[
   {n:'Januar',s:'❄️ Hochwinter',a:['Bäume nach Sturmschäden prüfen','Obstbaumschnitt (frostfreie Tage)','Winterdienst: Streuen und Räumen','Jahresplanung, Saatgut bestellen']},
   {n:'Februar',s:'❄️ Spätwinter',a:['Kernobst schneiden (Apfel, Birne)','Gartengeräte warten und schärfen','Erste Beetvorbereitung','Winterdienst weiterführen']},
-  {n:'März',s:'🌱 Frühling',a:['Erste Rasenmahd (ab 8 °C Bodentemp.)','Frühjahrsputz: Winterlaub entfernen','Stauden und Rosen zurückschneiden','Laubschutz von Beeten entfernen']},
+  {n:'März',s:'🌱 Frühling',a:['Erste Rasenmahd (ab 8 °C Bodentemp.)','Frühjahrsputz: Winterlaub entfernen','Stauden und Rosen zurückschneiden','Laubschutz von Beeten entfernen']},
   {n:'April',s:'🌱 Frühling',a:['Rasen vertikutieren und nachsäen','Frühlings-Rasendünger (N-betont)','Bänke und Möbel aufstellen','Frühlingsblüher pflanzen']},
-  {n:'Mai',s:'🌱 Frühling',a:['Wöchentliche Rasenmahd beginnt','Heckenformschnitt (1. Runde)','Bewässerung prüfen und einrichten','Mulch auf Beete und Baumscheiben']},
+  {n:'Mai',s:'🌱 Frühling',a:['Wöchentliche Rasenmahd beginnt','Heckenformschnitt (1. Runde)','Bewässerung prüfen und einrichten','Mulch auf Beete und Baumscheiben']},
   {n:'Juni',s:'☀️ Frühsommer',a:['Kirschen ernten (je nach Sorte)','Wasserschosse an Obstbäumen kappen','Bewässerung bei Trockenheit','Wege: Moos und Unkraut entfernen']},
-  {n:'Juli',s:'☀️ Hochsommer',a:['Pflaumen und Mirabellen ernten','Rasen höher stehen lassen (Hitzeschutz)','Junge Bäume wässern (20–30 L/Stück)','Fallobst täglich aufsammeln']},
-  {n:'August',s:'☀️ Spätsommer',a:['Frühäpfel und Frühbirnen ernten','Steinobst nach Ernte schneiden','Fallobst täglich aufsammeln','Hecken: 2. Formschnitt (Hainbuche)','Rasen: Sommerdüngung','Junge Bäume bei Hitze wässern']},
-  {n:'September',s:'🍂 Frühherbst',a:['Äpfel und Birnen Haupternte','Rasen-Nachsaat (bester Zeitpunkt!)','Herbst-Rasendünger (Kalium-betont)','Aerifizieren und Vertikutieren','Letzter Heckenschnitt der Saison','Blumenzwiebeln pflanzen']},
+  {n:'Juli',s:'☀️ Hochsommer',a:['Pflaumen und Mirabellen ernten','Rasen höher stehen lassen (Hitzeschutz)','Junge Bäume wässern (20–30 L/Stück)','Fallobst täglich aufsammeln']},
+  {n:'August',s:'☀️ Spätsommer',a:['Frühäpfel und Frühbirnen ernten','Steinobst nach Ernte schneiden','Fallobst täglich aufsammeln','Hecken: 2. Formschnitt (Hainbuche)','Rasen: Sommerdüngung','Junge Bäume bei Hitze wässern']},
+  {n:'September',s:'🍂 Früherbst',a:['Äpfel und Birnen Haupternte','Rasen-Nachsaat (bester Zeitpunkt!)','Herbst-Rasendünger (Kalium-betont)','Aerifizieren und Vertikutieren','Letzter Heckenschnitt der Saison','Blumenzwiebeln pflanzen']},
   {n:'Oktober',s:'🍂 Herbst',a:['Laubreinigung täglich','Spätäpfel und Quitten ernten','Gartenmöbel einlagern','Baumkontrolle: Standsicherheit']},
   {n:'November',s:'🍂 Spätherbst',a:['Laubreinigung Hochsaison','Rasen in Ruhe lassen','Winterschutz empfindlicher Pflanzen','Streumittel auffüllen']},
   {n:'Dezember',s:'❄️ Winter',a:['Winterdienst (Schnee und Eis)','Außenbeleuchtung kontrollieren','Bäume nach Sturm prüfen','Planung für nächste Saison']}
 ];
 
 const ARTIKEL=[
-  {mo:1,ico:'✂️',kat:'Obstbäume',titel:'Obstbaumschnitt im Winter: Was, wann, wie?',text:'Kernobst (Apfel, Birne, Quitte) wird am besten zwischen Januar und März geschnitten, an frostfreien Tagen. Ohne Laub sieht man die Struktur des Baumes klarer und kann gezielter arbeiten. Ziel: Licht in die Krone bringen, Kreuzäste entfernen, altes Holz auslichten.',tipp:'Nie mehr als ein Drittel der Krone in einem Jahr entfernen.',dauer:'Januar – März'},
-  {mo:2,ico:'🔧',kat:'Vorbereitung',titel:'Gartengeräte: Jetzt schärfen und ölen lohnt sich',text:'Im Februar ist Gartenarbeit noch Mangelware — perfekt um die Geräte fit zu machen. Schaufeln und Spaten schärfen, Schnittwerkzeug reinigen und mit Öl behandeln, Sägeblätter prüfen. Ein scharfes Werkzeug arbeitet effizienter und hinterlässt sauberere Schnittstellen an Pflanzen.',tipp:'Reparaturbedarf jetzt bestellen — April und Mai sind die Stoßzeiten im Handel.',dauer:'Februar'},
-  {mo:3,ico:'🌱',kat:'Frühjahr',titel:'Frühjahrsputz: Warum das Winterlaub jetzt weg muss',text:'Laub das den Winter auf Beeten und unter Hecken lag, ist durchweicht und schimmlig. Pilzkrankheiten können sich daraus entwickeln und im Frühjahr auf Pflanzen überspringen. Außerdem blockiert es die ersten Triebe. Im März alles aufsammeln, bevor die Pflanzen richtig austreiben.',tipp:'Moos auf Wegen jetzt mit einem Schaber entfernen — im Sommer ist es doppelt so viel.',dauer:'März'},
-  {mo:4,ico:'🌿',kat:'Rasen',titel:'Vertikutieren: Was ist das und warum ist es so wichtig?',text:'Im Laufe des Winters bildet sich auf dem Rasen Rasenfilz — abgestorbenes Gras das sich verdichtet. Dieser verhindert, dass Wasser, Luft und Nährstoffe zu den Wurzeln gelangen. Das Vertikutiergerät schneidet diesen Filz auf und kratzt ihn heraus. Danach sieht der Rasen vorübergehend schlimm aus — erholt sich aber innerhalb von 2–3 Wochen eindrucksvoll.',tipp:'Nur bei Bodentemperatur über 8 °C vertikutieren — vorher schadet es mehr als es nützt.',dauer:'April'},
-  {mo:5,ico:'✂️',kat:'Hecken',titel:'Erster Heckenschnitt: Vor der Brutzeit — aber mit Augenmaß',text:'Der erste große Formschnitt des Jahres findet im Mai statt, bevor sich die meisten Vögel in Hecken einnisten. Gesetzlich ist Pflegeschnitt das ganze Jahr erlaubt, aber: Vor jedem Schnitt prüfen ob Nester vorhanden sind. Ist ein Nest aktiv besetzt, muss gewartet werden.',tipp:'Früh morgens schauen — Vögel sitzen dann noch auf dem Nest und sind leichter zu entdecken.',dauer:'Mai'},
-  {mo:6,ico:'🍒',kat:'Obstbäume',titel:'Kirschernte: Schnell handeln lohnt sich',text:'Kirschen sind reif, wenn sie tief dunkelrot und leicht nachgebend sind. Nach der Reife halten sie nur wenige Tage am Baum — dann platzen sie bei Regen auf. Deshalb möglichst in einem Durchgang ernten. Direkt danach kann der Sommerschnitt beginnen.',tipp:'Mit Stiel abpflücken — so halten die Kirschen länger frisch im Kühlschrank.',dauer:'Juni – Mitte Juli'},
-  {mo:7,ico:'🌿',kat:'Rasen',titel:'Rasen im Hochsommer: Höher lassen schützt die Wurzeln',text:'Bei extremer Hitze sollte der Rasen auf 5–6 cm stehen bleiben statt auf 3–4 cm. Die längeren Halme beschatten die Wurzeln und verringern die Bodenverdunstung deutlich. Mähen bei mehr als 30 °C stresst den Rasen zusätzlich — besser in die frühen Morgenstunden verlegen.',tipp:'Grasschnitt liegen lassen: Er wirkt als Mulch und düngt gleichzeitig.',dauer:'Juli – August'},
-  {mo:8,ico:'✂️',kat:'Hecken',titel:'Zweiter Heckenschnitt: Jetzt für ein ganzes Jahr in Form',text:'Hecken wie Hainbuche und Liguster brauchen nach dem ersten Schnitt im Frühjahr im Spätsommer einen zweiten Schnitt. Wer jetzt kürzt, gibt der Hecke noch Zeit zum Eindicken bevor die Wachstumsphase endet — und die Form bleibt den ganzen Winter erhalten. Schneidet man zu spät (nach Oktober), treibt die Hecke nicht mehr nach und der Schnitt sieht bis zum Frühjahr ungepflegt aus.',tipp:'Schnitt in Trapezform (oben schmaler) damit Licht die unteren Äste erreicht.',dauer:'August'},
-  {mo:8,ico:'🌳',kat:'Obstbäume',titel:'Sommerschnitt bei Pflaumen und Kirschen: Besser als im Winter',text:'Nach der Ernte ist der ideale Zeitpunkt für den Schnitt von Steinobst (Pflaumen, Zwetschgen, Kirschen). Im Sommer heilen die Wunden an warmen Tagen schnell zu — Pilze wie der Erreger der Silberkrankheit oder Monilia haben kaum eine Chance, einzudringen. Im Winter dagegen bleiben Schnittstellen wochenlang offen in der Kälte und Nässe.',tipp:'Nur nach der Ernte schneiden. Schnittstellen über 3 cm mit Baumwachs versiegeln.',dauer:'August – Mitte September'},
-  {mo:8,ico:'🍎',kat:'Fallobst',titel:'Fallobst täglich aufsammeln — drei gute Gründe',text:'Heruntergefallene Äpfel und Pflaumen auf Wegen sind eine echte Stolperfalle. Dazu kommen Wespen, die von vergärenden Früchten angezogen werden. Am wichtigsten: Fallobst ist der Hauptüberträger von Pilzkrankheiten wie Schorf und Monilia — liegt es liegen, übertragen sich die Sporen im nächsten Jahr auf den Baum.',tipp:'Fallobst nicht in den normalen Kompost — besser in den Restmüll oder separat entsorgen.',dauer:'August – Oktober'},
-  {mo:9,ico:'🌿',kat:'Rasen',titel:'September: Der wichtigste Monat für einen gesunden Rasen',text:'Der Rasen hat den Hochsommer hinter sich — jetzt ist die beste Zeit zum Regenerieren. Der Boden ist noch warm (ideal für Keimung), aber die Hitze lässt nach. Jetzt nachsäen, aerifizieren und mit Herbstdünger stärken. Was im September investiert wird, zahlt sich im nächsten Frühjahr aus.',tipp:'Nachgesäte Flächen 3–4 Wochen nicht betreten und gleichmäßig feucht halten.',dauer:'Ganzer September'},
-  {mo:9,ico:'💊',kat:'Rasen',titel:'Herbstdünger: Warum jetzt kein Stickstoff?',text:'Im Frühling bekommt der Rasen stickstoffreichen Dünger — der treibt das Wachstum an. Im Herbst ist das falsch: Stickstoff würde weiches, empfindliches Gras produzieren, das der erste Frost schädigt. Stattdessen braucht der Rasen Kalium: Das wirkt wie ein natürlicher Frostschutz in den Zellen und macht das Gras winterfest.',tipp:'Nur Herbst-Rasendünger verwenden — auf der Packung: Kalium-betont, wenig N.',dauer:'September'},
-  {mo:9,ico:'✂️',kat:'Hecken',titel:'Letzter Heckenschnitt 2026: Jetzt oder erst im März',text:'Ende September endet die gesetzliche Brutschutzzeit für Vögel. Der letzte Schnitt des Jahres sollte bis spätestens 30. September erfolgen. Danach wird nicht mehr geschnitten — die Hecke geht in natürlicher Form in den Winter. Nächste Möglichkeit: Ende März, wenn die neue Brutzeit noch nicht beginnt.',tipp:'Schnitt in den kühlen Morgenstunden — immer zuerst prüfen ob Vögel im Strauch sitzen.',dauer:'Bis 30. September'},
-  {mo:10,ico:'🍂',kat:'Laub',titel:'Laubreinigung: Täglich oder der Rasen leidet',text:'Eine geschlossene Laubschicht auf dem Rasen sperrt Licht und Luft — der Rasen beginnt darunter zu faulen. Auf Wegen ist nasses Laub rutschig und eine Unfallgefahr, besonders für ältere Bewohnerinnen. Laub auf Rasenflächen und Wegen täglich oder mindestens alle 2 Tage entfernen.',tipp:'Laub aus Obstbäumen nicht kompostieren — Pilzsporen überleben den normalen Kompost.',dauer:'Oktober – November'},
-  {mo:11,ico:'🛡️',kat:'Wintervorbereitung',titel:'Empfindliche Pflanzen schützen: Was muss eingepackt werden?',text:'Nicht alle Pflanzen überleben einen Berliner Winter ohne Hilfe. Kübelpflanzen kommen ins Lager. Stauden in Beeten bekommen eine Mulchschicht aus Laub oder Stroh. Winterharte Bäume und Sträucher brauchen in der Regel keinen Schutz — außer sie wurden erst in diesem Jahr gepflanzt.',tipp:'Junge Neupflanzungen (1. Winter) mit Jute-Vlies schützen.',dauer:'Oktober – November'},
-  {mo:12,ico:'❄️',kat:'Winterdienst',titel:'Winterdienst: Was ist Pflicht, was ist freiwillig?',text:'Schnee und Glatteis müssen werktags bis 7:00 Uhr, sonntags bis 9:00 Uhr geräumt und gestreut sein. Auf dem Stiftungsgelände gilt: Alle Zugänge, Wege und Treppen müssen sicher passierbar sein — das gilt besonders für ältere Bewohnerinnen, für die Glatteis eine ernste Gefahr ist.',tipp:'Streusplitt oder Sand bevorzugen — Salz schadet Bäumen, Rasen und Bodenplatten.',dauer:'Dezember – Februar'}
+  // JANUAR
+  {mo:1,ico:'✂️',kat:'Obstbäume',bild:'DSC00868b.jpg',
+   titel:'Obstbaumschnitt im Winter: Was, wann, wie?',
+   text:'Kernobst (Apfel, Birne, Quitte) wird am besten zwischen Januar und März geschnitten, an frostfreien Tagen. Ohne Laub sieht man die Struktur des Baumes klar.',
+   tipp:'Nie mehr als ein Drittel der Krone in einem Jahr entfernen.',
+   dauer:'Januar–März',
+   abschnitte:[
+     {h:null,p:'Wenn die Gärten kahl und die Bäume blattlos sind, beginnt die Zeit für einen der wichtigsten Schnitte im Jahr: den Winterschnitt an Kernobst. Apfel, Birne und Quitte werden am besten zwischen Januar und März beschnitten, sobald keine starken Fröste mehr zu erwarten sind.'},
+     {h:'Warum ohne Laub schneiden?',p:'Der größte Vorteil im Winter: Man sieht den Baum wie ein Skelett. Kreuzäste, zu dichte Stellen, abgestorbenes Holz — all das ist ohne Laub sofort erkennbar. Im Sommer würde das Blattwerk vieles verdecken.'},
+     {h:'Was kommt weg?',p:'Entfernt werden: Wasserschosse (die steil aufwachsenden Triebe die dem Baum Energie stehlen), Äste die sich gegenseitig kreuzen oder reiben, sehr alte Äste die kaum noch Früchte tragen, und Äste die nach innen wachsen. Ziel ist eine lichte, offene Krone in der Licht und Luft zirkulieren können.'},
+     {h:'Wichtig: Steinobst nicht jetzt!',p:'Pflaumen, Kirschen und Pfirsiche — das sogenannte Steinobst — werden nicht im Winter geschnitten. Sie sind sehr empfindlich gegenüber Pilzkrankheiten und bekommen ihren Schnitt besser im Sommer direkt nach der Ernte. Im Winter bleiben Wunden zu lange offen und feucht.'}
+   ],
+   fuerBewohnerinnen:'In den Wintermonaten werden Sie sehen, dass wir mit Leiter und Säge an den Obstbäumen arbeiten. Diese Pflegeschnitte sind wichtig für eine gute Ernte im nächsten Jahr. Frisch geschnittene Äste am Boden werden immer am gleichen Tag entfernt.'
+  },
+  // FEBRUAR
+  {mo:2,ico:'🔧',kat:'Vorbereitung',bild:'DSC_0153sk_03.jpg',
+   titel:'Gartengeräte: Jetzt schärfen und ölen lohnt sich',
+   text:'Im Februar ist Gartenarbeit noch Mangelware — perfekt um Geräte fit zu machen. Ein scharfes Werkzeug schneidet sauberer und schont die Pflanzen.',
+   tipp:'Reparaturbedarf jetzt bestellen — April und Mai sind die Stoßzeiten im Handel.',
+   dauer:'Februar',
+   abschnitte:[
+     {h:null,p:'Der Februar ist die ruhigste Zeit im Gartenjahr. Draußen passiert wenig, drinnen aber umso mehr: Jetzt ist der richtige Moment um alle Gartengeräte zu prüfen, zu schärfen und für die kommende Saison vorzubereiten.'},
+     {h:'Warum scharfe Werkzeuge so wichtig sind',p:'Ein stumpfes Gartenmesser oder eine stumpfe Schere reißt Äste ab statt sie sauber zu schneiden. Diese ausgefransten Schnittstellen heilen langsamer und bieten Pilzen und Bakterien eine größere Angriffsfläche. Ein scharfer, sauberer Schnitt — glatt und schräg — überwällt dagegen innerhalb von Wochen.'},
+     {h:'Was wird gemacht?',p:'Spaten und Schaufeln werden mit einer Feile geschärft und danach mit Leinöl eingerieben. Schnittwerkzeug (Heckenschere, Gartenschere, Astschere) wird geschärft und mit Öl behandelt. Sägeblätter werden auf Schäden geprüft und bei Bedarf ausgetauscht. Schläuche und Bewässerungsanlagen werden auf Risse kontrolliert.'}
+   ],
+   fuerBewohnerinnen:'Im Februar sehen Sie uns oft in der Garage oder im Keller mit Werkzeug hantieren. Das ist die stille Vorbereitung für die Gartensaison die im März beginnt. Ein gut vorbereitetes Werkzeug ist die Grundlage für gepflegte Außenanlagen das ganze Jahr.'
+  },
+  // MÄRZ
+  {mo:3,ico:'🌱',kat:'Frühjahr',bild:'Hintergrund4.jpg',
+   titel:'Frühjahrsputz: Warum das Winterlaub jetzt weg muss',
+   text:'Laub das den Winter auf Beeten und unter Hecken lag, ist durchweicht und schimmlig. Daraus können sich Pilzkrankheiten entwickeln die Pflanzen im Frühjahr befallen.',
+   tipp:'Moos auf Wegen jetzt mit einem Schaber entfernen — im Sommer ist es doppelt so viel.',
+   dauer:'März',
+   abschnitte:[
+     {h:null,p:'Wenn die ersten Tage mit Temperaturen über 10 °C kommen, beginnt im Garten das große Erwachen. Und gleichzeitig die erste große Aufräumaktion: der Frühjahrsputz. Ziel ist es, den Boden für die neue Saison vorzubereiten und abgestorbenes Material zu entfernen bevor es zum Problem wird.'},
+     {h:'Warum Winterlaub gefährlich sein kann',p:'Laub das den Winter auf Beeten, unter Hecken und auf dem Rasen verbracht hat, ist feucht, zusammengedrückt und oft schimmlig. Darin überwintern Pilzsporen, Schneckeneier und Schädlingslarven. Bleibt das Laub liegen, startet die neue Saison mit einem Pilz- und Schädlingsvorsprung.'},
+     {h:'Was kommt zuerst?',p:'Als erstes werden alle Rasenflächen von Laub befreit — darunter hat der Rasen gelitten und braucht jetzt Luft und Licht. Dann die Beete: Laub entfernen, Boden vorsichtig auflockern, erste Unkräuter ziehen. Hecken und Sträucher bekommen einen Kontrollschnitt: abgestorbene Triebe raus, Form prüfen.'},
+     {h:'Wege und Flächen',p:'Nasses Laub auf Wegen ist im Winter immer wieder eine Rutschgefahr gewesen. Im März werden alle Pflasterflächen mit dem Besen gereinigt, Moos mit einem Schaber entfernt und wenn nötig Fugen neu abgesandet.'}
+   ],
+   fuerBewohnerinnen:'Der Frühjahrsputz im März bedeutet: Mehr Aktivität im Park und auf den Wegen. Schubkarren, Laubbläser und Harken sind im Einsatz. Wir arbeiten immer von einem Ende des Geländes zum anderen — damit der bereits gereinigte Bereich sauber bleibt.'
+  },
+  // APRIL
+  {mo:4,ico:'🌿',kat:'Rasen',bild:'DSC00887b.jpg',
+   titel:'Vertikutieren: Was ist das und warum ist es so wichtig?',
+   text:'Im Laufe des Winters bildet sich Rasenfilz aus abgestorbenem Gras. Das Vertikutiergerät schneidet ihn auf — danach erholt sich der Rasen eindrucksvoll.',
+   tipp:'Nur bei Bodentemperatur über 8 °C vertikutieren — davor schadet es mehr als es nützt.',
+   dauer:'April',
+   abschnitte:[
+     {h:null,p:'Wer im Frühjahr einen Rasen sieht der trotz regelmäßiger Pflege fleckig, dünn oder gelblich wirkt, hat oft ein Filzproblem. Der sogenannte Rasenfilz — eine Schicht aus abgestorbenem Gras, Moos und organischen Resten — hat sich im Laufe der Jahre zwischen den Halmen angesammelt.'},
+     {h:'Was ist Rasenfilz?',p:'Rasenfilz entsteht wenn abgestorbene Pflanzenteile nicht vollständig abgebaut werden. Er verdichtet sich und bildet eine undurchlässige Schicht die Wasser, Luft und Nährstoffe abhält. Die Grashalme können nicht mehr tief wurzeln — der Rasen wird anfällig für Trockenheit, Krankheiten und Moos.'},
+     {h:'Wie funktioniert das Vertikutieren?',p:'Das Vertikutiergerät hat senkrecht rotierende Messer die den Filz aufschneiden und herausreißen. Das Ergebnis sieht direkt danach erschreckend aus: kahle Streifen, aufgewühlter Rasen. Aber innerhalb von 2–3 Wochen schließen sich die Lücken und der Rasen ist dichter, grüner und gesünder als zuvor.'},
+     {h:'Was danach passiert',p:'Direkt nach dem Vertikutieren werden kahle Stellen nachgesät. Dann kommt eine erste Düngergabe mit stickstoffbetontem Frühlingsdünger. In den folgenden Wochen wird der Rasen regelmäßig gewässert — die neuen Samen brauchen gleichmäßige Feuchtigkeit.'}
+   ],
+   fuerBewohnerinnen:'Wenn Sie im April sehen dass der Rasen nach unserer Arbeit merkwürdig aussieht — mit kahlen Streifen und aufgewühlten Stellen — dann haben wir gerade vertikutiert. Das sieht vorübergehend schlimm aus, ist aber der wichtigste Schritt für einen dichten, gesunden Rasen im Sommer.'
+  },
+  // MAI
+  {mo:5,ico:'✂️',kat:'Hecken',bild:'DSC01277b.jpg',
+   titel:'Erster Heckenschnitt: Vor der Brutzeit — aber mit Augenmaß',
+   text:'Der erste große Formschnitt des Jahres findet im Mai statt, bevor sich die meisten Vögel in Hecken einnisten. Vorher immer prüfen ob Nester vorhanden sind.',
+   tipp:'Früh morgens schauen — Vögel sitzen dann noch auf dem Nest und sind leichter zu entdecken.',
+   dauer:'Mai',
+   abschnitte:[
+     {h:null,p:'Im Mai beginnt die Hecke nach dem Frühjahr intensiv zu wachsen. Die neuen Triebe schießen in alle Richtungen und innerhalb weniger Wochen geht die Form des letzten Schnitts verloren. Der Mai ist der optimale Zeitpunkt für den ersten großen Formschnitt des Jahres.'},
+     {h:'Was sagt das Gesetz?',p:'Paragraf 39 des Bundesnaturschutzgesetzes (BNatSchG) verbietet vom 1. März bis 30. September das "auf den Stock setzen" von Hecken — also radikale Rückschnitte. Normaler Pflegeschnitt zur Formgebung ist dagegen das ganze Jahr über erlaubt. Voraussetzung: Keine aktiv belegten Vogelnester im Strauch.'},
+     {h:'Wie prüfe ich auf Nester?',p:'Vor jedem Schnitt kurz in die Hecke schauen und lauschen. Aktive Nester erkennt man an: Vögeln die nervös um die Hecke fliegen, Gesang oder Alarmrufe, sichtbaren Nestern mit Eiern oder Jungvögeln. Ist ein Nest aktiv besetzt, wird dieser Abschnitt ausgelassen und erst nach dem Ausfliegen der Jungen geschnitten.'},
+     {h:'Das Ergebnis des Frühjahrsschnitts',p:'Nach dem Mai-Schnitt sieht die Hecke gleichmäßig und gepflegt aus. Das verdichtete neue Grün schließt mögliche Lücken vom Winter. Bis zum nächsten Schnitt im August wird die Form gehalten.'}
+   ],
+   fuerBewohnerinnen:'Wenn wir im Mai die Heckenschere einsetzen, gehen wir immer zuerst die gesamte Hecke ab und schauen nach Nestern. Falls Sie einen Vogel beobachten der nervös um eine Hecke fliegt, sagen Sie uns gerne Bescheid — dann sparen wir diesen Abschnitt aus.'
+  },
+  // JUNI
+  {mo:6,ico:'🍒',kat:'Obstbäume',bild:'DSC01312b.jpg',
+   titel:'Kirschernte: Jetzt schnell handeln',
+   text:'Kirschen sind nur wenige Tage am Baum reif bevor sie platzen oder von Vögeln gefressen werden. Der richtige Zeitpunkt ist entscheidend.',
+   tipp:'Mit Stiel abpflücken — so halten die Kirschen länger frisch im Kühlschrank.',
+   dauer:'Juni–Mitte Juli',
+   abschnitte:[
+     {h:null,p:'Kirschen gehören zu den kurzzeitigsten Früchten im Obstgarten. Das Zeitfenster zwischen "noch nicht reif" und "überreif oder schon geplatzt" ist bei manchen Sorten nur 3–5 Tage. Wer zu lange wartet verliert die Ernte an Regen (Platzen) oder an Vögel.'},
+     {h:'Woran erkenne ich Reife?',p:'Reife Kirschen sind je nach Sorte tief dunkelrot bis fast schwarz, fühlen sich leicht weich an wenn man sie behutsam drückt, und lösen sich mit einem leichten Zug inklusive Stiel vom Baum. Grüne oder hellrote Kirschen brauchen noch etwas Zeit.'},
+     {h:'Was nach der Ernte passiert',p:'Direkt nach der Kirschernte ist der beste Zeitpunkt für den Sommerschnitt: Die Wunden heilen im warmen Sommer schnell und Pilze wie die Silberkrankheit haben kaum eine Chance. Beim Kirschbaum gilt das besonders — sein Holz ist ohne Ernteschnitt sehr anfällig.'},
+     {h:'Fallobst bei Kirschen',p:'Geplatz­te oder ausgefallene Kirschen am Boden unbedingt täglich aufsammeln. Sie ziehen Fruchtfliegen und Wespen an und dienen als Überwinterungsort für Pilzkrankheiten.'}
+   ],
+   fuerBewohnerinnen:'Wenn die Kirschen reif sind, ernten wir in einem oder zwei Durchgängen den ganzen Baum. Falls Sie Kirschen vom Baum möchten, sprechen Sie uns gerne an — wir sagen Ihnen wann der richtige Moment ist.'
+  },
+  // JULI
+  {mo:7,ico:'🌿',kat:'Rasen',bild:'DSC00868b.jpg',
+   titel:'Rasen im Hochsommer: Höher lassen schützt die Wurzeln',
+   text:'Bei extremer Hitze sollte der Rasen auf 5–6 cm stehen statt auf 3–4 cm. Die längeren Halme schützen die Wurzeln vor Austrocknung.',
+   tipp:'Grasschnitt liegen lassen: Er wirkt als Mulch und düngt gleichzeitig.',
+   dauer:'Juli–August',
+   abschnitte:[
+     {h:null,p:'Der Hochsommer ist die härteste Zeit für Rasenflächen. Hitze, Trockenheit und intensive Sonneneinstrahlung setzen dem Gras zu. Wer jetzt falsch mäht oder wässert, riskiert einen dauerhaft geschädigten Rasen.'},
+     {h:'Warum jetzt höher mähen?',p:'Die Faustregel: Im Sommer Schnitthohe auf 5–6 cm erhöhen (statt der üblichen 3–4 cm). Längere Halme beschatten die Erde darunter — das reduziert die Bodenverdunstung erheblich. Außerdem können längere Halme mehr Photosynthese betreiben und sind insgesamt stressresistenter.'},
+     {h:'Wann und wie wässern?',p:'Wässern immer früh morgens oder am späten Abend. Tagsüber verdampft ein großer Teil des Wassers bevor er in den Boden einzieht. Besser: einmal pro Woche gründlich wässern (30–40 Minuten) statt täglich ein wenig. So erreicht das Wasser die Wurzeln statt nur die Oberfläche zu befeuchten.'},
+     {h:'Düngen im Sommer?',p:'Eine leichte Sommerdüngung im August ist möglich — aber nur bei bewölktem Wetter oder nach dem Wässern, nie bei praller Sonne. Dünger auf trockenem Rasen in der Hitze kann die Halme verbrennen.'}
+   ],
+   fuerBewohnerinnen:'Wenn der Rasen im Juli etwas länger wirkt als sonst, ist das gewollt. Wir mähen bewusst weniger kurz um den Rasen vor der Hitze zu schützen. Nach dem Sommer wird er wieder auf Normalhöhe gebracht.'
+  },
+  // AUGUST – Artikel 1
+  {mo:8,ico:'✂️',kat:'Hecken',bild:'DSC00866b.jpg',
+   titel:'Zweiter Heckenschnitt: Jetzt für ein ganzes Jahr in Form',
+   text:'Hecken wie Hainbuche und Liguster brauchen nach dem Frühjahrsschnitt im Spätsommer einen zweiten Schnitt. Die Form die wir jetzt schneiden, bleibt den ganzen Winter.',
+   tipp:'Trapezform schneiden (oben schmaler) damit Licht die unteren Äste erreicht.',
+   dauer:'August',
+   abschnitte:[
+     {h:null,p:'Die Hecken rund um die Stiftung brauchen im Jahr in der Regel zwei Schnitte: einen im Frühjahr und einen im Spätsommer. Der erste Schnitt im Mai bringt die Hecke nach dem Winterschlaf in Form. Der zweite Schnitt jetzt im August ist genauso wichtig — aber aus anderen Gründen.'},
+     {h:'Warum jetzt schneiden?',p:'Hecken wie Hainbuche (Carpinus betulus) und Liguster (Ligustrum vulgare) wachsen nach dem Frühlingsschnitt kräftig weiter. Bis zum Hochsommer haben sich viele neue Triebe gebildet die die Form aufweichen. Wird jetzt noch einmal geschnitten, verdichtet die Hecke diese Triebe und bildet eine gleichmäßige, dichte Wand aus.'},
+     {h:null,p:'Das Entscheidende: Nach dem August-Schnitt ist das Wachstum für die Saison weitgehend abgeschlossen. Die Form die wir jetzt schneiden, bleibt bis zum nächsten Frühjahr erhalten. Wer diesen Schnitt auslässt oder zu spät macht, hat eine lockere, ausgefranste Hecke durch den ganzen Winter.'},
+     {h:'Die richtige Technik: Trapezform',p:'Der häufigste Fehler beim Heckenschnitt ist eine rechteckige Form mit senkrechten Seiten. Dadurch bekommen die unteren Äste zu wenig Licht und werden kahl. Die richtige Form ist ein leichtes Trapez — oben etwas schmaler als unten. So fällt Licht auf alle Teile der Hecke, und die Äste bis zum Boden bleiben dicht und grün.'},
+     {h:'Brutschutz beachten',p:'Gesetzlich ist der Pflegeschnitt von Hecken das ganze Jahr erlaubt (§ 39 BNatSchG). Wichtig: Vor jedem Schnitt prüfen ob Vögel nisten. Aktiv besetzte Nester bedeuten: warten. Im August sind die meisten Jungvögel bereits flügge.'}
+   ],
+   fuerBewohnerinnen:'Die Hecken im Park und rund um die Gebäude werden in diesen Wochen turnusmäßig geschnitten. Dabei entsteht vorübergehend Lärm durch die Heckenschere. Der Schnitt dauert in der Regel 1–2 Tage für die gesamte Anlage. Das Ergebnis: gepflegte, gleichmäßige Hecken die den ganzen Winter schön aussehen.'
+  },
+  // AUGUST – Artikel 2
+  {mo:8,ico:'🌳',kat:'Obstbäume',bild:'DSC01289b.jpg',
+   titel:'Sommerschnitt bei Pflaumen und Kirschen: Besser als im Winter',
+   text:'Nach der Ernte ist der ideale Zeitpunkt für den Schnitt von Steinobst. Im Sommer heilen Wunden schnell zu — Pilze wie die Silberkrankheit haben kaum eine Chance.',
+   tipp:'Schnittstellen über 3 cm mit Baumwachs versiegeln.',
+   dauer:'August–Mitte September',
+   abschnitte:[
+     {h:null,p:'Wenn man an Obstbaumschnitt denkt, denkt man meist an den Winter: kahl, übersichtlich, ohne Laub. Doch bei Steinobst — also Pflaumen, Zwetschgen, Kirschen und Pfirsichen — ist der Sommerschnitt direkt nach der Ernte die deutlich bessere Wahl.'},
+     {h:'Das Problem mit dem Winterschnitt bei Steinobst',p:'Steinobstbäume sind sehr empfindlich gegenüber Pilzkrankheiten. Der gefährlichste ist der Erreger der Silberkrankheit (Chondrostereum purpureum), der über frische Schnittstellen in das Holz eindringt. Im Winter bleiben diese Wunden wochenlang offen — bei Kälte und Nässe, genau den Bedingungen unter denen sich Pilzsporen am besten verbreiten.'},
+     {h:'Warum der Sommerschnitt überlegen ist',p:'Im Sommer direkt nach der Ernte sind die Bedingungen völlig anders: Wunden trocknen schnell an der Sommerluft. Die Zellteilung ist aktiv, was das Überwallen (den natürlichen Wundverschluss) beschleunigt. Pilze haben kaum Zeit und kaum Feuchtigkeit um einzudringen. Studien aus der Obstbauforschung zeigen: Steinobst das nach der Ernte geschnitten wird, erkrankt deutlich seltener als im Winter beschnittene Bäume.'},
+     {h:'Was wird beim Sommerschnitt entfernt?',p:'Wasserschosse: die steil nach oben wachsenden Triebe die dem Baum Energie rauben. Kreuzäste: Äste die sich gegenseitig beschatten. Kranke oder beschädigte Äste. Äste die zu dicht stehen — Licht muss in die Krone.'}
+   ],
+   fuerBewohnerinnen:'In den nächsten Wochen werden die Obstbäume auf dem Gelände nach der Ernte beschnitten. Sie werden sehen dass die Bäume danach luftiger wirken — das ist gewollt. Licht in der Krone bedeutet mehr und besseres Obst im nächsten Jahr. Wenn Sie reifes Obst sehen das noch nicht geerntet wurde, geben Sie uns gerne Bescheid.'
+  },
+  // AUGUST – Artikel 3
+  {mo:8,ico:'🍎',kat:'Fallobst',bild:'DSC00868b.jpg',
+   titel:'Fallobst täglich aufsammeln — drei gute Gründe',
+   text:'Heruntergefallene Äpfel und Pflaumen sind Stolperfallen, ziehen Wespen an und übertragen Pilzkrankheiten auf den Baum. Täglich aufsammeln ist Pflicht.',
+   tipp:'Fallobst nicht in den normalen Kompost — besser in den Restmüll oder separat entsorgen.',
+   dauer:'August–Oktober',
+   abschnitte:[
+     {h:'Grund 1: Stolperfallen auf dem Weg',p:'Runde, weiche Früchte auf glattem Pflaster oder Rasenbelägen sind eine ernste Unfallgefahr — besonders für ältere Bewohnerinnen die auch mit Stock oder Rollator unterwegs sind. Ein fauler Apfel auf einem Weg ist schwerer zu sehen als ein nasser Stein und noch rutschiger. Wir sammeln deshalb täglich auf, besonders auf allen begangenen Wegen und Terrassen.'},
+     {h:'Grund 2: Wespen werden angezogen',p:'Vergärendes Fallobst produziert Alkohol und süßliche Aromastoffe die Wespen über viele Meter anziehen. Eine hohe Wespenkonzentration ist nicht nur unangenehm — sie kann für allergische Personen gefährlich werden. Regelmäßiges Aufsammeln bevor die Früchte zu gären beginnen, reduziert die Wespenaktivität im Park erheblich.'},
+     {h:'Grund 3: Pilzkrankheiten überwintern im Fallobst',p:'Das ist der wichtigste Grund für die Gesundheit der Bäume. Pilzkrankheiten wie Schorf (Venturia inaequalis) und Monilia (Braunfäule) überwintern in abgefallenem Obst und in abgefallenen Blättern. Im Frühjahr werden Sporen freigesetzt die auf den Baum zurückfallen und die Ernte des nächsten Jahres befallen. Wer Fallobst liegen lässt, füttert also nicht nur Wespen — sondern auch die Pilze die den Baum krank machen.'},
+     {h:'Wohin mit dem Fallobst?',p:'Wichtig: Fallobst aus Obstbäumen gehört nicht in den normalen Kompost. Pilzsporen überleben den Hauskompost problemlos. Fallobst kommt in den Restmüll oder wird separat kompostiert (Heißkompostierung bei über 60 °C tötet die Sporen ab).'}
+   ],
+   fuerBewohnerinnen:'Sie werden sehen dass wir täglich durch den Park gehen und Fallobst aufsammeln — besonders nach windigen Nächten kann das viel sein. Wenn Sie früh am Morgen noch Obst auf dem Weg sehen, dürfen Sie uns gerne darauf aufmerksam machen. Ihre Sicherheit hat oberste Priorität.'
+  },
+  // AUGUST – Artikel 4
+  {mo:8,ico:'💧',kat:'Bewässerung',bild:'DSC01277b.jpg',
+   titel:'Junge Bäume im Hochsommer: So viel Wasser brauchen sie',
+   text:'Bäume die erst in den letzten 2–3 Jahren gepflanzt wurden, haben noch kein tiefes Wurzelsystem. Bei Hitze können sie buchstäblich verdursten — 20–30 L pro Baum sind nötig.',
+   tipp:'Mulch um den Stamm reduziert die Verdunstung bis zu dreifach.',
+   dauer:'Juli–August',
+   abschnitte:[
+     {h:null,p:'Die Bäume auf dem Gelände der Sidonie-Scharfe-Stiftung sind nicht alle gleich alt. Neben den alten Laubbäumen die seit Jahrzehnten im Park stehen, gibt es auch jüngere Bäume — und genau diese brauchen im Hochsommer besondere Aufmerksamkeit.'},
+     {h:'Warum junge Bäume mehr Wasser brauchen',p:'Ein alter Baum hat im Laufe der Jahre ein tiefes, weitreichendes Wurzelsystem aufgebaut. Seine Wurzeln reichen in feuchte Erdschichten die auch in Trockenperioden Wasser speichern. Ein junger Baum der erst vor 2–3 Jahren gepflanzt wurde, hat noch kein solches System. Seine Wurzeln sind noch nah an der Oberfläche — dort wo die Erde am schnellsten austrocknet.'},
+     {h:null,p:'Bei langen Hitzewellen kann ein junger Baum in echten Trockenstress geraten: Er verdunstet über seine Blätter mehr Wasser als die Wurzeln nachliefern können. Die Folge sind eingerollte Blätter, Gelb- oder Braunfärbung — und im schlimmsten Fall stirbt der Baum ab.'},
+     {h:'Wie viel Wasser und wann?',p:'Die Faustregel: 20 bis 30 Liter pro Baum, langsam gegossen. Wichtig ist dass das Wasser tief in den Boden einzieht — also langsam gießen, nicht mit starkem Strahl auf die Oberfläche. Der beste Zeitpunkt ist früh morgens oder am späten Abend. Tagsüber bei voller Sonne verdampft ein Teil des Wassers bevor es die Wurzeln erreicht.'},
+     {h:'Der Mulch-Trick',p:'Eine Schicht Rindenmulch (5–10 cm) um den Stamm herum reduziert die Verdunstung aus dem Boden um das Zwei- bis Dreifache. Das spart nicht nur Wasser — sondern auch Arbeitszeit beim Wässern.'}
+   ],
+   fuerBewohnerinnen:'In den Sommerwochen werden Sie sehen wie wir regelmäßig mit Schlauch oder Gießkanne die jüngeren Bäume im Park und an den Wegen wässern. Bei anhaltender Trockenheit wiederholen wir das täglich. Gesunde Bäume geben dem Park seinen Charakter — und wir sorgen dafür dass sie ihn behalten.'
+  },
+  // SEPTEMBER
+  {mo:9,ico:'🌿',kat:'Rasen',bild:'DSC01289b.jpg',
+   titel:'September: Der wichtigste Monat für einen gesunden Rasen',
+   text:'Der Boden ist noch warm, die Hitze lässt nach — perfekt für Nachsaat, Aerifizieren und Herbstdünger. Was jetzt investiert wird, zahlt sich im nächsten Frühjahr aus.',
+   tipp:'Nachgesäte Flächen 3–4 Wochen nicht betreten und gleichmäßig feucht halten.',
+   dauer:'Ganzer September',
+   abschnitte:[
+     {h:null,p:'Wenn der September beginnt, hat der Rasen seinen härtesten Monat hinter sich. Hitze, Trockenheit und intensive Nutzung hinterlassen Spuren: kahle Stellen, dünne Bereiche, vielleicht Moos. Jetzt ist der beste Zeitpunkt des ganzen Jahres um gegenzusteuern.'},
+     {h:'Warum September optimal ist',p:'Drei Faktoren machen September ideal: Der Boden ist noch warm von der Sommerwärme (optimal für die Keimung von Grassamen). Die Hitze hat deutlich nachgelassen und Fröste sind noch weit weg. Und der Herbstregen kommt die Feuchtigkeit sichert ohne dass manuell so viel gewässert werden muss.'},
+     {h:'Schritt 1: Aerifizieren',p:'Mit einem Aerifizierer oder einer Grabgabel werden kleine Löcher in den Rasen gesteckt. Das lockert verdichteten Boden, verbessert die Belüftung und ermöglicht Wasser und Nährstoffen tiefer einzudringen. Gerade nach einem heißen Sommer mit viel Rasenmahd ist der Boden oft stark verdichtet.'},
+     {h:'Schritt 2: Nachsäen',p:'Kahle Stellen werden kurz gemäht, aufgeharkt und dann mit Grassamen besät. Im September keimen die Samen zuverlässig — wärmer Boden, ausreichend Feuchtigkeit, kein Hitzestress. Wichtig: die nachgesäten Stellen 3–4 Wochen nicht betreten und gleichmäßig feucht halten.'},
+     {h:'Schritt 3: Herbstdünger',p:'Jetzt wird ausschließlich Herbst-Rasendünger verwendet — mit hohem Kaliumanteil und wenig Stickstoff. Kalium wirkt wie ein natürlicher Frostschutz in den Graszellen und macht den Rasen winterfest. Stickstoff jetzt würde weiches, frostempfindliches Gras produzieren.'}
+   ],
+   fuerBewohnerinnen:'Im September sehen Sie uns intensiv auf dem Rasen arbeiten: Aerifizieren, säen, düngen. Der Rasen sieht danach vorübergehend etwas bearbeitet aus. Bitte die frisch gesäten Stellen ein paar Wochen möglichst nicht betreten — wir markieren sie wenn nötig.'
+  },
+  {mo:9,ico:'💊',kat:'Rasen',bild:'DSC00887b.jpg',
+   titel:'Herbstdünger: Warum jetzt kein Stickstoff?',
+   text:'Im Frühling braucht der Rasen Stickstoff für Wachstum. Im Herbst ist das falsch: Jetzt braucht er Kalium — das wirkt wie ein natürlicher Frostschutz in den Zellen.',
+   tipp:'Nur Herbst-Rasendünger verwenden: auf der Packung Kalium-betont, wenig N.',
+   dauer:'September',
+   abschnitte:[
+     {h:null,p:'Wer im Frühjahr für seinen Rasen einkauft, greift zu stickstoffreichem Dünger — Stickstoff (N) treibt das Wachstum an, macht Gras kräftig grün und dicht. Im Herbst ist genau dieser Dünger aber falsch und kann echten Schaden anrichten.'},
+     {h:'Stickstoff im Herbst: Das Problem',p:'Stickstoff im Herbst signalisiert dem Gras: Wachsen! Neue, weiche Halme schießen hoch. Diese frischen Triebe sind nicht abgehärtet und extrem frostempfindlich. Kommt dann der erste Frost, gefrieren die jungen Zellen und die Halme sterben ab. Das Ergebnis: im Frühjahr liegt ein teilweise abgestorbener, löchriger Rasen vor einem.'},
+     {h:'Kalium: Das richtige Mittel',p:'Kalium (K) ist das gegenteilige Nährstoff. Es wird nicht für Wachstum gebraucht, sondern für Festigkeit. Kalium erhöht den osmotischen Druck in den Pflanzenzellen — das senkt ihren Gefrierpunkt. Vereinfacht gesagt: Kalium wirkt wie ein eingebauter Frostschutz. Halme mit ausreichend Kalium überstehen Frost deutlich besser.'},
+     {h:'Wie erkennt man den richtigen Herbstdünger?',p:'Auf der Verpackung nach der NPK-Zusammensetzung schauen. N sollte niedrig sein (unter 5 %), K sollte hoch sein (über 20 %). Produkte die explizit als "Herbstdünger" oder "Wintervorbereitung" bezeichnet werden, haben in der Regel die richtige Zusammensetzung.'}
+   ],
+   fuerBewohnerinnen:'Wenn wir im September den Rasen düngen, ist das Granulat zu sehen das wir ausgestreut haben. Es löst sich beim nächsten Regen auf. Für Haustiere und Menschen ist handelsüblicher Rasendünger nach dem Einarbeiten in der Regel unbedenklich — direkt nach dem Streuen besser den frisch gedüngten Bereich meiden.'
+  },
+  {mo:9,ico:'✂️',kat:'Hecken',bild:'DSC00866b.jpg',
+   titel:'Letzter Heckenschnitt 2026: Jetzt oder erst im März',
+   text:'Ende September endet die Brutschutzzeit. Der letzte Schnitt muss bis 30. September erfolgen — danach wird die Hecke in natürlicher Form in den Winter entlassen.',
+   tipp:'Schnitt in den kühlen Morgenstunden — immer zuerst prüfen ob Vögel im Strauch sitzen.',
+   dauer:'Bis 30. September',
+   abschnitte:[
+     {h:null,p:'Der 30. September ist ein wichtiges Datum für alle die Hecken pflegen: Dann endet die gesetzliche Brutschutzzeit nach § 39 BNatSchG. Bis zu diesem Tag ist der letzte Heckenschnitt des Jahres möglich und sinnvoll.'},
+     {h:'Was passiert wenn man es verpasst?',p:'Wird der September-Schnitt ausgelassen, muss man bis Ende März des nächsten Jahres warten — dann beginnt die neue Brutzeit und damit wieder ein eingeschränktes Schnittfenster. Eine Hecke die 6 Monate nicht geschnitten wird, verliert deutlich an Form.'},
+     {h:'Was jetzt noch geschnitten wird',p:'Beim letzten Schnitt des Jahres geht es vor allem um die Formgebung: gerade Linien, gleichmäßige Höhe, Trapezform. Es wird nicht zu stark eingekürzt — die Hecke soll mit etwas Volumen in den Winter gehen um frostempfindliche Stellen besser zu schützen.'},
+     {h:'Was danach nicht mehr passiert',p:'Ab Oktober bis Ende März: kein Rückschnitt. Die Hecke darf in diesem Zeitraum in Ruhe bleiben. Leichtes Zurechtschneiden einzelner wild wachsender Triebe ist erlaubt, aber größere Formschnitte warten bis zum Frühjahr.'}
+   ],
+   fuerBewohnerinnen:'Nach dem letzten Heckenschnitt im September werden die Hecken den ganzen Winter in ihrer Form bleiben. Im Frühjahr — sobald die Temperaturen steigen — beginnt das Spiel von vorn. Falls Sie im Winter bemerken dass ein Ast sich über einen Weg biegt oder stört, sagen Sie uns Bescheid — das können wir auch in der Winterpause beheben.'
+  },
+  {mo:9,ico:'🍎',kat:'Obstbäume',bild:'DSC01312b.jpg',
+   titel:'Apfelernte: Wann ist der richtige Zeitpunkt?',
+   text:'Nicht jeder Apfel ist gleichzeitig reif. Frühsorten halten sich kaum 2 Wochen, Herbstsorten sind jetzt optimal für den Vorrat. Ein einfacher Test verrät die Reife.',
+   tipp:'Äpfel zum Lagern nicht waschen und kühl, dunkel, getrennt von anderem Obst lagern.',
+   dauer:'September–Oktober',
+   abschnitte:[
+     {h:null,p:'Die Apfelernte ist keine einmalige Aktion, sondern zieht sich je nach Sorte von August bis in den Oktober. Das Wissen welche Sorte wann reif ist und wie man Reife erkennt, ist entscheidend für eine gute Ernte.'},
+     {h:'Früh- und Herbstsorten',p:'Frühsorten wie Klarapfel oder Gravensteiner sind bereits im August reif und halten sich kaum länger als 2 Wochen. Herbstsorten — Cox Orange, Boskoop, Elstar — folgen jetzt im September und Oktober. Sie sind deutlich lagerfähiger: richtig gelagert halten sie bis in den Winter.'},
+     {h:'Wie erkenne ich Reife?',p:'Ein einfacher Test: Den Apfel leicht nach oben drehen. Löst er sich mit minimalem Widerstand inklusive Stiel — ist er reif. Muss man ihn reißen, braucht er noch etwas Zeit. Reife Äpfel haben außerdem eine gleichmäßige Grundfarbe (auch unter der Rottönung), und die Kerne im Inneren sind braun statt weiß.'},
+     {h:'Fallobst vs. geerntete Äpfel',p:'Äpfel die von selbst gefallen sind, können trotzdem noch gut und essbar sein — aber sie halten sich nicht mehr lange und sollten zuerst verarbeitet werden. Geerntete Äpfel mit Stiel, ohne Druckstellen, halten sich deutlich länger.'}
+   ],
+   fuerBewohnerinnen:'Wenn die Äpfel auf dem Gelände reif sind, ernten wir in Absprache. Reifen Äpfel vom Baum gerne mitnehmen — bitte immer mit dem Stiel abpflücken um den Baum nicht zu beschädigen. Äpfel die auf den Wegen liegen werden täglich aufgesammelt.'
+  },
+  // OKTOBER
+  {mo:10,ico:'🍂',kat:'Laub',bild:'DSC01298b.jpg',
+   titel:'Laubreinigung: Täglich oder der Rasen leidet',
+   text:'Eine geschlossene Laubschicht sperrt Licht und Luft vom Rasen ab. Nasses Laub auf Wegen ist eine Rutschgefahr. Täglich aufnehmen ist der einzige Weg.',
+   tipp:'Laub aus Obstbäumen nicht kompostieren — Pilzsporen überleben den normalen Kompost.',
+   dauer:'Oktober–November',
+   abschnitte:[
+     {h:null,p:'Wenn im Oktober die großen Laubbäume anfangen abzuwerfen, beginnt eine der arbeitsintensivsten Phasen des Jahres: die Laubreinigung. Täglich, manchmal mehrfach täglich, werden Wege und Rasenflächen von gefallenen Blättern befreit.'},
+     {h:'Warum der Rasen kein Laub verträgt',p:'Eine geschlossene Laubschicht auf dem Rasen sperrt Licht und Luft vollständig ab. Darunter beginnt das Gras bereits nach wenigen Tagen zu faulen. Feuchtigkeit unter dem Laub fördert Pilzkrankheiten wie Schneeschimmel. Kurzum: Laub auf dem Rasen über mehrere Tage verursacht kahle, kranke Stellen die im Frühjahr aufwendig repariert werden müssen.'},
+     {h:'Die Rutschgefahr auf Wegen',p:'Nasses Laub auf Pflaster oder Plattenbelägen ist eine der häufigsten Sturzursachen im Herbst. Die Blätter setzen sich fest und bilden eine glatte, kaum sichtbare Schicht. Besonders morgens nach Tau oder Regen ist die Gefahr besonders hoch. Wir priorisieren deshalb immer zuerst alle begangenen Wege.'},
+     {h:'Wohin mit dem Laub?',p:'Normales Laub (Linde, Birke, Buche) kompostiert gut und wird in kompostierbaren Mengen auf Kompostflächen gegeben oder als Mulch zwischen Stauden verwendet. Laub von Obstbäumen — Äpfel, Pflaumen — kommt separat in den Restmüll, wegen Pilzsporen.'}
+   ],
+   fuerBewohnerinnen:'Im Oktober sind wir täglich mit Rechen und Laubbläser im Park. Bitte auf nassen Herbsttagen besonders auf Wegen aufpassen — trotz täglicher Reinigung kann morgens kurz wieder Laub auf einem Weg liegen. Bitte geben Sie uns Bescheid wenn ein Weg besonders rutschig ist.'
+  },
+  // NOVEMBER
+  {mo:11,ico:'🛡️',kat:'Wintervorbereitung',bild:'BlumenEingangDSC_0014.jpg',
+   titel:'Empfindliche Pflanzen schützen: Was muss eingepackt werden?',
+   text:'Nicht alle Pflanzen überleben einen Berliner Winter ohne Hilfe. Kübelpflanzen ins Lager, Beete mit Mulch, junge Neupflanzungen mit Vlies schützen.',
+   tipp:'Junge Neupflanzungen (1. Winter) mit Jute-Vlies schützen.',
+   dauer:'Oktober–November',
+   abschnitte:[
+     {h:null,p:'Berlin-Zehlendorf liegt in einer für Deutschland vergleichsweise milden Zone, trotzdem können die Winter kalt werden. Für die meisten alten Bäume und winterharten Stauden auf dem Gelände bedeutet das kein Problem — aber nicht für alle Pflanzen gilt das gleiche.'},
+     {h:'Kübelpflanzen',p:'Pflanzen in Kübeln und Töpfen sind besonders gefährdet: Die Erde in einem Kübel friert viel schneller durch als Erdreich im Boden. Oleander, Fuchsien, Kübelhortensien und ähnliche Pflanzen kommen ins Lager — ein kühler, heller, frostfreier Raum mit möglichst wenig Heizung. Dort überwintern sie und kommen im April oder Mai wieder heraus.'},
+     {h:'Stauden in Beeten',p:'Winterharte Stauden wie Hostas, Phlox oder Astern brauchen in der Regel keinen Schutz. Eine Mulchschicht aus Laub oder Rindenmulch (5–10 cm) um die Wurzeln schützt den Wurzelballen vor starkem Frost und hält Feuchtigkeit. Das abgestorbene oberirdische Material kann als zusätzlicher Schutz stehen bleiben bis zum Frühjahr.'},
+     {h:'Junge Neupflanzungen',p:'Bäume und Sträucher die erst in diesem Jahr gepflanzt wurden, überstehen ihren ersten Winter oft ohne Probleme — aber es ist ein Risiko. Zur Sicherheit wird der Wurzelbereich großzügig gemulcht und die Pflanze wenn möglich mit Jutegewebe oder Wintervlies umwickelt. Im Frühjahr kommt das Schutzmaterial dann wieder runter.'}
+   ],
+   fuerBewohnerinnen:'Im Oktober und November sehen Sie uns dabei wie wir Kübelpflanzen einräumen und Beete mit Laub oder Mulch abdecken. Falls Sie eigene Kübelpflanzen auf dem Balkon oder der Terrasse haben und sich nicht sicher sind ob sie frosthart sind — sprechen Sie uns an, wir helfen gerne weiter.'
+  },
+  // DEZEMBER
+  {mo:12,ico:'❄️',kat:'Winterdienst',bild:'DSC_0153sk_03.jpg',
+   titel:'Winterdienst: Was ist Pflicht, was ist freiwillig?',
+   text:'Schnee und Glatteis müssen werktags bis 7:00 Uhr geräumt sein. Auf dem Stiftungsgelände gilt: alle Zugänge und Wege müssen sicher passierbar sein.',
+   tipp:'Streusplitt oder Sand bevorzugen — Salz schadet Bäumen, Rasen und Bodenplatten.',
+   abschnitte:[
+     {h:null,p:'Sobald die ersten Schneeflocken fallen oder Frost angekündigt wird, beginnt der Winterdienst. Er ist nicht nur eine freundliche Geste — er ist rechtlich vorgeschrieben und schützt die Bewohnerinnen vor Unfällen.'},
+     {h:'Was gesetzlich gefordert ist',p:'Schnee und Glatteis müssen auf öffentlichen Gehwegen werktags bis 7:00 Uhr morgens beseitigt sein, an Sonn- und Feiertagen bis 9:00 Uhr. Für das Stiftungsgelände selbst gilt: Alle Zugänge, Wege und Treppen müssen zu jederzeit sicher passierbar sein. Bei starkem Schneefall oder Eis wird nachgearbeitet.'},
+     {h:'Streumittel: Splitt statt Salz',p:'Salz taut zuverlässig, hat aber Nachteile: Es schadet den Bäumen und Rasen in der Umgebung, greift Pflasterfugen an und ist schlecht für Haustiere. Wir verwenden deshalb vorrangig Streusplitt oder Sand — diese geben Halt ohne Schäden zu verursachen. Bei extremem Glatteis kann punktuell Salz notwendig sein.'},
+     {h:'Kontrolle und Reaktionszeit',p:'Bei Frost oder angekündigtem Schnee: früh morgens (oft vor 6:00 Uhr) erste Kontrolle und Räumen. Bei anhaltendem Schneefall werden die Hauptwege stündlich kontrolliert. Abends vor dem Frost: Hauptwege abstreuen als Vorsichtsmaßnahme.'}
+   ],
+   dauer:'Dezember–Februar',
+   fuerBewohnerinnen:'Im Winter können Sie sich darauf verlassen dass wir früh auf den Beinen sind und die Wege freimachen bevor Sie das Haus verlassen. Bitte melden Sie uns sofort wenn ein Weg trotzdem rutschig ist — in dringenden Fällen auch abends oder nachts. Ihre Sicherheit geht vor.'
+  }
 ];
 
 const MO_NAMEN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+function openArtikel(idx){
+  const a=ARTIKEL[idx];if(!a)return;
+  const box=document.getElementById('art-box');
+  const ov=document.getElementById('art-ov');
+  const secs=(a.abschnitte||[]).map(s=>
+    (s.h?`<div class="modal-h3">${s.h}</div>`:'')+
+    `<p class="modal-p">${s.p}</p>`
+  ).join('');
+  box.innerHTML=`
+    ${a.bild?`<img class="modal-hero" src="${IMG_BASE}${a.bild}" alt="${a.kat}" loading="lazy">`:''}
+    <div class="modal-inner">
+      <div class="modal-kat-line">${a.ico} ${a.kat}</div>
+      <div class="modal-h1">${a.titel}</div>
+      ${secs}
+      ${a.tipp?`<div class="modal-tbox"><strong>Tipp: </strong>${a.tipp}</div>`:''}
+      ${a.fuerBewohnerinnen?`<div class="modal-bew"><div class="modal-bew-lbl">Für Sie als Bewohnerin</div>${a.fuerBewohnerinnen}</div>`:''}
+    </div>`;
+  ov.classList.add('open');
+  document.body.style.overflow='hidden';
+  ov.scrollTop=0;
+  box.scrollTop=0;
+}
+
+function closeArtikel(){
+  document.getElementById('art-ov').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+document.getElementById('art-ov').addEventListener('click',function(e){
+  if(e.target===this)closeArtikel();
+});
 
 function renderMoGrid(){
   const g=document.getElementById('mo-grid');if(!g)return;
@@ -719,9 +1014,10 @@ function renderArtikel(){
   if(!g)return;
   const mo=new Date().getMonth()+1;
   if(mn)mn.textContent=MO_NAMEN[mo-1];
-  const cur=ARTIKEL.filter(a=>a.mo===mo);
+  const cur=ARTIKEL.map((a,i)=>({...a,_i:i})).filter(a=>a.mo===mo);
   if(!cur.length){g.innerHTML=`<p style="color:var(--stone);font-size:14px;font-family:var(--sans)">Im ${MO_NAMEN[mo-1]} stehen keine besonderen Maßnahmen an.</p>`;return;}
-  g.innerHTML=cur.map(a=>`<div class="artikel-card">
+  g.innerHTML=cur.map(a=>`<div class="artikel-card" onclick="openArtikel(${a._i})">
+    ${a.bild?`<img class="artikel-img" src="${IMG_BASE}${a.bild}" alt="${a.kat}" loading="lazy">`:''}
     <div class="artikel-head">
       <span class="artikel-ico">${a.ico}</span>
       <span class="artikel-kat">${a.kat}</span>
@@ -731,7 +1027,7 @@ function renderArtikel(){
       <div class="artikel-titel">${a.titel}</div>
       <p class="artikel-text">${a.text}</p>
       <div class="artikel-tipp">${a.tipp}</div>
-      <div class="artikel-dauer">${a.dauer}</div>
+      <div class="artikel-dauer">${a.dauer||''}</div>
     </div>
   </div>`).join('');
 }
