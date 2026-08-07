@@ -20,56 +20,73 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#f4f6f4;color:#1a
 
 .card{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
 
+/* BEWOHNER SELECTOR */
+.bw-card{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.bw-label{font-size:15px;font-weight:700;color:#1a3c2e;margin-bottom:12px}
+
+.bw-selected{display:none;align-items:center;gap:14px}
+.bw-selected.show{display:flex}
+.bw-avatar{width:52px;height:52px;border-radius:50%;background:#d8f3dc;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.bw-info{flex:1}
+.bw-name{font-size:18px;font-weight:700;color:#1a3c2e}
+.bw-room{font-size:14px;color:#607060;margin-top:2px}
+.bw-change{font-size:13px;color:#2d6a4f;text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;margin-top:5px;display:block}
+
+.bw-select-wrap{display:none}
+.bw-select-wrap.show{display:block}
+.bw-hint{font-size:14px;color:#607060;margin-bottom:10px}
+select.bw-select{
+  width:100%;padding:14px 15px;
+  border:2px solid #dde5dd;border-radius:10px;
+  font-size:18px;background:#fafcfa;color:#1a2e1a;
+  font-family:inherit;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%23607060' d='M5 8l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:44px
+}
+select.bw-select:focus{outline:none;border-color:#40916c;background:#fff}
+
+.bw-confirm-btn{
+  display:block;width:100%;padding:14px;
+  background:#2d6a4f;color:#fff;border:none;border-radius:10px;
+  font-size:17px;font-weight:600;cursor:pointer;margin-top:10px
+}
+.bw-confirm-btn:active{opacity:.88}
+.bw-anon{display:block;text-align:center;font-size:14px;color:#8fa88f;margin-top:10px;cursor:pointer;text-decoration:underline;background:none;border:none;width:100%}
+
+/* FORM FIELDS */
 .field{margin-bottom:20px}
 .field:last-child{margin-bottom:0}
-
 label{display:block;font-size:15px;font-weight:700;color:#1a3c2e;margin-bottom:7px;letter-spacing:-.1px}
-.opt{font-weight:400;font-size:13px;color:#607060;margin-left:4px}
 
-input[type=text],
-select,
-textarea{
-  width:100%;
-  padding:14px 15px;
-  border:2px solid #dde5dd;
-  border-radius:10px;
-  font-size:18px;
-  background:#fafcfa;
-  color:#1a2e1a;
-  font-family:inherit;
-  transition:border-color .15s;
-  -webkit-appearance:none;
-  appearance:none
+input[type=text],select.std,textarea{
+  width:100%;padding:14px 15px;
+  border:2px solid #dde5dd;border-radius:10px;
+  font-size:18px;background:#fafcfa;color:#1a2e1a;
+  font-family:inherit;transition:border-color .15s;
+  -webkit-appearance:none;appearance:none
 }
-input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:#40916c;background:#fff}
+select.std{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%23607060' d='M5 8l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:44px
+}
+input[type=text]:focus,select.std:focus,textarea:focus{outline:none;border-color:#40916c;background:#fff}
 textarea{min-height:110px;resize:vertical}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%23607060' d='M5 8l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:40px}
 
+/* PHOTO */
 .photo-area{border:2px dashed #b7c9b7;border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:#607060;font-size:16px;position:relative;overflow:hidden;transition:border-color .15s,background .15s}
 .photo-area:hover,.photo-area:active{border-color:#40916c;background:#f0f7f0}
 .photo-area input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
 .photo-icon{font-size:32px;margin-bottom:6px}
-.photo-text{font-size:16px}
 .photo-hint{font-size:13px;color:#8fa88f;margin-top:3px}
-
-.photo-preview-wrap{margin-top:10px;position:relative;display:inline-block}
+.photo-preview-wrap{margin-top:10px;position:relative;display:none}
 .photo-preview-wrap img{width:100%;max-height:200px;object-fit:cover;border-radius:8px;display:block}
 .photo-rm{position:absolute;top:6px;right:6px;background:#c1121f;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 .submit-btn{
-  display:block;
-  width:100%;
-  padding:18px;
-  background:#1a3c2e;
-  color:#fff;
-  border:none;
-  border-radius:12px;
-  font-size:19px;
-  font-weight:700;
-  cursor:pointer;
-  margin-top:8px;
-  transition:opacity .15s,transform .1s;
-  letter-spacing:-.1px
+  display:block;width:100%;padding:18px;
+  background:#1a3c2e;color:#fff;border:none;border-radius:12px;
+  font-size:19px;font-weight:700;cursor:pointer;margin-top:8px;
+  transition:opacity .15s,transform .1s;letter-spacing:-.1px
 }
 .submit-btn:active{opacity:.88;transform:scale(.98)}
 .submit-btn:disabled{opacity:.5;cursor:not-allowed}
@@ -77,7 +94,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .error-banner{background:#ffe5e5;border:1.5px solid #c1121f;border-radius:10px;padding:13px 15px;color:#c1121f;font-size:15px;margin-bottom:14px;display:none}
 .error-banner.show{display:block}
 
-/* SUCCESS SCREEN */
+/* SUCCESS */
 .success{display:none;text-align:center;padding:40px 20px}
 .success.show{display:block}
 .success-icon{font-size:70px;margin-bottom:18px;line-height:1}
@@ -86,7 +103,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .success .time{font-size:14px;color:#8fa88f;margin-top:12px}
 .new-btn{display:inline-block;margin-top:24px;padding:14px 28px;background:#1a3c2e;color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:600;cursor:pointer}
 
-/* LOADING SPINNER */
+/* LOADING */
+.loading-msg{text-align:center;padding:20px;color:#8fa88f;font-size:15px}
 .spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -94,9 +112,11 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   body{background:#0d1a0f;color:#e0ede0}
   .hdr{background:#0a2018}
   .intro{background:#162018;color:#a0c8a0;border-left-color:#2d6a4f}
-  .card{background:#162018;box-shadow:0 1px 4px rgba(0,0,0,.4)}
-  input[type=text],select,textarea{background:#0d1a0f;border-color:#243326;color:#e0ede0}
-  input[type=text]:focus,select:focus,textarea:focus{border-color:#52b788;background:#0d2012}
+  .card,.bw-card{background:#162018;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+  input[type=text],select.bw-select,select.std,textarea{background:#0d1a0f;border-color:#243326;color:#e0ede0}
+  input[type=text]:focus,select.bw-select:focus,select.std:focus,textarea:focus{border-color:#52b788;background:#0d2012}
+  .bw-avatar{background:#1a3c2e}
+  .bw-name{color:#e0ede0}
   .photo-area{border-color:#2d4a2d;color:#6a8f6a}
   .photo-area:hover{border-color:#52b788;background:#0d2012}
   .error-banner{background:#3a0f0f;border-color:#c1121f}
@@ -113,33 +133,45 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 <div class="container">
 
-  <!-- INTRO -->
   <div class="intro" id="intro-box">
     Bitte beschreiben Sie den Schaden oder das Problem. Unser Hausmeister kümmert sich umgehend darum.
   </div>
 
-  <!-- ERROR -->
   <div class="error-banner" id="err-banner">
     Die Meldung konnte leider nicht gesendet werden. Bitte versuchen Sie es erneut oder sprechen Sie Herrn Schneider direkt an.
   </div>
 
-  <!-- FORM -->
-  <form id="form" onsubmit="submitForm(event)">
-    <div class="card">
-      <div class="field">
-        <label>Ihr Name <span class="opt">(optional)</span></label>
-        <input type="text" id="f-name" placeholder="z. B. Maria Müller" autocomplete="name">
-      </div>
-      <div class="field">
-        <label>Zimmer oder Bereich <span class="opt">(optional)</span></label>
-        <input type="text" id="f-zimmer" placeholder="z. B. Zimmer 14 oder Erdgeschoss">
+  <!-- BEWOHNER-AUSWAHL -->
+  <div class="bw-card" id="bw-card">
+    <div class="bw-label">Wer sind Sie?</div>
+
+    <!-- Bekannter Bewohner angezeigt -->
+    <div class="bw-selected" id="bw-selected">
+      <div class="bw-avatar">👤</div>
+      <div class="bw-info">
+        <div class="bw-name" id="bw-disp-name"></div>
+        <div class="bw-room" id="bw-disp-room"></div>
+        <button class="bw-change" onclick="showSelector()">Nicht Sie? Ändern</button>
       </div>
     </div>
 
+    <!-- Auswahl -->
+    <div class="bw-select-wrap" id="bw-select-wrap">
+      <div class="bw-hint" id="bw-hint">Bitte wählen Sie Ihren Namen:</div>
+      <select class="bw-select" id="bw-select" onchange="onBwSelect(this.value)">
+        <option value="">Bitte wählen …</option>
+      </select>
+      <button class="bw-confirm-btn" id="bw-confirm" onclick="confirmBewohner()" style="display:none">Weiter →</button>
+      <button class="bw-anon" onclick="selectAnon()">Ohne Angabe fortfahren</button>
+    </div>
+  </div>
+
+  <!-- MELDEFORMULAR (zunächst versteckt bis Bewohner gewählt) -->
+  <form id="form" onsubmit="submitForm(event)" style="display:none">
     <div class="card">
       <div class="field">
         <label>Wo ist das Problem?</label>
-        <select id="f-ort" required>
+        <select class="std" id="f-ort" required>
           <option value="">Bitte wählen …</option>
           <option>Eingang / Haustür</option>
           <option>Flur / Gang</option>
@@ -161,26 +193,24 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
     <div class="card">
       <div class="field">
-        <label>Foto <span class="opt">(optional)</span></label>
+        <label>Foto <span style="font-weight:400;font-size:13px;color:#607060">(optional)</span></label>
         <div class="photo-area" id="photo-area">
           <div class="photo-icon">📷</div>
-          <div class="photo-text">Foto aufnehmen oder auswählen</div>
+          <div>Foto aufnehmen oder auswählen</div>
           <div class="photo-hint">Tippen Sie hier, um ein Foto hinzuzufügen</div>
           <input type="file" accept="image/*" capture="environment" id="photo-input" onchange="handlePhoto(event)">
         </div>
-        <div class="photo-preview-wrap" id="photo-preview-wrap" style="display:none">
+        <div class="photo-preview-wrap" id="photo-preview-wrap">
           <img id="photo-preview" src="" alt="Vorschau">
           <button type="button" class="photo-rm" onclick="removePhoto()">×</button>
         </div>
       </div>
     </div>
 
-    <button type="submit" class="submit-btn" id="submit-btn">
-      Meldung absenden
-    </button>
+    <button type="submit" class="submit-btn" id="submit-btn">Meldung absenden</button>
   </form>
 
-  <!-- SUCCESS SCREEN -->
+  <!-- SUCCESS -->
   <div class="success" id="success">
     <div class="success-icon">✅</div>
     <h2>Vielen Dank!</h2>
@@ -196,27 +226,138 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <script>
 const SB_URL = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
 const SB_KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+const BW_KEY = 'hm_bewohner'; // localStorage key für gespeicherten Bewohner
 
+let selectedBewohner = null; // {id, name, zimmer} oder null für anon
 let photoBase64 = null;
+let bewohnerListe = [];
 
+// ── BEWOHNER LADEN ─────────────────────────────────────────────────────────────
+async function loadBewohner() {
+  try {
+    const res = await fetch(
+      `${SB_URL}/rest/v1/bewohner?aktiv=eq.true&order=zimmer.asc&select=id,name,zimmer`,
+      { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } }
+    );
+    if (!res.ok) throw new Error(res.status);
+    bewohnerListe = await res.json();
+    fillDropdown();
+  } catch {
+    // Fallback: Freitext-Eingabe aktivieren
+    showFallbackInputs();
+  }
+}
+
+function fillDropdown() {
+  const sel = document.getElementById('bw-select');
+  sel.innerHTML = '<option value="">Bitte wählen …</option>';
+  bewohnerListe.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = `Zi. ${b.zimmer} — ${b.name}`;
+    sel.appendChild(opt);
+  });
+}
+
+function showFallbackInputs() {
+  // Bewohnerliste nicht verfügbar → Freitext anzeigen
+  document.getElementById('bw-hint').textContent = 'Bewohnerliste wird eingerichtet. Bitte Namen eingeben:';
+  document.getElementById('bw-select').style.display = 'none';
+  const nameIn = document.createElement('input');
+  nameIn.type = 'text';
+  nameIn.placeholder = 'Ihr Name (optional)';
+  nameIn.id = 'fb-name';
+  nameIn.style.cssText = 'width:100%;padding:14px 15px;border:2px solid #dde5dd;border-radius:10px;font-size:18px;background:#fafcfa;color:#1a2e1a;font-family:inherit;margin-bottom:10px';
+  document.getElementById('bw-select').insertAdjacentElement('beforebegin', nameIn);
+  selectAnon();
+}
+
+// ── BEWOHNER AUSWAHL ──────────────────────────────────────────────────────────
+function onBwSelect(id) {
+  const btn = document.getElementById('bw-confirm');
+  btn.style.display = id ? 'block' : 'none';
+}
+
+function confirmBewohner() {
+  const id = document.getElementById('bw-select').value;
+  if (!id) return;
+  const b = bewohnerListe.find(x => x.id === id);
+  if (!b) return;
+  saveBewohner(b);
+  showSelectedCard(b);
+  showForm();
+}
+
+function selectAnon() {
+  saveBewohner(null);
+  document.getElementById('bw-card').style.display = 'none';
+  showForm();
+}
+
+function saveBewohner(b) {
+  selectedBewohner = b;
+  if (b) {
+    localStorage.setItem(BW_KEY, JSON.stringify(b));
+  } else {
+    localStorage.removeItem(BW_KEY);
+  }
+}
+
+function showSelectedCard(b) {
+  document.getElementById('bw-disp-name').textContent = b.name;
+  document.getElementById('bw-disp-room').textContent = 'Zimmer ' + b.zimmer;
+  document.getElementById('bw-selected').classList.add('show');
+  document.getElementById('bw-select-wrap').classList.remove('show');
+}
+
+function showSelector() {
+  document.getElementById('bw-selected').classList.remove('show');
+  document.getElementById('bw-select-wrap').classList.add('show');
+  document.getElementById('bw-select').value = '';
+  document.getElementById('bw-confirm').style.display = 'none';
+}
+
+function showForm() {
+  document.getElementById('form').style.display = 'block';
+  document.getElementById('f-ort').focus();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+(async function init() {
+  // Gespeicherten Bewohner prüfen
+  const saved = localStorage.getItem(BW_KEY);
+  if (saved) {
+    try {
+      const b = JSON.parse(saved);
+      selectedBewohner = b;
+      showSelectedCard(b);
+      showForm();
+      loadBewohner(); // Dropdown im Hintergrund aktualisieren für "Ändern"
+      return;
+    } catch { localStorage.removeItem(BW_KEY); }
+  }
+  // Keine Auswahl → Dropdown zeigen
+  document.getElementById('bw-select-wrap').classList.add('show');
+  await loadBewohner();
+})();
+
+// ── FOTO ──────────────────────────────────────────────────────────────────────
 function handlePhoto(e) {
   const file = e.target.files[0];
   if (!file) return;
   compressImage(file).then(b64 => {
     photoBase64 = b64;
     document.getElementById('photo-preview').src = b64;
-    document.getElementById('photo-preview-wrap').style.display = 'inline-block';
+    document.getElementById('photo-preview-wrap').style.display = 'block';
     document.getElementById('photo-area').style.display = 'none';
   });
 }
-
 function removePhoto() {
   photoBase64 = null;
   document.getElementById('photo-input').value = '';
   document.getElementById('photo-preview-wrap').style.display = 'none';
   document.getElementById('photo-area').style.display = 'block';
 }
-
 function compressImage(file) {
   return new Promise(resolve => {
     const reader = new FileReader();
@@ -237,6 +378,7 @@ function compressImage(file) {
   });
 }
 
+// ── ABSENDEN ──────────────────────────────────────────────────────────────────
 async function submitForm(e) {
   e.preventDefault();
   const ort = document.getElementById('f-ort').value;
@@ -251,12 +393,14 @@ async function submitForm(e) {
   const now = new Date();
   const datum = now.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
 
+  // Freitext-Fallback falls Dropdown nicht geladen
+  const fbName = document.getElementById('fb-name');
+
   const payload = {
     datum,
-    name: document.getElementById('f-name').value.trim() || null,
-    zimmer: document.getElementById('f-zimmer').value.trim() || null,
-    ort,
-    problem: prob,
+    name: selectedBewohner?.name || fbName?.value?.trim() || null,
+    zimmer: selectedBewohner?.zimmer || null,
+    ort, problem: prob,
     prio: 'Mittel',
     von: 'Bewohner',
     status: 'Offen',
@@ -287,7 +431,7 @@ async function submitForm(e) {
 function showSuccess(date) {
   document.getElementById('form').style.display = 'none';
   document.getElementById('intro-box').style.display = 'none';
-  document.getElementById('err-banner').style.display = 'none';
+  document.getElementById('bw-card').style.display = 'none';
   document.getElementById('success-time').textContent =
     'Gesendet am ' + date.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'}) +
     ' um ' + date.toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}) + ' Uhr';
@@ -300,9 +444,12 @@ function resetForm() {
   removePhoto();
   document.getElementById('form').style.display = 'block';
   document.getElementById('intro-box').style.display = 'block';
+  document.getElementById('bw-card').style.display = 'block';
   document.getElementById('success').classList.remove('show');
   document.getElementById('submit-btn').disabled = false;
   document.getElementById('submit-btn').textContent = 'Meldung absenden';
+  // Wenn Bewohner bekannt: direkt Form zeigen
+  if (selectedBewohner) showSelectedCard(selectedBewohner);
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
 </script>
