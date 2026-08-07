@@ -1106,11 +1106,12 @@ function printZettel(id) {
 </div>
 <p class="body">Bei Fragen sprechen Sie mich gerne direkt an.</p>
 <div class="footer">Mit freundlichen Grüßen<br><br><strong>Hendrik Schneider</strong><br>Hausmeister · Sidonie-Scharfe-Stiftung<br>Scharfestraße 4–6 · 14163 Berlin-Zehlendorf</div>
-<script>window.onload=()=>window.print();</script>
 </body></html>`;
   const w = window.open('','_blank','width=640,height=720');
   w.document.write(html);
   w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
 }
 
 function addDetailPhoto(id, e) {
