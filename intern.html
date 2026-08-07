@@ -83,6 +83,7 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
 .b-offen{background:var(--red-pale);color:var(--red)}
 .b-laufend{background:var(--yellow-pale);color:var(--yellow)}
+.b-beauftragt{background:#dbeafe;color:#1d4ed8;font-weight:600}
 .b-done{background:var(--green-pale);color:var(--green-mid)}
 .b-hoch{background:var(--red-pale);color:var(--red)}
 .b-mittel{background:var(--yellow-pale);color:var(--yellow)}
@@ -164,7 +165,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 .detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;align-items:center}
 .detail-row:last-child{border:none}
 .detail-row .lbl{font-size:12.5px;color:var(--text-muted)}
-.status-btns{display:flex;gap:7px;margin-top:10px;margin-bottom:4px}
+.status-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;margin-bottom:4px}
 .status-btn{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12.5px;cursor:pointer;text-align:center;transition:all .15s}
 .status-btn.active{border-color:var(--green-mid);background:var(--green-pale);color:var(--green-mid);font-weight:600}
 .detail-photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -258,7 +259,8 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <div class="chips" id="sc-filter">
     <button class="chip active" onclick="setFilter('Alle',this)">Alle</button>
     <button class="chip" onclick="setFilter('Offen',this)">Offen</button>
-    <button class="chip" onclick="setFilter('In Bearbeitung',this)">In Bearbeitung</button>
+    <button class="chip" onclick="setFilter('In Prüfung',this)">In Prüfung</button>
+    <button class="chip" onclick="setFilter('Handwerker beauftragt',this)">Beauftragt</button>
     <button class="chip" onclick="setFilter('Erledigt',this)">Erledigt</button>
     <button class="chip" onclick="setFilter('Bewohner',this)">🟣 Bewohner-App</button>
   </div>
@@ -525,7 +527,9 @@ async function updateSBStatus(item) {
         erledigt_am: item.erledigt || null,
         notiz: item.notiz || null,
         prio: item.prio,
-        kosten: item.kosten != null ? item.kosten : null
+        kosten: item.kosten != null ? item.kosten : null,
+        termin: item.termin || null,
+        rueckmeldung: item.rueckmeldung || null
       })
     });
   } catch {}
@@ -554,6 +558,8 @@ function fromSB(r) {
     erledigt: r.erledigt_am || '',
     notiz: r.notiz || '',
     kosten: r.kosten != null ? r.kosten : null,
+    termin: r.termin || '',
+    rueckmeldung: r.rueckmeldung || '',
     photos: r.foto ? [r.foto] : [],
     created_at: r.created_at
   };
@@ -570,7 +576,9 @@ function toSB(item) {
     erledigt_am: item.erledigt || null,
     notiz: item.notiz || null,
     foto: (item.photos && item.photos[0]) || null,
-    kosten: item.kosten != null ? item.kosten : null
+    kosten: item.kosten != null ? item.kosten : null,
+    termin: item.termin || null,
+    rueckmeldung: item.rueckmeldung || null
   };
 }
 
@@ -618,7 +626,7 @@ const td = () => new Date().toLocaleDateString('de-DE', {day:'2-digit',month:'2-
 function wk() { const d=new Date(),dw=d.getDay()||7,m=new Date(d); m.setDate(d.getDate()-(dw-1)); return m.toISOString().slice(0,10); }
 function kw() { const d=new Date(),j4=new Date(d.getFullYear(),0,4),sw=new Date(j4); sw.setDate(j4.getDate()-(j4.getDay()||7)+1); return Math.ceil((d-sw)/(7*864e5))+1; }
 const dc = p => p==='Hoch'?'d-hoch':p==='Mittel'?'d-mittel':'d-niedrig';
-const bc = s => s==='Offen'?'b-offen':s==='In Bearbeitung'?'b-laufend':'b-done';
+const bc = s => s==='Offen'?'b-offen':s==='In Prüfung'?'b-laufend':s==='Handwerker beauftragt'?'b-beauftragt':s==='In Bearbeitung'?'b-laufend':'b-done';
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
 let curView = 'dashboard';
@@ -716,6 +724,7 @@ function renderSchaden() {
     return (prio[a.prio]||2) - (prio[b.prio]||2);
   });
   if (schadenFilter === 'Bewohner') list = list.filter(s => s.von === 'Bewohner');
+  else if (schadenFilter === 'In Bearbeitung') list = list.filter(s => s.status === 'In Prüfung' || s.status === 'Handwerker beauftragt' || s.status === 'In Bearbeitung');
   else if (schadenFilter !== 'Alle') list = list.filter(s => s.status === schadenFilter);
 
   document.getElementById('sc-list').innerHTML = list.length
@@ -1000,7 +1009,8 @@ function openDetail(id) {
     ${bewohnerInfo}
     <div class="status-btns">
       <button class="status-btn${s.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
-      <button class="status-btn${s.status==='In Bearbeitung'?' active':''}" onclick="setStatus('${id}','In Bearbeitung')">In Bearbeitung</button>
+      <button class="status-btn${s.status==='In Prüfung'?' active':''}" onclick="setStatus('${id}','In Prüfung')">In Prüfung</button>
+      <button class="status-btn${s.status==='Handwerker beauftragt'?' active':''}" onclick="setStatus('${id}','Handwerker beauftragt')">Handwerker beauftragt</button>
       <button class="status-btn${s.status==='Erledigt'?' active':''}" onclick="setStatus('${id}','Erledigt')">Erledigt ✓</button>
     </div>
     <div style="margin-top:14px">
@@ -1017,12 +1027,17 @@ function openDetail(id) {
     </select>
     <label>Kosten (€)</label>
     <input type="number" id="d-kosten" min="0" step="0.01" placeholder="0,00" value="${s.kosten!=null?s.kosten:''}">
+    <label>Voraussichtlicher Termin</label>
+    <input type="text" id="d-termin" placeholder="z. B. Ende August, KW 35, 20.08.2026 …" value="${s.termin||''}">
+    <label>Rückmeldung an Bewohnerin</label>
+    <textarea id="d-rueck" placeholder="Wird auf dem Türzettel gedruckt …">${s.rueckmeldung||''}</textarea>
     ${s.photos&&s.photos.length ? `<label>Fotos</label><div class="detail-photos">${s.photos.map((p,i) => `<img src="${p}" onclick="viewPhoto('${id}',${i})">`).join('')}</div>` : ''}
     <label>Fotos hinzufügen</label>
     <div class="photo-zone">📷 Foto aufnehmen oder auswählen<input type="file" accept="image/*" multiple onchange="addDetailPhoto('${id}',event)"></div>
-    <label>Notiz / Interne Bemerkung</label>
+    <label>Interne Notiz</label>
     <textarea id="d-notiz">${s.notiz||''}</textarea>
     <button class="btn btn-primary" onclick="saveDetail('${id}')">Änderungen speichern</button>
+    <button class="btn" style="background:var(--gold);color:#fff;margin-top:8px" onclick="printZettel('${id}')">🖨 Türzettel drucken</button>
     <button class="btn btn-danger" style="margin-top:8px" onclick="delSchaden('${id}')">Meldung löschen</button>`;
   ovOpen('ov-detail');
 }
@@ -1045,10 +1060,57 @@ async function saveDetail(id) {
   s.prio = document.getElementById('d-prio').value;
   const k = parseFloat(document.getElementById('d-kosten').value);
   s.kosten = isNaN(k) ? null : k;
+  s.termin = document.getElementById('d-termin').value.trim();
+  s.rueckmeldung = document.getElementById('d-rueck').value.trim();
   saveLocal();
   if (sbOnline) updateSBStatus(s);
   ovClose('ov-detail');
   render(curView);
+}
+
+function printZettel(id) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  const anrede = s.name ? `Sehr geehrte Frau ${s.name.split(' ').slice(-1)[0]},` : 'Liebe Bewohnerin,';
+  const statusText = {
+    'Offen': 'Ihre Meldung ist bei uns eingegangen und wird geprüft.',
+    'In Prüfung': 'Ihre Meldung wird derzeit geprüft. Wir melden uns mit einem Termin.',
+    'In Bearbeitung': 'Ihre Meldung ist in Bearbeitung.',
+    'Handwerker beauftragt': 'Ein Fachbetrieb wurde beauftragt. Die Reparatur wird in Kürze durchgeführt.',
+    'Erledigt': 'Das Problem wurde behoben. Wir hoffen, alles ist zu Ihrer Zufriedenheit.'
+  }[s.status] || 'Ihre Meldung ist in Bearbeitung.';
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Hausmeister-Info #${s.nr||'–'}</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,'Book Antiqua',serif;font-size:14px;color:#1A1510;padding:36px 44px;max-width:580px}
+.hdr{border-bottom:2px solid #B8892A;padding-bottom:12px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-end}
+.hdr-title{font-size:15px;font-weight:normal;color:#1C4A2E;letter-spacing:.02em}
+.hdr-nr{font-size:11.5px;color:#7A7168}
+.anrede{font-size:15px;margin-bottom:14px;line-height:1.6}
+.body{line-height:1.75;margin-bottom:14px;font-size:14px}
+.info-box{background:#F6F1E9;border-left:3px solid #1C4A2E;padding:12px 16px;margin:14px 0;line-height:1.7;font-size:13.5px}
+.termin{margin-top:8px;font-weight:bold;color:#1C4A2E}
+.rueck{margin-top:8px;color:#3A322C}
+.footer{margin-top:28px;border-top:1px solid #D4CBB8;padding-top:14px;font-size:12.5px;color:#7A7168;line-height:1.7}
+.footer strong{color:#1A1510}
+@media print{body{padding:20px}}
+</style></head><body>
+<div class="hdr">
+  <div class="hdr-title">Sidonie-Scharfe-Stiftung &nbsp;·&nbsp; Hausmeister</div>
+  <div class="hdr-nr">Meldung #${s.nr||'–'} &nbsp;·&nbsp; ${new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
+</div>
+<p class="anrede">${anrede}</p>
+<p class="body">bezüglich Ihrer Meldung vom ${s.datum||'–'} (<strong>${s.ort}</strong>):</p>
+<div class="info-box">
+  <div>${statusText}</div>
+  ${s.termin ? `<div class="termin">Voraussichtlicher Termin: ${s.termin}</div>` : ''}
+  ${s.rueckmeldung ? `<div class="rueck">${s.rueckmeldung}</div>` : ''}
+</div>
+<p class="body">Bei Fragen sprechen Sie mich gerne direkt an.</p>
+<div class="footer">Mit freundlichen Grüßen<br><br><strong>Hendrik Schneider</strong><br>Hausmeister · Sidonie-Scharfe-Stiftung<br>Scharfestraße 4–6 · 14163 Berlin-Zehlendorf</div>
+<script>window.onload=()=>window.print();</script>
+</body></html>`;
+  const w = window.open('','_blank','width=640,height=720');
+  w.document.write(html);
+  w.document.close();
 }
 
 function addDetailPhoto(id, e) {
