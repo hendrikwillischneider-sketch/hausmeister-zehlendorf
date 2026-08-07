@@ -402,8 +402,8 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 </div>
 
 <!-- ARTIKEL FORM MODAL -->
-<div class="modal" id="ak-modal" style="display:none">
-  <div class="modal-box" style="max-width:520px">
+<div class="overlay" id="ak-modal" style="display:none">
+  <div class="modal" style="max-width:520px">
     <div class="modal-hdr">
       <div class="modal-title" id="ak-modal-title">Neuer Artikel</div>
       <button class="modal-close" onclick="closeArtikelForm()">✕</button>
@@ -1617,9 +1617,8 @@ let _akData = [];
 let _akMonat = 0; // 0 = alle
 
 async function loadArtikel() {
-  const url = `${SB_URL}/rest/v1/artikel?order=monat.asc,reihenfolge.asc&select=*`;
   try {
-    const r = await sb(url);
+    const r = await sbReq('artikel?order=monat.asc,reihenfolge.asc&select=*');
     _akData = await r.json();
     renderAkFilter();
     renderAkList();
@@ -1705,9 +1704,9 @@ async function saveArtikel() {
   };
   try {
     if (id) {
-      await sb(`${SB_URL}/rest/v1/artikel?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
+      await sbReq(`artikel?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
     } else {
-      await sb(`${SB_URL}/rest/v1/artikel`, {method:'POST', body:JSON.stringify(payload)});
+      await sbReq('artikel', {method:'POST', body:JSON.stringify(payload)});
     }
     closeArtikelForm();
     loadArtikel();
@@ -1718,7 +1717,7 @@ async function saveArtikel() {
 
 async function deleteArtikel(id) {
   if (!confirm('Artikel wirklich löschen?')) return;
-  await sb(`${SB_URL}/rest/v1/artikel?id=eq.${id}`, {method:'DELETE'});
+  await sbReq(`artikel?id=eq.${id}`, {method:'DELETE'});
   loadArtikel();
 }
 
