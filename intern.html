@@ -281,6 +281,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <button onclick="show('plan',this)">Pflegeplan</button>
   <button onclick="show('bewohner',this)">Bewohner</button>
   <button onclick="show('settings',this)">Einstellungen</button>
+  <button onclick="show('artikel',this)">Artikel</button>
 </nav>
 
 <!-- ÜBERSICHT -->
@@ -387,6 +388,82 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
     <div class="set-row"><div class="lbl">Objekt</div><span style="color:var(--text-muted);font-size:13px">~2.000 m² Grünfläche</span></div>
   </div>
   <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(event)">
+</div>
+
+
+<!-- ARTIKEL CMS -->
+<div class="view" id="view-artikel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="sec" style="margin:0">Artikel verwalten</div>
+    <button class="chip" onclick="openArtikelForm(null)" style="background:var(--green-mid);color:#fff;border-color:var(--green-mid)">+ Neuer Artikel</button>
+  </div>
+  <div class="chips" id="ak-monat-filter" style="margin-bottom:10px"></div>
+  <div class="card" id="ak-list"></div>
+</div>
+
+<!-- ARTIKEL FORM MODAL -->
+<div class="modal" id="ak-modal" style="display:none">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="ak-modal-title">Neuer Artikel</div>
+      <button class="modal-close" onclick="closeArtikelForm()">✕</button>
+    </div>
+    <div style="padding:14px;display:grid;gap:10px">
+      <input type="hidden" id="ak-id">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Monat</label>
+          <select id="ak-monat" class="inp">
+            <option value="1">Januar</option><option value="2">Februar</option>
+            <option value="3">März</option><option value="4">April</option>
+            <option value="5">Mai</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8" selected>August</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Dezember</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Kategorie</label>
+          <input type="text" id="ak-kat" class="inp" placeholder="z.B. Rasen, Hecken …">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Icon</label>
+          <input type="text" id="ak-ico" class="inp" placeholder="🌿">
+        </div>
+        <div>
+          <label class="lbl">Bild-Dateiname</label>
+          <input type="text" id="ak-bild" class="inp" placeholder="DSC01289b.jpg">
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Titel *</label>
+        <input type="text" id="ak-titel" class="inp" placeholder="Artikelüberschrift …">
+      </div>
+      <div>
+        <label class="lbl">Teaser (Kartentext)</label>
+        <textarea id="ak-teaser" class="inp" rows="2" placeholder="1–2 Sätze für die Karte auf der Startseite …" style="resize:vertical"></textarea>
+      </div>
+      <div>
+        <label class="lbl">Tipp</label>
+        <input type="text" id="ak-tipp" class="inp" placeholder="Praxis-Tipp …">
+      </div>
+      <div>
+        <label class="lbl">Zeitraum</label>
+        <input type="text" id="ak-dauer" class="inp" placeholder="z.B. August–Oktober">
+      </div>
+      <div>
+        <label class="lbl">Für Bewohnerinnen</label>
+        <textarea id="ak-bew" class="inp" rows="2" style="resize:vertical" placeholder="Text für den Bewohnerinnen-Abschnitt …"></textarea>
+      </div>
+      <div id="ak-err" style="color:var(--red);font-size:13px;display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="saveArtikel()" style="flex:1;background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">Speichern</button>
+        <button onclick="closeArtikelForm()" style="padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:14px">Abbrechen</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- FAB -->
@@ -866,6 +943,7 @@ function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) docu
 function render(id) {
   if (id==='dashboard') renderDash();
   if (id==='schaden') renderSchaden();
+  if (id==='artikel') loadArtikel();
   if (id==='woche') renderWoche();
   if (id==='plan') renderPlan();
   if (id==='bewohner') renderBewohner();
@@ -1533,6 +1611,117 @@ if (sessionStorage.getItem(AUTH_KEY) === '1') {
   // Show password gate; focus input
   setTimeout(() => document.getElementById('pw-in').focus(), 200);
 }
+
+// ── ARTIKEL CMS ───────────────────────────────────────────────────────────────
+let _akData = [];
+let _akMonat = 0; // 0 = alle
+
+async function loadArtikel() {
+  const url = `${SB_URL}/rest/v1/artikel?order=monat.asc,reihenfolge.asc&select=*`;
+  try {
+    const r = await sb(url);
+    _akData = await r.json();
+    renderAkFilter();
+    renderAkList();
+  } catch(e) {
+    document.getElementById('ak-list').innerHTML = '<div class="empty"><p>Fehler beim Laden.</p></div>';
+  }
+}
+
+function renderAkFilter() {
+  const months = [...new Set(_akData.map(a => a.monat))].sort((a,b)=>a-b);
+  const MN = ['','Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  document.getElementById('ak-monat-filter').innerHTML =
+    `<button class="chip${_akMonat===0?' active':''}" onclick="setAkMonat(0,this)">Alle (${_akData.length})</button>` +
+    months.map(m => `<button class="chip${_akMonat===m?' active':''}" onclick="setAkMonat(${m},this)">${MN[m]} (${_akData.filter(a=>a.monat===m).length})</button>`).join('');
+}
+
+function setAkMonat(m, btn) {
+  _akMonat = m;
+  document.querySelectorAll('#ak-monat-filter .chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAkList();
+}
+
+function renderAkList() {
+  const MN=['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const list = _akMonat ? _akData.filter(a=>a.monat===_akMonat) : _akData;
+  const el = document.getElementById('ak-list');
+  if (!list.length) { el.innerHTML='<div class="empty"><p>Keine Artikel gefunden.</p></div>'; return; }
+  el.innerHTML = list.map(a => `
+    <div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">${a.ico||''} ${MN[a.monat]} · ${a.kat||'–'}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text)">${a.titel}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.teaser||''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+        <button onclick="openArtikelForm(${JSON.stringify(a).replace(/"/g,'&quot;')})" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
+        <button onclick="deleteArtikel('${a.id}')" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function openArtikelForm(a) {
+  document.getElementById('ak-modal').style.display='flex';
+  document.getElementById('ak-modal-title').textContent = a ? 'Artikel bearbeiten' : 'Neuer Artikel';
+  document.getElementById('ak-err').style.display='none';
+  if (a) {
+    document.getElementById('ak-id').value = a.id||'';
+    document.getElementById('ak-monat').value = a.monat||8;
+    document.getElementById('ak-kat').value = a.kat||'';
+    document.getElementById('ak-ico').value = a.ico||'';
+    document.getElementById('ak-bild').value = a.bild||'';
+    document.getElementById('ak-titel').value = a.titel||'';
+    document.getElementById('ak-teaser').value = a.teaser||'';
+    document.getElementById('ak-tipp').value = a.tipp||'';
+    document.getElementById('ak-dauer').value = a.dauer||'';
+    document.getElementById('ak-bew').value = a.fuer_bewohnerinnen||'';
+  } else {
+    ['ak-id','ak-kat','ak-ico','ak-bild','ak-titel','ak-teaser','ak-tipp','ak-dauer','ak-bew'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ak-monat').value=new Date().getMonth()+1;
+  }
+}
+
+function closeArtikelForm() {
+  document.getElementById('ak-modal').style.display='none';
+}
+
+async function saveArtikel() {
+  const titel = document.getElementById('ak-titel').value.trim();
+  if (!titel) { const e=document.getElementById('ak-err'); e.textContent='Titel ist Pflichtfeld.'; e.style.display='block'; return; }
+  const id = document.getElementById('ak-id').value;
+  const payload = {
+    monat: parseInt(document.getElementById('ak-monat').value),
+    kat:   document.getElementById('ak-kat').value.trim(),
+    ico:   document.getElementById('ak-ico').value.trim(),
+    bild:  document.getElementById('ak-bild').value.trim(),
+    titel,
+    teaser: document.getElementById('ak-teaser').value.trim(),
+    tipp:   document.getElementById('ak-tipp').value.trim(),
+    dauer:  document.getElementById('ak-dauer').value.trim(),
+    fuer_bewohnerinnen: document.getElementById('ak-bew').value.trim(),
+    aktiv: true
+  };
+  try {
+    if (id) {
+      await sb(`${SB_URL}/rest/v1/artikel?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
+    } else {
+      await sb(`${SB_URL}/rest/v1/artikel`, {method:'POST', body:JSON.stringify(payload)});
+    }
+    closeArtikelForm();
+    loadArtikel();
+  } catch(e) {
+    const err=document.getElementById('ak-err'); err.textContent='Fehler: '+e.message; err.style.display='block';
+  }
+}
+
+async function deleteArtikel(id) {
+  if (!confirm('Artikel wirklich löschen?')) return;
+  await sb(`${SB_URL}/rest/v1/artikel?id=eq.${id}`, {method:'DELETE'});
+  loadArtikel();
+}
+
 </script>
 </body>
 </html>
