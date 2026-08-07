@@ -64,6 +64,7 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .stat-val{font-size:22px;font-weight:700;color:var(--green-mid)}
 .stat-val.warn{color:var(--red)}
 .stat-val.alert{color:var(--orange)}
+.stat-val.alert{color:var(--orange)}
 .stat-lbl{font-size:11px;color:var(--text-muted);margin-top:1px}
 
 /* SECTION */
@@ -117,6 +118,18 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .b-kat-moebel{background:var(--blue-pale);color:var(--blue)}
 .b-kat-sperr{background:var(--green-pale);color:var(--green-mid)}
 .b-kat-auftrag{background:var(--yellow-pale);color:#92400e}
+.b-kosten{background:#fef3c7;color:#d97706;font-weight:600}
+.b-freigegeben{background:#dcfce7;color:#166534;font-weight:600}
+.b-abgeschlossen{background:var(--green-pale);color:var(--green-mid);font-weight:600}
+/* BUDGET BAR */
+.budget-bar{background:var(--card);border-radius:var(--radius);padding:11px 13px;box-shadow:var(--shadow);margin-bottom:12px}
+.budget-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:5px}
+.budget-lbl{color:var(--text-muted)}
+.budget-val{font-weight:700;color:var(--gold)}
+.budget-val.warn{color:var(--red)}
+.budget-prog{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.budget-fill{height:100%;border-radius:4px;transition:width .4s;background:var(--gold)}
+.budget-fill.warn{background:var(--red)}
 
 /* CARD */
 .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
@@ -251,6 +264,7 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 <!-- AUFTRÄGE -->
 <div class="view active" id="view-auftraege">
   <div class="stat-row" id="au-stats"></div>
+  <div id="au-budget"></div>
 
   <div class="hb-banner" id="hb-banner">
     <strong>⚠️ Handlungsbedarf</strong>
@@ -281,8 +295,10 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
   <div class="chips" id="au-filter">
     <button class="chip active" onclick="setFilter('Alle',this)">Alle</button>
     <button class="chip" onclick="setFilter('Offen',this)">Offen</button>
-    <button class="chip" onclick="setFilter('In Bearbeitung',this)">In Bearbeitung</button>
-    <button class="chip" onclick="setFilter('Erledigt',this)">Erledigt</button>
+    <button class="chip" onclick="setFilter('Kosten geschätzt',this)">💰 Freigabe?</button>
+    <button class="chip" onclick="setFilter('Freigegeben',this)">✅ Freigegeben</button>
+    <button class="chip" onclick="setFilter('In Umsetzung',this)">🔨 In Umsetzung</button>
+    <button class="chip" onclick="setFilter('Abgeschlossen',this)">✓ Abgeschlossen</button>
     <button class="chip" onclick="setFilter('Handlungsbedarf',this)">⚠️ Handlungsbedarf</button>
   </div>
   <div class="card" id="au-list">
@@ -508,6 +524,7 @@ async function init() {
     auftraege = [];
   }
   render();
+  loadBudget();
 }
 
 function setSyncDot(state) {
@@ -527,6 +544,7 @@ function fromSB(r) {
     zimmer: r.zimmer || null,
     status: r.status || 'Offen',
     kategorie: r.kategorie || null,
+    freigabe_by: r.freigabe_by || null,
     rueckmeldung: r.rueckmeldung || '',
     kosten: r.kosten != null ? r.kosten : null,
     photos: r.foto ? [r.foto] : [],
@@ -537,14 +555,14 @@ function fromSB(r) {
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render() {
   const offen = auftraege.filter(a => a.status === 'Offen').length;
-  const laufend = auftraege.filter(a => a.status === 'In Bearbeitung' || a.status === 'In Prüfung' || a.status === 'Handwerker beauftragt').length;
-  const erledigt = auftraege.filter(a => a.status === 'Erledigt').length;
-  const hb = auftraege.filter(a => a.rueckmeldung && a.status !== 'Erledigt').length;
+  const kostenAusstehend = auftraege.filter(a => a.status === 'Kosten geschätzt').length;
+  const hb = auftraege.filter(a => a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status)).length;
 
   document.getElementById('au-stats').innerHTML = `
     <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Offen</div></div>
-    <div class="stat"><div class="stat-val">${laufend}</div><div class="stat-lbl">In Bearbeitung</div></div>
+    <div class="stat"><div class="stat-val${kostenAusstehend>0?' alert':''}">${kostenAusstehend}</div><div class="stat-lbl">Freigabe nötig</div></div>
     <div class="stat"><div class="stat-val${hb>0?' alert':''}">${hb}</div><div class="stat-lbl">Handlungsbedarf</div></div>`;
+  renderBudgetBar();
 
   document.getElementById('hb-banner').classList.toggle('show', hb > 0);
   const badge = document.getElementById('hb-badge');
@@ -552,10 +570,9 @@ function render() {
   badge.className = 'hdr-badge' + (hb > 0 ? ' show' : '');
 
   let list = [...auftraege];
-  if (curFilter === 'Handlungsbedarf') list = list.filter(a => a.rueckmeldung && a.status !== 'Erledigt');
-  else if (curFilter === 'Offen') list = list.filter(a => a.status === 'Offen');
-  else if (curFilter === 'In Bearbeitung') list = list.filter(a => ['In Bearbeitung','In Prüfung','Handwerker beauftragt'].includes(a.status));
-  else if (curFilter === 'Erledigt') list = list.filter(a => a.status === 'Erledigt');
+  if (curFilter === 'Handlungsbedarf') list = list.filter(a => a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status));
+  else if (curFilter === 'Abgeschlossen') list = list.filter(a => ['Abgeschlossen','Erledigt'].includes(a.status));
+  else if (curFilter !== 'Alle') list = list.filter(a => a.status === curFilter);
 
   document.getElementById('au-list').innerHTML = list.length
     ? list.map(aiHTML).join('')
@@ -564,7 +581,7 @@ function render() {
 
 const KAT_CSS = {'Schaden':'b-kat-schaden','Möbel & Aufbau':'b-kat-moebel','Sperrmüll':'b-kat-sperr','Kleiner Auftrag':'b-kat-auftrag'};
 const KAT_ICON = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
-const bc = s => s==='Offen'?'b-offen':s==='Erledigt'?'b-done':'b-laufend';
+const bc = s => s==='Offen'?'b-offen':s==='Kosten geschätzt'?'b-kosten':s==='Freigegeben'?'b-freigegeben':s==='In Umsetzung'?'b-laufend':s==='Abgeschlossen'?'b-abgeschlossen':s==='Erledigt'?'b-done':'b-laufend';
 const dc = p => p==='Hoch'?'d-hoch':p==='Mittel'?'d-mittel':'d-niedrig';
 
 function aiHTML(a) {
@@ -572,7 +589,7 @@ function aiHTML(a) {
     ? `<span class="b-kat ${KAT_CSS[a.kategorie]}">${KAT_ICON[a.kategorie]} ${a.kategorie}</span>` : '';
   const nameInfo = a.name ? ` · ${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}` : '';
   const kostenBadge = a.kosten != null ? `<span class="kosten-badge">· ${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
-  const hbFlag = (a.rueckmeldung && a.status !== 'Erledigt')
+  const hbFlag = (a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status))
     ? `<div class="hb-flag">⚠️ Rückmeldung von Herrn Schneider — bitte weitergeben</div>` : '';
   return `<div class="ai" onclick="openDetail('${a.id}')">
     <div class="ai-top">
@@ -601,7 +618,7 @@ function openDetail(id) {
   if (!a) return;
   const katBadge = a.kategorie && KAT_CSS[a.kategorie]
     ? `<span class="b-kat ${KAT_CSS[a.kategorie]}" style="font-size:12px;padding:3px 9px">${KAT_ICON[a.kategorie]} ${a.kategorie}</span>` : '';
-  const hbSection = (a.rueckmeldung && a.status !== 'Erledigt') ? `
+  const hbSection = (a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status)) ? `
     <div class="detail-section">
       <div class="hb-detail">
         <strong>⚠️ Rückmeldung von Herrn Schneider — bitte an Bewohnerin weitergeben:</strong>
@@ -609,6 +626,12 @@ function openDetail(id) {
       </div>
     </div>` : '';
   const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}</div></div>` : '';
+  const freigabeSection = (a.status === 'Kosten geschätzt' && a.kosten != null) ? `
+    <div class="detail-section" style="background:var(--yellow-pale);border-radius:9px;padding:12px 14px;border:1px solid rgba(233,167,32,.3)">
+      <div style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:6px">💰 Kosten: ${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</div>
+      <div style="font-size:12.5px;color:#92400e;margin-bottom:10px">Bitte prüfen und freigeben, damit die Umsetzung starten kann.</div>
+      <button onclick="genehmigenFreigabe('${a.id}')" style="display:block;width:100%;padding:11px;background:#166534;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer">✅ Freigabe erteilen</button>
+    </div>` : '';
   const photoSection = a.photos && a.photos[0] ? `
     <div class="detail-section">
       <div class="detail-lbl">Foto</div>
@@ -621,6 +644,7 @@ function openDetail(id) {
       <button class="modal-close" onclick="ovClose('ov-detail')">×</button>
     </div>
     ${hbSection}
+    ${freigabeSection}
     <div class="detail-section">
       <div class="detail-lbl">Beschreibung</div>
       <div class="detail-val">${a.prob}</div>
@@ -925,6 +949,62 @@ function openFab() {
     show('auftraege', firstNavBtn);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+}
+
+// ── FREIGABE ──────────────────────────────────────────────────────────────────
+async function genehmigenFreigabe(id) {
+  if (!confirm('Freigabe erteilen? Die Kosten werden genehmigt und die Umsetzung kann starten.')) return;
+  try {
+    const res = await sbReq(`schaden?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'Freigegeben', freigabe_by: 'Frau Schwade' })
+    });
+    if (!res.ok) throw 0;
+    const a = auftraege.find(x => x.id === id);
+    if (a) { a.status = 'Freigegeben'; a.freigabe_by = 'Frau Schwade'; }
+    render();
+    ovClose('ov-detail');
+  } catch { alert('Fehler beim Speichern der Freigabe.'); }
+}
+
+// ── BUDGET ────────────────────────────────────────────────────────────────────
+let monatlichesBudget = 500;
+
+async function loadBudget() {
+  try {
+    const res = await sbReq('settings?key=eq.monatliches_budget&select=value');
+    if (res.ok) {
+      const data = await res.json();
+      if (data[0]) monatlichesBudget = parseFloat(data[0].value) || 500;
+    }
+  } catch {}
+  renderBudgetBar();
+}
+
+function renderBudgetBar() {
+  const el = document.getElementById('au-budget');
+  if (!el) return;
+  const now = new Date(), mm = now.getMonth()+1, yyyy = now.getFullYear();
+  const MNS = {1:'Jan',2:'Feb',3:'Mär',4:'Apr',5:'Mai',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Okt',11:'Nov',12:'Dez'};
+  const spent = auftraege
+    .filter(a => {
+      if (a.kosten == null) return false;
+      if (!['Freigegeben','In Umsetzung','Abgeschlossen','Handwerker beauftragt','Erledigt'].includes(a.status)) return false;
+      const p = (a.datum||'').split('.');
+      return p.length >= 3 && parseInt(p[1])===mm && parseInt(p[2])===yyyy;
+    })
+    .reduce((sum,a) => sum+(a.kosten||0), 0);
+  const pct = monatlichesBudget > 0 ? Math.min(100, Math.round(spent/monatlichesBudget*100)) : 0;
+  const warn = pct >= 80;
+  el.innerHTML = `<div class="budget-bar">
+    <div class="budget-row">
+      <span class="budget-lbl">💰 Budget ${MNS[mm]} ${yyyy}</span>
+      <span class="budget-val${warn?' warn':''}">
+        ${spent.toLocaleString('de-DE',{style:'currency',currency:'EUR'})} / ${monatlichesBudget.toLocaleString('de-DE',{style:'currency',currency:'EUR'})}
+      </span>
+    </div>
+    <div class="budget-prog"><div class="budget-fill${warn?' warn':''}" style="width:${pct}%"></div></div>
+  </div>`;
 }
 
 </script>
