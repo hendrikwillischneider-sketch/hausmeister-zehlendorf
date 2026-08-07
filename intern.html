@@ -7,8 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Hausmeister Intern — Sidonie-Scharfe-Stiftung</title>
 <style>
-:root{--green:#1a3c2e;--green-mid:#2d6a4f;--green-light:#40916c;--green-pale:#d8f3dc;--accent:#52b788;--red:#c1121f;--red-pale:#ffe5e5;--yellow:#e9a720;--yellow-pale:#fff3cd;--purple:#6b46c1;--purple-pale:#ede9fe;--gray:#6c757d;--bg:#f4f6f4;--card:#fff;--border:#dde5dd;--text:#1a2e1a;--text-muted:#607060;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.07),0 1px 8px rgba(0,0,0,.04)}
-@media(prefers-color-scheme:dark){:root{--bg:#0d1a0f;--card:#162018;--border:#243326;--text:#e0ede0;--text-muted:#6a8f6a;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--purple-pale:#1e1535;--shadow:0 1px 4px rgba(0,0,0,.4)}}
+:root{--green:#1C4A2E;--green-d:#132E1C;--green-mid:#2d6a4f;--green-light:#40916c;--green-pale:#d8f3dc;--burg:#7A2430;--accent:#52b788;--gold:#B8892A;--red:#c1121f;--red-pale:#ffe5e5;--yellow:#e9a720;--yellow-pale:#fff3cd;--purple:#6b46c1;--purple-pale:#ede9fe;--gray:#6c757d;--bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;--radius:12px;--shadow:0 1px 3px rgba(26,21,16,.06),0 4px 16px rgba(26,21,16,.04)}
+@media(prefers-color-scheme:dark){:root{--bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--purple-pale:#1e1535;--shadow:0 1px 4px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--purple-pale:#1e1535;--shadow:0 1px 4px rgba(0,0,0,.4)}
+:root[data-theme="light"]{--bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;--shadow:0 1px 3px rgba(26,21,16,.06),0 4px 16px rgba(26,21,16,.04)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
 
@@ -348,7 +350,11 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
       <option value="Niedrig">🟢 Niedrig — kann warten</option>
     </select>
     <label>Gemeldet von</label>
-    <input type="text" id="n-von" value="Hendrik">
+    <select id="n-von">
+      <option value="Hendrik">Hendrik</option>
+      <option value="Frau Schwade">Frau Schwade</option>
+      <option value="Bewohner">Bewohnerin (direkt)</option>
+    </select>
     <label>Fotos (optional)</label>
     <div class="photo-zone" id="photo-zone">
       📷 Foto aufnehmen oder auswählen
@@ -518,7 +524,8 @@ async function updateSBStatus(item) {
         status: item.status,
         erledigt_am: item.erledigt || null,
         notiz: item.notiz || null,
-        prio: item.prio
+        prio: item.prio,
+        kosten: item.kosten != null ? item.kosten : null
       })
     });
   } catch {}
@@ -546,6 +553,7 @@ function fromSB(r) {
     status: r.status || 'Offen',
     erledigt: r.erledigt_am || '',
     notiz: r.notiz || '',
+    kosten: r.kosten != null ? r.kosten : null,
     photos: r.foto ? [r.foto] : [],
     created_at: r.created_at
   };
@@ -561,7 +569,8 @@ function toSB(item) {
     status: item.status,
     erledigt_am: item.erledigt || null,
     notiz: item.notiz || null,
-    foto: (item.photos && item.photos[0]) || null
+    foto: (item.photos && item.photos[0]) || null,
+    kosten: item.kosten != null ? item.kosten : null
   };
 }
 
@@ -648,10 +657,12 @@ function renderDash() {
   badge.textContent = offen + ' offen';
   badge.className = 'hdr-badge' + (offen > 0 ? ' show' : '');
 
+  const kostenOffen = S.schaden.filter(s=>s.status!=='Erledigt'&&s.kosten).reduce((sum,s)=>sum+(s.kosten||0),0);
+  const kostenStr = kostenOffen > 0 ? kostenOffen.toLocaleString('de-DE',{style:'currency',currency:'EUR'}) : '–';
   document.getElementById('ds-stats').innerHTML = `
     <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Schäden offen</div></div>
     <div class="stat"><div class="stat-val">${laufend}</div><div class="stat-lbl">In Bearbeitung</div></div>
-    <div class="stat"><div class="stat-val">${done}/${mt.length}</div><div class="stat-lbl">Aufgaben ✓</div></div>`;
+    <div class="stat"><div class="stat-val" style="font-size:16px">${kostenStr}</div><div class="stat-lbl">Kosten (offen)</div></div>`;
 
   const offenList = S.schaden.filter(s => s.status !== 'Erledigt').slice(0, 4);
   document.getElementById('ds-schaden').innerHTML = offenList.length
@@ -669,11 +680,12 @@ function renderDash() {
 function siHTML(s) {
   const bewohnerBadge = s.von === 'Bewohner' ? '<span class="badge b-bewohner">Bewohner-App</span>' : '';
   const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Zi. ' + s.zimmer : ''}` : '';
+  const kostenInfo = s.kosten != null ? ` · <span style="color:var(--gold);font-weight:600">${Number(s.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
   return `<div class="si" onclick="openDetail('${s.id}')">
     <div class="si-dot ${s.status==='Erledigt'?'d-done':dc(s.prio)}"></div>
     <div class="si-body">
       <div class="si-title">${s.prob}${bewohnerBadge}</div>
-      <div class="si-meta">${s.ort} · ${s.datum || ''}${nameInfo}</div>
+      <div class="si-meta">${s.ort} · ${s.datum || ''}${nameInfo}${kostenInfo}</div>
     </div>
     ${s.photos&&s.photos[0] ? `<img class="si-thumb" src="${s.photos[0]}" alt="">` : ''}
     <div class="si-right"><span class="badge ${bc(s.status)}">${s.status}</span><div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">#${s.nr||'–'}</div></div>
@@ -992,18 +1004,25 @@ function openDetail(id) {
       <button class="status-btn${s.status==='Erledigt'?' active':''}" onclick="setStatus('${id}','Erledigt')">Erledigt ✓</button>
     </div>
     <div style="margin-top:14px">
-      <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right">${s.prob}</span></div>
-      <div class="detail-row"><span class="lbl">Priorität</span><span class="badge b-${s.prio.toLowerCase()}">${s.prio}</span></div>
-      <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum}</span></div>
-      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' (' + s.name + ')' : ''}</span></div>
+      <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right;font-weight:500">${s.prob}</span></div>
+      <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum||'–'}</span></div>
+      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + (s.zimmer ? ', Zi. '+s.zimmer : '') : ''}</span></div>
       ${s.erledigt ? `<div class="detail-row"><span class="lbl">Erledigt am</span><span>${s.erledigt}</span></div>` : ''}
     </div>
+    <label>Priorität</label>
+    <select id="d-prio">
+      <option value="Hoch"${s.prio==='Hoch'?' selected':''}>🔴 Hoch — Sicherheitsrisiko</option>
+      <option value="Mittel"${s.prio==='Mittel'?' selected':''}>🟡 Mittel — bald erledigen</option>
+      <option value="Niedrig"${s.prio==='Niedrig'?' selected':''}>🟢 Niedrig — kann warten</option>
+    </select>
+    <label>Kosten (€)</label>
+    <input type="number" id="d-kosten" min="0" step="0.01" placeholder="0,00" value="${s.kosten!=null?s.kosten:''}">
     ${s.photos&&s.photos.length ? `<label>Fotos</label><div class="detail-photos">${s.photos.map((p,i) => `<img src="${p}" onclick="viewPhoto('${id}',${i})">`).join('')}</div>` : ''}
-    <label style="margin-top:16px">Fotos hinzufügen</label>
+    <label>Fotos hinzufügen</label>
     <div class="photo-zone">📷 Foto aufnehmen oder auswählen<input type="file" accept="image/*" multiple onchange="addDetailPhoto('${id}',event)"></div>
-    <label>Notiz</label>
+    <label>Notiz / Interne Bemerkung</label>
     <textarea id="d-notiz">${s.notiz||''}</textarea>
-    <button class="btn btn-primary" onclick="saveNotiz('${id}')">Notiz speichern</button>
+    <button class="btn btn-primary" onclick="saveDetail('${id}')">Änderungen speichern</button>
     <button class="btn btn-danger" style="margin-top:8px" onclick="delSchaden('${id}')">Meldung löschen</button>`;
   ovOpen('ov-detail');
 }
@@ -1019,13 +1038,17 @@ async function setStatus(id, status) {
   render(curView);
 }
 
-async function saveNotiz(id) {
+async function saveDetail(id) {
   const s = S.schaden.find(x => x.id === id);
   if (!s) return;
   s.notiz = document.getElementById('d-notiz').value;
+  s.prio = document.getElementById('d-prio').value;
+  const k = parseFloat(document.getElementById('d-kosten').value);
+  s.kosten = isNaN(k) ? null : k;
   saveLocal();
   if (sbOnline) updateSBStatus(s);
   ovClose('ov-detail');
+  render(curView);
 }
 
 function addDetailPhoto(id, e) {
