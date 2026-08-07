@@ -488,10 +488,10 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
       <h2 id="bw-modal-title">Neue Bewohnerin</h2>
       <button class="modal-close" onclick="ovClose('ov-bewohner')">×</button>
     </div>
-    <label>Name</label>
-    <input type="text" id="bw-name" placeholder="z. B. Maria Müller">
-    <label>Zimmer</label>
-    <input type="text" id="bw-zimmer" placeholder="z. B. 14">
+    <label>Vorname</label>
+    <input type="text" id="bw-name" placeholder="z. B. Maria">
+    <label>Suite-Nummer</label>
+    <input type="text" id="bw-zimmer" placeholder="z. B. 7">
     <label>Kontaktweg für Rückmeldungen</label>
     <select id="bw-kontakt" onchange="toggleKontaktFelder()">
       <option value="Türzettel">🖨 Türzettel (Standard)</option>
@@ -822,7 +822,7 @@ const KAT_ICON = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'�
 function siHTML(s) {
   const bewohnerBadge = s.von === 'Bewohner' ? '<span class="badge b-bewohner">Bewohner-App</span>' : '';
   const katBadge = s.kategorie && KAT_CSS[s.kategorie] ? `<span class="b-kat ${KAT_CSS[s.kategorie]}">${KAT_ICON[s.kategorie]} ${s.kategorie}</span>` : '';
-  const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Zi. ' + s.zimmer : ''}` : '';
+  const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Suite ' + s.zimmer : ''}` : '';
   const kostenInfo = s.kosten != null ? ` · <span style="color:var(--gold);font-weight:600">${Number(s.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
   return `<div class="si" onclick="openDetail('${s.id}')">
     <div class="si-dot ${s.status==='Erledigt'?'d-done':dc(s.prio)}"></div>
@@ -968,7 +968,7 @@ function renderBewohner() {
     return;
   }
 
-  // Sort: aktive zuerst, dann nach Zimmernummer
+  // Sort: aktive zuerst, dann nach Suite-Nummer
   const sorted = [...bewohnerListe].sort((a, b) => {
     if (a.aktiv !== b.aktiv) return a.aktiv ? -1 : 1;
     return (parseInt(a.zimmer) || 0) - (parseInt(b.zimmer) || 0) || a.zimmer.localeCompare(b.zimmer);
@@ -976,10 +976,10 @@ function renderBewohner() {
 
   document.getElementById('bw-list').innerHTML = sorted.map(b => `
     <div class="bw-row" onclick="openEditBw('${b.id}')">
-      <div class="bw-zimmer">Zi.<br>${b.zimmer}</div>
+      <div class="bw-zimmer">S.<br>${b.zimmer}</div>
       <div class="bw-info">
         <div class="bw-rname" style="${!b.aktiv ? 'color:var(--text-muted);text-decoration:line-through' : ''}">${b.name}</div>
-        <div class="bw-rmeta">Zimmer ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''} · ${{'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'}[b.kontakt_art||'Türzettel']} ${b.kontakt_art||'Türzettel'}</div>
+        <div class="bw-rmeta">Suite ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''} · ${{'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'}[b.kontakt_art||'Türzettel']} ${b.kontakt_art||'Türzettel'}</div>
       </div>
       <button class="bw-toggle ${b.aktiv ? 'on' : 'off'}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}')"></button>
     </div>`).join('');
@@ -1023,7 +1023,7 @@ function openEditBw(id) {
 async function saveBewohner() {
   const name = document.getElementById('bw-name').value.trim();
   const zimmer = document.getElementById('bw-zimmer').value.trim();
-  if (!name || !zimmer) { alert('Name und Zimmer angeben.'); return; }
+  if (!name || !zimmer) { alert('Vorname und Suite-Nummer angeben.'); return; }
 
   const btn = document.getElementById('bw-save-btn');
   btn.textContent = 'Speichert …'; btn.disabled = true;
@@ -1097,7 +1097,7 @@ function openNew() {
     .sort((a,b) => (parseInt(a.zimmer)||0)-(parseInt(b.zimmer)||0))
     .forEach(b => {
       const o = document.createElement('option');
-      o.value = b.name; o.textContent = `Zi. ${b.zimmer} — ${b.name}`;
+      o.value = b.name; o.textContent = `Suite ${b.zimmer} — ${b.name}`;
       dd.appendChild(o);
     });
   document.getElementById('n-kat-picker').style.display = 'block';
@@ -1176,7 +1176,7 @@ async function saveNew() {
     const art = document.getElementById('n-a-art').value;
     const wo  = document.getElementById('n-a-wo').value.trim();
     const det = document.getElementById('n-a-details').value.trim();
-    if (!wo) { alert('Bitte Ort/Zimmer angeben.'); return; }
+    if (!wo) { alert('Bitte Ort/Suite angeben.'); return; }
     ort = wo; prob = art + (det ? `: ${det}` : '');
   }
 
@@ -1230,7 +1230,7 @@ function openDetail(id) {
   if (!s) return;
   const bewohnerInfo = s.von === 'Bewohner'
     ? `<div style="background:var(--purple-pale);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--purple)">
-        🟣 Gemeldet über Bewohner-App${s.name ? ' von ' + s.name : ''}${s.zimmer ? ', Zimmer ' + s.zimmer : ''}
+        🟣 Gemeldet über Bewohner-App${s.name ? ' von ' + s.name : ''}${s.zimmer ? ', Suite ' + s.zimmer : ''}
       </div>` : '';
 
   let kontaktBanner = '';
@@ -1264,7 +1264,7 @@ function openDetail(id) {
     <div style="margin-top:14px">
       <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right;font-weight:500">${s.prob}</span></div>
       <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum||'–'}</span></div>
-      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + (s.zimmer ? ', Zi. '+s.zimmer : '') : ''}</span></div>
+      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + (s.zimmer ? ', Suite '+s.zimmer : '') : ''}</span></div>
       ${s.erledigt ? `<div class="detail-row"><span class="lbl">Erledigt am</span><span>${s.erledigt}</span></div>` : ''}
     </div>
     <label>Priorität</label>
