@@ -289,6 +289,25 @@ html{scroll-behavior:smooth}
 .pfl-dl dd{color:var(--text);margin:0}
 .pfl-hint{background:var(--border);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text-muted);margin-top:10px}
 .pfl-hint strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:4px}
+
+/* Park Tabs */
+.park-tabs{display:flex;gap:8px;margin-bottom:20px}
+.park-tab{padding:8px 20px;border-radius:20px;border:1.5px solid var(--border);background:transparent;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-muted);transition:.15s}
+.park-tab.active{background:var(--green);border-color:var(--green);color:#fff}
+/* Baum-Liste öffentlich */
+.baum-bereich-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin:20px 0 10px}
+.baum-pub-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:box-shadow .15s}
+.baum-pub-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.baum-vital-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.baum-pub-nr{font-size:11px;font-weight:700;color:var(--text-muted);min-width:38px}
+.baum-pub-body{flex:1;min-width:0}
+.baum-pub-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.baum-pub-lat{font-size:12px;font-style:italic;color:var(--text-muted)}
+.baum-pub-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);margin-top:6px}
+/* Baum Detail Modal */
+.baum-detail-dl{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:14px;margin:12px 0}
+.baum-detail-dl dt{color:var(--text-muted);font-weight:600;white-space:nowrap}
+.baum-detail-dl dd{color:var(--text);margin:0}
 </style>
 </head>
 <body>
@@ -354,13 +373,31 @@ html{scroll-behavior:smooth}
 <section class="park-section" id="unser-park">
   <p class="section-eyebrow">Unsere Pflanzen &amp; Bäume</p>
   <h2 class="section-heading">Unser Park</h2>
-  <div class="park-search-wrap">
-    <span class="park-search-icon">🔍</span>
-    <input class="park-search" id="pfl-search" type="search" placeholder="Pflanze suchen …" oninput="filterPflanzen()">
+
+  <!-- Tab-Switcher -->
+  <div class="park-tabs" id="park-tabs">
+    <button class="park-tab active" onclick="switchParkTab('pflanzen',this)">🌱 Pflanzen</button>
+    <button class="park-tab" onclick="switchParkTab('baeume',this)">🌳 Bäume</button>
   </div>
-  <div class="park-chips" id="pfl-chips"></div>
-  <div class="pflanzen-grid" id="pflanzen-grid">
-    <p style="color:var(--text-muted);font-size:14px">Wird geladen …</p>
+
+  <!-- Pflanzen-Ansicht -->
+  <div id="park-view-pflanzen">
+    <div class="park-search-wrap">
+      <span class="park-search-icon">🔍</span>
+      <input class="park-search" id="pfl-search" type="search" placeholder="Pflanze suchen …" oninput="filterPflanzen()">
+    </div>
+    <div class="park-chips" id="pfl-chips"></div>
+    <div class="pflanzen-grid" id="pflanzen-grid">
+      <p style="color:var(--text-muted);font-size:14px">Wird geladen …</p>
+    </div>
+  </div>
+
+  <!-- Bäume-Ansicht -->
+  <div id="park-view-baeume" style="display:none">
+    <div class="park-chips" id="baum-pub-filter"></div>
+    <div id="baeume-pub-list">
+      <p style="color:var(--text-muted);font-size:14px">Wird geladen …</p>
+    </div>
   </div>
 </section>
 
@@ -379,6 +416,26 @@ html{scroll-behavior:smooth}
     </div>
   </div>
 </div>
+
+<!-- BAUM DETAIL MODAL -->
+<div class="modal-ov" id="baum-pub-modal" style="display:none" onclick="if(event.target===this)closeBaumPub()">
+  <div class="modal-box" style="max-width:460px;padding:0;overflow:hidden">
+    <div id="baum-pub-hero" style="width:100%;height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;background:var(--border)">🌳</div>
+    <button onclick="closeBaumPub()" style="position:absolute;top:12px;right:14px;background:rgba(0,0,0,.45);border:none;color:#fff;font-size:18px;width:32px;height:32px;border-radius:50%;cursor:pointer;line-height:1">✕</button>
+    <div style="padding:16px 18px 24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span id="baum-pub-nr-badge" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--border);color:var(--text-muted)"></span>
+        <span id="baum-pub-vital-badge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px"></span>
+      </div>
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px" id="baum-pub-name"></div>
+      <div style="font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:14px" id="baum-pub-lat"></div>
+      <dl class="baum-detail-dl" id="baum-pub-dl"></dl>
+      <div id="baum-pub-notiz" style="display:none;background:var(--border);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text-muted);margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+
 
 <div class="main" id="melden">
   <div class="pg-title">
@@ -983,6 +1040,131 @@ document.addEventListener('DOMContentLoaded', () => {
   const sec = document.getElementById('unser-park');
   if (sec) pflObserver.observe(sec);
 });
+
+// ── BÄUME ÖFFENTLICH ──────────────────────────────────────────────
+let _baumPubData = [], _baumPubFilter = 'Alle';
+const VITAL_COL_PUB = {1:'#2d7a3a', 2:'#B8892A', 3:'#c0522a', 4:'#7A2430'};
+const VITAL_LBL_PUB = {1:'Vital', 2:'Leicht geschwächt', 3:'Stark geschwächt', 4:'Abgestorben'};
+const BEREICHE_ORDER = ['Park','Parkrand','Innenhof','Eingang'];
+
+function switchParkTab(tab, btn) {
+  document.querySelectorAll('.park-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('park-view-pflanzen').style.display = tab === 'pflanzen' ? '' : 'none';
+  document.getElementById('park-view-baeume').style.display  = tab === 'baeume'   ? '' : 'none';
+  if (tab === 'baeume' && !_baumPubData.length) loadBaeumePublic();
+}
+
+async function loadBaeumePublic() {
+  try {
+    const r = await fetch(
+      'https://rzpsmvczwaeraupnhhkx.supabase.co/rest/v1/baeume?aktiv=eq.true&order=baum_nr.asc',
+      {headers:{'apikey':'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem','Authorization':'Bearer sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem'}}
+    );
+    _baumPubData = await r.json();
+    buildBaumPubFilter();
+    renderBaeumePublic();
+  } catch(e) {
+    document.getElementById('baeume-pub-list').innerHTML = '<p style="color:var(--text-muted)">Konnte nicht laden.</p>';
+  }
+}
+
+function buildBaumPubFilter() {
+  const bereiche = ['Alle', ...new Set(_baumPubData.map(b => b.standort_bereich).filter(Boolean))];
+  document.getElementById('baum-pub-filter').innerHTML = bereiche.map(b =>
+    `<button class="park-chip${b===_baumPubFilter?' active':''}" onclick="setBaumPubFilter('${b}',this)">${b==='Alle'?'Alle ('+_baumPubData.length+')':b+' ('+_baumPubData.filter(x=>x.standort_bereich===b).length+')'}</button>`
+  ).join('');
+}
+
+function setBaumPubFilter(b, btn) {
+  _baumPubFilter = b;
+  document.querySelectorAll('#baum-pub-filter .park-chip').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderBaeumePublic();
+}
+
+function renderBaeumePublic() {
+  const list = _baumPubFilter === 'Alle' ? _baumPubData : _baumPubData.filter(b => b.standort_bereich === _baumPubFilter);
+  const el = document.getElementById('baeume-pub-list');
+  if (!list.length) { el.innerHTML = '<p style="color:var(--text-muted)">Keine Einträge.</p>'; return; }
+
+  // Nach Bereich gruppieren
+  const groups = {};
+  list.forEach(b => {
+    const key = b.standort_bereich || 'Sonstige';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(b);
+  });
+
+  const orderKeys = [...BEREICHE_ORDER, ...Object.keys(groups).filter(k => !BEREICHE_ORDER.includes(k))];
+  let out = '';
+  orderKeys.filter(k => groups[k]).forEach(bereich => {
+    out += `<div class="baum-bereich-title">${bereich}</div>`;
+    out += groups[bereich].map(b => {
+      const col = VITAL_COL_PUB[b.vitalitaet] || '#888';
+      const idx = _baumPubData.indexOf(b);
+      const meta = [
+        b.hoehe_m   ? `📏 ${b.hoehe_m} m` : '',
+        b.alter_jahre ? `🌱 ca. ${b.alter_jahre} Jahre` : '',
+        b.standort_beschreibung || '',
+      ].filter(Boolean).join(' · ');
+      return `<div class="baum-pub-card" onclick="openBaumPub(${idx})">
+        <div class="baum-vital-dot" style="background:${col}"></div>
+        <div class="baum-pub-nr">${b.baum_nr}</div>
+        <div class="baum-pub-body">
+          <div class="baum-pub-name">${b.name_de}</div>
+          <div class="baum-pub-lat">${b.name_lat||''}</div>
+          ${meta ? `<div class="baum-pub-meta">${meta}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  });
+  el.innerHTML = out;
+}
+
+function openBaumPub(idx) {
+  const b = _baumPubData[idx];
+  const m = document.getElementById('baum-pub-modal');
+  m.style.display = 'flex';
+
+  // Hero
+  const hero = document.getElementById('baum-pub-hero');
+  if (b.bild) {
+    hero.innerHTML = `<img src="https://sidoniescharfestiftung.de/wp-content/uploads/2026/02/${b.bild}" style="width:100%;height:160px;object-fit:cover" onerror="this.parentElement.innerHTML='🌳'">`;
+  } else {
+    hero.innerHTML = '🌳';
+  }
+
+  // Badges
+  document.getElementById('baum-pub-nr-badge').textContent = b.baum_nr;
+  const vBadge = document.getElementById('baum-pub-vital-badge');
+  const col = VITAL_COL_PUB[b.vitalitaet] || '#888';
+  vBadge.textContent = VITAL_LBL_PUB[b.vitalitaet] || '';
+  vBadge.style.background = col + '22';
+  vBadge.style.color = col;
+
+  // Name
+  document.getElementById('baum-pub-name').textContent = b.name_de;
+  document.getElementById('baum-pub-lat').textContent = b.name_lat || '';
+
+  // Details
+  let dl = '';
+  if (b.standort_bereich)      dl += `<dt>Bereich</dt><dd>${b.standort_bereich}</dd>`;
+  if (b.standort_beschreibung) dl += `<dt>Standort</dt><dd>${b.standort_beschreibung}</dd>`;
+  if (b.hoehe_m)               dl += `<dt>Höhe</dt><dd>ca. ${b.hoehe_m} m</dd>`;
+  if (b.stamm_umfang_cm)       dl += `<dt>Stammumfang</dt><dd>${b.stamm_umfang_cm} cm</dd>`;
+  if (b.krone_dm_m)            dl += `<dt>Kronendurchmesser</dt><dd>ca. ${b.krone_dm_m} m</dd>`;
+  if (b.alter_jahre)           dl += `<dt>Geschätztes Alter</dt><dd>ca. ${b.alter_jahre} Jahre</dd>`;
+  if (b.gepflanzt_am)          dl += `<dt>Gepflanzt</dt><dd>${b.gepflanzt_am}</dd>`;
+  document.getElementById('baum-pub-dl').innerHTML = dl;
+
+  // Notiz für Bewohnerinnen
+  const notEl = document.getElementById('baum-pub-notiz');
+  if (b.notizen) { notEl.style.display='block'; notEl.textContent = b.notizen; }
+  else notEl.style.display = 'none';
+}
+
+function closeBaumPub() { document.getElementById('baum-pub-modal').style.display='none'; }
 </script>
 </body>
 </html>
