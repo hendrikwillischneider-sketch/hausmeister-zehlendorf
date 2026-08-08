@@ -282,6 +282,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <button onclick="show('bewohner',this)">Bewohner</button>
   <button onclick="show('settings',this)">Einstellungen</button>
   <button onclick="show('artikel',this)">Artikel</button>
+  <button onclick="show('pflanzen',this)">Pflanzen</button>
   <button onclick="show('baumkataster',this)">Baumkataster</button>
 </nav>
 
@@ -467,6 +468,186 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   </div>
 </div>
 
+
+
+<!-- PFLANZEN CMS -->
+<div class="view" id="view-pflanzen">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)">Pflanzendatenbank</div>
+    <button onclick="openPflanzForm(null)" style="background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer">+ Neue Pflanze</button>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="pfl-int-filter"></div>
+  <div id="pfl-int-summary" style="font-size:13px;color:var(--text-muted);margin-bottom:12px"></div>
+  <div id="pfl-int-list"><p style="color:var(--text-muted);font-size:14px">Wird geladen …</p></div>
+</div>
+
+<!-- PFLANZE FORM MODAL -->
+<div class="overlay" id="pfl-int-modal" style="display:none">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="pfl-int-modal-title">Neue Pflanze</div>
+      <button class="modal-close" onclick="closePflanzForm()">✕</button>
+    </div>
+    <div style="padding:14px;display:grid;gap:10px;max-height:72vh;overflow-y:auto">
+      <input type="hidden" id="pfl-int-id">
+
+      <!-- Name -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Deutscher Name *</label>
+          <input type="text" id="pfl-int-name-de" class="inp" placeholder="z.B. Funkie">
+        </div>
+        <div>
+          <label class="lbl">Lateinischer Name</label>
+          <input type="text" id="pfl-int-name-lat" class="inp" placeholder="Hosta">
+        </div>
+      </div>
+
+      <!-- Typ + Kategorie -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Typ</label>
+          <select id="pfl-int-typ" class="inp">
+            <option value="">— wählen —</option>
+            <option>Baum</option><option>Strauch</option><option>Staude</option>
+            <option>Einjährige</option><option>Zweijährige</option>
+            <option>Zwiebelpflanze</option><option>Knollenpflanze</option>
+            <option>Kletterpflanze</option><option>Bodendecker</option><option>Gras</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Kategorie</label>
+          <input type="text" id="pfl-int-kat" class="inp" placeholder="z.B. Zierstaude, Hecke …">
+        </div>
+      </div>
+
+      <!-- Standort -->
+      <div>
+        <label class="lbl">Standort</label>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+            <input type="checkbox" id="pfl-st-sonne"> ☀️ Sonne
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+            <input type="checkbox" id="pfl-st-halb"> 🌤️ Halbschatten
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+            <input type="checkbox" id="pfl-st-schatten"> 🌥️ Schatten
+          </label>
+        </div>
+      </div>
+
+      <!-- Wasser + Blütezeit -->
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Wasserbedarf</label>
+          <select id="pfl-int-wasser" class="inp">
+            <option value="">—</option>
+            <option>gering</option><option>mittel</option><option>hoch</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Blüte von</label>
+          <select id="pfl-int-bluete-von" class="inp">
+            <option value="">—</option>
+            <option value="1">Januar</option><option value="2">Februar</option>
+            <option value="3">März</option><option value="4">April</option>
+            <option value="5">Mai</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">August</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Dezember</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Blüte bis</label>
+          <select id="pfl-int-bluete-bis" class="inp">
+            <option value="">—</option>
+            <option value="1">Januar</option><option value="2">Februar</option>
+            <option value="3">März</option><option value="4">April</option>
+            <option value="5">Mai</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">August</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Dezember</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Blütenfarbe + Höhe -->
+      <div style="display:grid;grid-template-columns:1fr 80px 80px;gap:8px">
+        <div>
+          <label class="lbl">Blütenfarbe</label>
+          <input type="text" id="pfl-int-bluetfarbe" class="inp" placeholder="rot, weiß, …">
+        </div>
+        <div>
+          <label class="lbl">Höhe min (cm)</label>
+          <input type="number" id="pfl-int-hoehe-min" class="inp" placeholder="20">
+        </div>
+        <div>
+          <label class="lbl">Höhe max (cm)</label>
+          <input type="number" id="pfl-int-hoehe-max" class="inp" placeholder="80">
+        </div>
+      </div>
+
+      <!-- Flags -->
+      <div style="display:flex;gap:16px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+          <input type="checkbox" id="pfl-int-winterhart" checked> Winterhart
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+          <input type="checkbox" id="pfl-int-im-park" checked> Im Park vorhanden
+        </label>
+      </div>
+
+      <!-- Park-Standort + Bild -->
+      <div style="display:grid;grid-template-columns:1fr 160px;gap:8px">
+        <div>
+          <label class="lbl">Standort im Park</label>
+          <input type="text" id="pfl-int-park-standort" class="inp" placeholder="z.B. Innenhof, Parkrand">
+        </div>
+        <div>
+          <label class="lbl">Bild-Dateiname</label>
+          <input type="text" id="pfl-int-bild" class="inp" placeholder="DSC01289b.jpg">
+        </div>
+      </div>
+
+      <!-- Pflegehinweise -->
+      <div>
+        <label class="lbl">Pflegehinweise</label>
+        <textarea id="pfl-int-pflege" class="inp" rows="2" style="resize:vertical" placeholder="Schnitt, Düngung, Besonderheiten …"></textarea>
+      </div>
+
+      <!-- Schnittmonate -->
+      <div>
+        <label class="lbl">Schnittmonate (kommagetrennt, z.B. 3,8)</label>
+        <input type="text" id="pfl-int-schnitt" class="inp" placeholder="3, 8">
+      </div>
+
+      <!-- Gießhinweis -->
+      <div>
+        <label class="lbl">Gießhinweis</label>
+        <input type="text" id="pfl-int-giessen" class="inp" placeholder="z.B. Täglich bei Hitze">
+      </div>
+
+      <!-- Tags -->
+      <div>
+        <label class="lbl">Tags (kommagetrennt)</label>
+        <input type="text" id="pfl-int-tags" class="inp" placeholder="giftig, duftend, bienenpflanze, wintergrün">
+      </div>
+
+      <!-- Bewohner-Info -->
+      <div>
+        <label class="lbl">Info für Bewohnerinnen</label>
+        <textarea id="pfl-int-bew-info" class="inp" rows="2" style="resize:vertical" placeholder="Interessanter Fakt, der auf der Startseite erscheint …"></textarea>
+      </div>
+
+      <div id="pfl-int-err" style="color:var(--red);font-size:13px;display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="savePflanz()" style="flex:1;background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">Speichern</button>
+        <button onclick="closePflanzForm()" style="padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:14px">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- BAUMKATASTER -->
 <div class="view" id="view-baumkataster">
@@ -1094,6 +1275,7 @@ function render(id) {
   if (id==='dashboard') renderDash();
   if (id==='schaden') renderSchaden();
   if (id==='artikel') loadArtikel();
+  if (id==='pflanzen') loadPflanzenInt();
   if (id==='baumkataster') loadBaeume();
   if (id==='woche') renderWoche();
   if (id==='plan') renderPlan();
@@ -2055,6 +2237,161 @@ async function deleteBaum(id) {
   if (!confirm('Baum aus dem Kataster löschen?')) return;
   await sbReq(`baeume?id=eq.${id}`, {method:'DELETE'});
   loadBaeume();
+}
+
+// ── PFLANZENDATENBANK (intern) ────────────────────────────────────
+let _pflIntData = [], _pflIntFilter = 'Alle';
+const MN_PFL = ['','Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+async function loadPflanzenInt() {
+  try {
+    const r = await sbReq('pflanzen?order=name_de.asc&aktiv=eq.true');
+    _pflIntData = await r.json();
+    renderPflIntFilter();
+    document.getElementById('pfl-int-summary').textContent = `🌱 ${_pflIntData.length} Pflanzen erfasst · ${_pflIntData.filter(p=>p.im_park).length} im Park`;
+    renderPflIntList();
+  } catch(e) {
+    document.getElementById('pfl-int-list').innerHTML = '<div class="empty"><p>Fehler beim Laden.</p></div>';
+  }
+}
+
+function renderPflIntFilter() {
+  const kats = ['Alle', ...new Set(_pflIntData.map(p=>p.kategorie).filter(Boolean)).values()].sort((a,b)=>a==='Alle'?-1:a.localeCompare(b,'de'));
+  document.getElementById('pfl-int-filter').innerHTML = kats.map(k =>
+    `<button class="chip${k===_pflIntFilter?' active':''}" onclick="setPflIntFilter('${k}',this)">${k==='Alle'?'Alle ('+_pflIntData.length+')':k+' ('+_pflIntData.filter(p=>p.kategorie===k).length+')'}</button>`
+  ).join('');
+}
+
+function setPflIntFilter(k, btn) {
+  _pflIntFilter = k;
+  document.querySelectorAll('#pfl-int-filter .chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPflIntList();
+}
+
+function renderPflIntList() {
+  const list = _pflIntFilter==='Alle' ? _pflIntData : _pflIntData.filter(p=>p.kategorie===_pflIntFilter);
+  const el = document.getElementById('pfl-int-list');
+  if (!list.length) { el.innerHTML='<div class="empty"><p>Keine Einträge.</p></div>'; return; }
+  el.innerHTML = list.map(p => {
+    const bluete = p.bluete_von ? `🌸 ${MN_PFL[p.bluete_von]}${p.bluete_bis&&p.bluete_bis!==p.bluete_von?'–'+MN_PFL[p.bluete_bis]:''}` : '';
+    const park = p.im_park ? '<span style="color:var(--green-mid);font-size:11px;font-weight:600">● IM PARK</span>' : '';
+    return `<div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <span style="font-size:14px;font-weight:600;color:var(--text)">${p.name_de}</span>
+          ${park}
+        </div>
+        <div style="font-size:12px;color:var(--text-muted)">${p.name_lat?'<i>'+p.name_lat+'</i> · ':''}${p.typ||''} · ${p.kategorie||''}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${[bluete, p.park_standort].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+        <button onclick='openPflanzForm(${JSON.stringify(p).replace(/'/g,"\'")})'
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
+        <button onclick="deletePflanz('${p.id}')"
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPflanzForm(p) {
+  document.getElementById('pfl-int-modal').style.display='flex';
+  document.getElementById('pfl-int-modal-title').textContent = p ? 'Pflanze bearbeiten' : 'Neue Pflanze';
+  document.getElementById('pfl-int-err').style.display='none';
+  const f=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val??'';};
+  const cb=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=!!val;};
+  if (p) {
+    f('pfl-int-id', p.id);
+    f('pfl-int-name-de', p.name_de);
+    f('pfl-int-name-lat', p.name_lat);
+    f('pfl-int-typ', p.typ);
+    f('pfl-int-kat', p.kategorie);
+    cb('pfl-st-sonne',    (p.standort||[]).includes('Sonne'));
+    cb('pfl-st-halb',     (p.standort||[]).includes('Halbschatten'));
+    cb('pfl-st-schatten', (p.standort||[]).includes('Schatten'));
+    f('pfl-int-wasser', p.wasser);
+    f('pfl-int-bluete-von', p.bluete_von);
+    f('pfl-int-bluete-bis', p.bluete_bis);
+    f('pfl-int-bluetfarbe', p.bluetfarbe);
+    f('pfl-int-hoehe-min', p.hoehe_min);
+    f('pfl-int-hoehe-max', p.hoehe_max);
+    cb('pfl-int-winterhart', p.winterhart!==false);
+    cb('pfl-int-im-park', p.im_park);
+    f('pfl-int-park-standort', p.park_standort);
+    f('pfl-int-bild', p.bild);
+    f('pfl-int-pflege', p.pflegehinweise);
+    f('pfl-int-schnitt', (p.schnitt_monate||[]).join(', '));
+    f('pfl-int-giessen', p.giessen_hinweis);
+    f('pfl-int-tags', (p.tags||[]).join(', '));
+    f('pfl-int-bew-info', p.bewohner_info);
+  } else {
+    ['pfl-int-id','pfl-int-name-de','pfl-int-name-lat','pfl-int-kat','pfl-int-wasser',
+     'pfl-int-bluete-von','pfl-int-bluete-bis','pfl-int-bluetfarbe','pfl-int-hoehe-min',
+     'pfl-int-hoehe-max','pfl-int-park-standort','pfl-int-bild','pfl-int-pflege',
+     'pfl-int-schnitt','pfl-int-giessen','pfl-int-tags','pfl-int-bew-info'].forEach(id=>f(id,''));
+    document.getElementById('pfl-int-typ').value='';
+    cb('pfl-st-sonne',false); cb('pfl-st-halb',false); cb('pfl-st-schatten',false);
+    cb('pfl-int-winterhart',true); cb('pfl-int-im-park',true);
+  }
+}
+
+function closePflanzForm() { document.getElementById('pfl-int-modal').style.display='none'; }
+
+async function savePflanz() {
+  const nameDE = document.getElementById('pfl-int-name-de').value.trim();
+  if (!nameDE) {
+    const e=document.getElementById('pfl-int-err'); e.textContent='Name ist Pflichtfeld.'; e.style.display='block'; return;
+  }
+  const g = id => document.getElementById(id).value.trim();
+  const standort = [
+    document.getElementById('pfl-st-sonne').checked    ? 'Sonne'       : null,
+    document.getElementById('pfl-st-halb').checked     ? 'Halbschatten': null,
+    document.getElementById('pfl-st-schatten').checked ? 'Schatten'    : null,
+  ].filter(Boolean);
+  const schnitt = g('pfl-int-schnitt').split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n)&&n>0);
+  const tags = g('pfl-int-tags').split(',').map(s=>s.trim()).filter(Boolean);
+  const id = g('pfl-int-id');
+  const payload = {
+    name_de:          nameDE,
+    name_lat:         g('pfl-int-name-lat') || null,
+    typ:              g('pfl-int-typ') || null,
+    kategorie:        g('pfl-int-kat') || null,
+    standort:         standort.length ? standort : null,
+    wasser:           g('pfl-int-wasser') || null,
+    bluete_von:       parseInt(g('pfl-int-bluete-von')) || null,
+    bluete_bis:       parseInt(g('pfl-int-bluete-bis')) || null,
+    bluetfarbe:       g('pfl-int-bluetfarbe') || null,
+    hoehe_min:        parseInt(g('pfl-int-hoehe-min')) || null,
+    hoehe_max:        parseInt(g('pfl-int-hoehe-max')) || null,
+    winterhart:       document.getElementById('pfl-int-winterhart').checked,
+    im_park:          document.getElementById('pfl-int-im-park').checked,
+    park_standort:    g('pfl-int-park-standort') || null,
+    bild:             g('pfl-int-bild') || null,
+    pflegehinweise:   g('pfl-int-pflege') || null,
+    schnitt_monate:   schnitt.length ? schnitt : null,
+    giessen_hinweis:  g('pfl-int-giessen') || null,
+    tags:             tags.length ? tags : null,
+    bewohner_info:    g('pfl-int-bew-info') || null,
+    aktiv:            true,
+  };
+  try {
+    if (id) {
+      await sbReq(`pflanzen?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
+    } else {
+      await sbReq('pflanzen', {method:'POST', body:JSON.stringify(payload)});
+    }
+    closePflanzForm();
+    loadPflanzenInt();
+  } catch(e) {
+    const err=document.getElementById('pfl-int-err'); err.textContent='Fehler: '+e.message; err.style.display='block';
+  }
+}
+
+async function deletePflanz(id) {
+  if (!confirm('Pflanze wirklich löschen?')) return;
+  await sbReq(`pflanzen?id=eq.${id}`, {method:'DELETE'});
+  loadPflanzenInt();
 }
 </script>
 </body>
