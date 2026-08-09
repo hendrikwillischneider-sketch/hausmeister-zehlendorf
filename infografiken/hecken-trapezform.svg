@@ -1,0 +1,72 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Hecke schneiden: Trapez schlägt Rechteck</text>
+
+  <!-- FALSCH: Rechteck -->
+  <text x="145" y="54" text-anchor="middle" font-size="13" font-weight="700" fill="#7A2430">✗ Falsch: Rechteck</text>
+
+  <!-- Hecke Rechteck (kahl unten) -->
+  <rect x="70" y="70" width="150" height="160" rx="4" fill="#2d7a3a"/>
+  <!-- kahle untere Zone -->
+  <rect x="70" y="190" width="150" height="40" rx="0 0 4 4" fill="#8B6914" opacity="0.6"/>
+  <text x="145" y="218" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Kahl — kein Licht</text>
+
+  <!-- Sonnenstrahlen blockiert -->
+  <g stroke="#B8892A" stroke-width="2" opacity="0.7" stroke-dasharray="4,2">
+    <line x1="30" y1="90" x2="65" y2="100"/>
+    <line x1="30" y1="120" x2="65" y2="130"/>
+    <line x1="30" y1="150" x2="65" y2="160"/>
+    <line x1="30" y1="180" x2="65" y2="180"/>
+  </g>
+  <text x="48" y="108" font-size="10" fill="#B8892A" text-anchor="middle" transform="rotate(-15,48,108)">Licht</text>
+  <!-- X blockiert -->
+  <text x="72" y="165" font-size="18" fill="#7A2430" font-weight="700">✗</text>
+
+  <!-- Maße Rechteck -->
+  <line x1="66" y1="70" x2="66" y2="230" stroke="#7A2430" stroke-width="1.5"/>
+  <line x1="62" y1="70" x2="70" y2="70" stroke="#7A2430" stroke-width="1.5"/>
+  <line x1="62" y1="230" x2="70" y2="230" stroke="#7A2430" stroke-width="1.5"/>
+  <text x="58" y="160" text-anchor="middle" font-size="10" fill="#7A2430" transform="rotate(-90,58,160)">oben = unten</text>
+
+  <!-- RICHTIG: Trapez -->
+  <text x="445" y="54" text-anchor="middle" font-size="13" font-weight="700" fill="#1C4A2E">✓ Richtig: Trapezform</text>
+
+  <!-- Hecke Trapez -->
+  <polygon points="360,70 540,70 560,230 340,230" fill="#2d7a3a"/>
+  <!-- Dichte auch unten -->
+  <polygon points="360,180 540,180 555,220 345,220" fill="#3a9a4a" opacity="0.4"/>
+
+  <!-- Sonnenstrahlen kommen durch -->
+  <g stroke="#B8892A" stroke-width="2">
+    <line x1="310" y1="90" x2="355" y2="100"/>
+    <line x1="310" y1="120" x2="348" y2="140"/>
+    <line x1="310" y1="150" x2="343" y2="165"/>
+    <line x1="310" y1="180" x2="342" y2="185"/>
+  </g>
+  <text x="328" y="108" font-size="10" fill="#B8892A" text-anchor="middle" transform="rotate(-15,328,108)">Licht</text>
+  <text x="340" y="165" font-size="16" fill="#1C4A2E" font-weight="700">✓</text>
+
+  <!-- Maße Trapez: oben schmaler -->
+  <line x1="334" y1="70" x2="334" y2="230" stroke="#1C4A2E" stroke-width="1.5"/>
+  <line x1="330" y1="70" x2="338" y2="70" stroke="#1C4A2E" stroke-width="1.5"/>
+  <line x1="330" y1="230" x2="338" y2="230" stroke="#1C4A2E" stroke-width="1.5"/>
+
+  <!-- Breitenangaben -->
+  <line x1="360" y1="60" x2="540" y2="60" stroke="#1C4A2E" stroke-width="1"/>
+  <line x1="360" y1="56" x2="360" y2="64" stroke="#1C4A2E" stroke-width="1"/>
+  <line x1="540" y1="56" x2="540" y2="64" stroke="#1C4A2E" stroke-width="1"/>
+  <text x="450" y="54" text-anchor="middle" font-size="9" fill="#1C4A2E">schmäler oben</text>
+
+  <line x1="340" y1="240" x2="560" y2="240" stroke="#1C4A2E" stroke-width="1"/>
+  <line x1="340" y1="236" x2="340" y2="244" stroke="#1C4A2E" stroke-width="1"/>
+  <line x1="560" y1="236" x2="560" y2="244" stroke="#1C4A2E" stroke-width="1"/>
+  <text x="450" y="254" text-anchor="middle" font-size="9" fill="#1C4A2E">breiter unten</text>
+
+  <!-- Trennlinie -->
+  <line x1="300" y1="45" x2="300" y2="300" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Erklärung unten -->
+  <rect x="30" y="268" width="540" height="40" rx="8" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="283" text-anchor="middle" font-size="11" fill="#1C4A2E" font-weight="600">Trapezform: Oben 10–15 cm schmaler als unten → Licht erreicht die gesamte Hecke</text>
+  <text x="300" y="300" text-anchor="middle" font-size="11" fill="#555">Rechteck: Untere Hälfte wird kahl, weil die obere Hälfte das Licht abschirmt</text>
+</svg>
