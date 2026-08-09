@@ -1,0 +1,88 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Rasen nachsäen im September — so schließen sich kahle Stellen</text>
+
+  <!-- 5 Schritte als Ablauf -->
+  <text x="300" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Die 5 Schritte zur erfolgreichen Nachsaat</text>
+
+  <!-- Schritt 1 -->
+  <g transform="translate(20, 62)">
+    <circle cx="22" cy="22" r="18" fill="#1C4A2E"/>
+    <text x="22" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">1</text>
+    <rect x="46" y="5" width="99" height="36" rx="6" fill="#1C4A2E" opacity="0.08"/>
+    <text x="96" y="19" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Kahle Stelle</text>
+    <text x="96" y="33" text-anchor="middle" font-size="9" fill="#555">auflockern (Rechen)</text>
+    <!-- Rechen-Symbol -->
+    <text x="152" y="26" font-size="22">🪣</text>
+  </g>
+
+  <!-- Schritt 2 -->
+  <g transform="translate(20, 116)">
+    <circle cx="22" cy="22" r="18" fill="#B8892A"/>
+    <text x="22" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">2</text>
+    <rect x="46" y="5" width="99" height="36" rx="6" fill="#B8892A" opacity="0.08"/>
+    <text x="96" y="19" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">Rasensamen</text>
+    <text x="96" y="33" text-anchor="middle" font-size="9" fill="#555">gleichmäßig streuen</text>
+    <text x="152" y="26" font-size="22">🌱</text>
+    <text x="175" y="19" font-size="9" fill="#555">50–60 g/m²</text>
+    <text x="175" y="32" font-size="9" fill="#555">Sportrasen / Schattenrasen</text>
+  </g>
+
+  <!-- Schritt 3 -->
+  <g transform="translate(20, 170)">
+    <circle cx="22" cy="22" r="18" fill="#3a9a4a"/>
+    <text x="22" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">3</text>
+    <rect x="46" y="5" width="99" height="36" rx="6" fill="#3a9a4a" opacity="0.08"/>
+    <text x="96" y="19" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Andrücken</text>
+    <text x="96" y="33" text-anchor="middle" font-size="9" fill="#555">mit Boden in Kontakt</text>
+    <text x="152" y="26" font-size="22">👣</text>
+    <text x="175" y="19" font-size="9" fill="#555">Leicht festtreten</text>
+    <text x="175" y="32" font-size="9" fill="#555">oder Walze benutzen</text>
+  </g>
+
+  <!-- Schritt 4 -->
+  <g transform="translate(20, 224)">
+    <circle cx="22" cy="22" r="18" fill="#4a90d9"/>
+    <text x="22" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">4</text>
+    <rect x="46" y="5" width="99" height="36" rx="6" fill="#4a90d9" opacity="0.08"/>
+    <text x="96" y="19" text-anchor="middle" font-size="10" font-weight="700" fill="#4a90d9">Wässern</text>
+    <text x="96" y="33" text-anchor="middle" font-size="9" fill="#555">täglich feucht halten</text>
+    <text x="152" y="26" font-size="22">💧</text>
+    <text x="175" y="19" font-size="9" fill="#555">2× täglich fein</text>
+    <text x="175" y="32" font-size="9" fill="#555">bis Keimung (7–14 Tage)</text>
+  </g>
+
+  <!-- Schritt 5 -->
+  <g transform="translate(20, 278)">
+    <circle cx="22" cy="22" r="18" fill="#7A2430"/>
+    <text x="22" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">5</text>
+    <rect x="46" y="5" width="99" height="36" rx="6" fill="#7A2430" opacity="0.07"/>
+    <text x="96" y="19" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">Schonen</text>
+    <text x="96" y="33" text-anchor="middle" font-size="9" fill="#555">6–8 Wochen nicht betreten</text>
+    <text x="152" y="26" font-size="20">🚫</text>
+  </g>
+
+  <!-- Rechte Seite: Warum September ideal? -->
+  <line x1="295" y1="55" x2="295" y2="310" stroke="#ddd" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <text x="450" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#1C4A2E">Warum September ideal?</text>
+
+  <rect x="308" y="80" width="278" height="56" rx="8" fill="#3a9a4a" opacity="0.09"/>
+  <text x="447" y="98" text-anchor="middle" font-size="22">🌡️</text>
+  <text x="447" y="116" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Warmer Boden</text>
+  <text x="447" y="130" text-anchor="middle" font-size="9" fill="#555">Boden speichert Sommerwärme → schnelle Keimung</text>
+
+  <rect x="308" y="144" width="278" height="56" rx="8" fill="#4a90d9" opacity="0.08"/>
+  <text x="447" y="162" text-anchor="middle" font-size="22">🌧️</text>
+  <text x="447" y="180" text-anchor="middle" font-size="10" font-weight="700" fill="#4a90d9">Herbstregen</text>
+  <text x="447" y="194" text-anchor="middle" font-size="9" fill="#555">Natürliche Bewässerung — weniger Handarbeit</text>
+
+  <rect x="308" y="208" width="278" height="56" rx="8" fill="#1C4A2E" opacity="0.07"/>
+  <text x="447" y="226" text-anchor="middle" font-size="22">☀️</text>
+  <text x="447" y="244" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Kein Hitzestress</text>
+  <text x="447" y="258" text-anchor="middle" font-size="9" fill="#555">Kühle Nächte = Keimling vertrocknet nicht</text>
+
+  <rect x="308" y="272" width="278" height="38" rx="8" fill="#B8892A" opacity="0.1"/>
+  <text x="447" y="290" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">Ergebnis bis Oktober:</text>
+  <text x="447" y="304" text-anchor="middle" font-size="9" fill="#555">Neues Gras schließt Lücken vor dem Winter</text>
+</svg>
