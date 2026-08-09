@@ -1,0 +1,92 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Baum richtig pflanzen — so wurzelt er sich im alten Park ein</text>
+
+  <!-- Links: Querschnitt Pflanzloch -->
+  <text x="170" y="50" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Das richtige Pflanzloch</text>
+
+  <!-- Erde Oberfläche -->
+  <rect x="20" y="90" width="320" height="8" fill="#8B6914" opacity="0.5"/>
+  <!-- Aushub -->
+  <path d="M60,98 L60,220 Q180,245 300,220 L300,98" fill="#7a4a1a" opacity="0.3"/>
+  <!-- Drainagesicht -->
+  <path d="M70,210 L290,210 L290,230 L70,230" fill="#c0a060" opacity="0.4"/>
+  <!-- Substrat/Kompost -->
+  <path d="M80,200 L280,200 L280,210 L70,210 L70,202" fill="#5a3a10" opacity="0.5"/>
+
+  <!-- Wurzelballen -->
+  <ellipse cx="180" cy="175" rx="55" ry="35" fill="#6B4423" opacity="0.7"/>
+  <ellipse cx="180" cy="168" rx="50" ry="28" fill="#8B6914" opacity="0.5"/>
+  <!-- Baum Stamm -->
+  <rect x="173" y="88" width="14" height="82" fill="#6B4423"/>
+  <!-- Krone angedeutet -->
+  <ellipse cx="180" cy="70" rx="45" ry="30" fill="#3a9a4a" opacity="0.5"/>
+
+  <!-- Pfahl -->
+  <rect x="145" y="90" width="8" height="110" fill="#8B6914" rx="2"/>
+  <rect x="218" y="90" width="8" height="110" fill="#8B6914" rx="2"/>
+  <!-- Anbindung -->
+  <rect x="148" y="115" width="77" height="6" rx="3" fill="#B8892A" opacity="0.8"/>
+
+  <!-- Maße-Pfeile -->
+  <!-- Breite: 2x Ballen -->
+  <line x1="60" y1="82" x2="300" y2="82" stroke="#1C4A2E" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="300" y1="82" x2="60" y2="82" stroke="#1C4A2E" stroke-width="1.5"/>
+  <text x="180" y="77" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="700">≥ 2× Ballendurchmesser breit</text>
+
+  <!-- Tiefe -->
+  <line x1="38" y1="98"  x2="38" y2="230" stroke="#7A2430" stroke-width="1.5"/>
+  <line x1="33" y1="98"  x2="43" y2="98"  stroke="#7A2430" stroke-width="1.5"/>
+  <line x1="33" y1="230" x2="43" y2="230" stroke="#7A2430" stroke-width="1.5"/>
+  <text x="35" y="175" text-anchor="middle" font-size="8" fill="#7A2430" transform="rotate(-90,35,175)">Ballenhöhe = Lochtiefe</text>
+
+  <!-- Beschriftungen -->
+  <text x="50" y="222" font-size="8" fill="#c0a060" opacity="0.9">Drainage</text>
+  <text x="297" y="120" font-size="8" fill="#6B4423">Pfähle</text>
+
+  <!-- Wurzelhals Markierung -->
+  <circle cx="180" cy="140" r="6" fill="none" stroke="#7A2430" stroke-width="1.5"/>
+  <line x1="186" y1="137" x2="215" y2="125" stroke="#7A2430" stroke-width="1"/>
+  <text x="218" y="123" font-size="8" fill="#7A2430">Wurzelhals</text>
+  <text x="218" y="134" font-size="8" fill="#7A2430">= Erdniveau!</text>
+
+  <!-- TRENNLINIE -->
+  <line x1="348" y1="42" x2="348" y2="316" stroke="#ddd" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- Rechts: Checkliste -->
+  <text x="474" y="50" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">5 Schritte zum Erfolg</text>
+
+  <g transform="translate(360, 60)">
+    <rect x="0" y="0" width="228" height="36" rx="6" fill="#1C4A2E" opacity="0.08"/>
+    <text x="10" y="14" font-size="18">🕳️</text>
+    <text x="35" y="13" font-size="10" font-weight="700" fill="#1C4A2E">1. Loch graben</text>
+    <text x="35" y="27" font-size="9" fill="#555">2× Ballen-Ø breit · genau Ballen-Höhe tief</text>
+
+    <rect x="0" y="42" width="228" height="36" rx="6" fill="#B8892A" opacity="0.09"/>
+    <text x="10" y="56" font-size="18">🌿</text>
+    <text x="35" y="55" font-size="10" font-weight="700" fill="#8B6914">2. Drainage + Kompost</text>
+    <text x="35" y="69" font-size="9" fill="#555">Kies unten · Kompost-Erde mischen</text>
+
+    <rect x="0" y="84" width="228" height="36" rx="6" fill="#6B4423" opacity="0.09"/>
+    <text x="10" y="98" font-size="18">🌳</text>
+    <text x="35" y="97" font-size="10" font-weight="700" fill="#6B4423">3. Baum einsetzen</text>
+    <text x="35" y="111" font-size="9" fill="#555">Wurzelhals auf Erdniveau · Veredelung oben</text>
+
+    <rect x="0" y="126" width="228" height="36" rx="6" fill="#3a9a4a" opacity="0.09"/>
+    <text x="10" y="140" font-size="18">🪵</text>
+    <text x="35" y="139" font-size="10" font-weight="700" fill="#3a9a4a">4. Pfähle &amp; Anbindung</text>
+    <text x="35" y="153" font-size="9" fill="#555">2 Pfähle windwärts · Acht-Schlinge locker</text>
+
+    <rect x="0" y="168" width="228" height="36" rx="6" fill="#4a90d9" opacity="0.09"/>
+    <text x="10" y="182" font-size="18">💧</text>
+    <text x="35" y="181" font-size="10" font-weight="700" fill="#4a90d9">5. Angießen</text>
+    <text x="35" y="195" font-size="9" fill="#555">10–20 L direkt nach Pflanzung · Mulchring!</text>
+  </g>
+
+  <!-- Alten Park Hinweis -->
+  <rect x="20" y="256" width="560" height="56" rx="8" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="272" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Für den alten Park: Nur standortgerechte, heimische Arten ergänzen</text>
+  <text x="300" y="288" text-anchor="middle" font-size="9" fill="#555">Linde, Eiche, Feldahorn, Hainbuche — keine invasiven oder pflegeintensiven Exoten</text>
+  <text x="300" y="304" text-anchor="middle" font-size="9" fill="#555">Herbst-Pflanzung: Baum wurzelt bis März fertig ein — kein Sommerstress</text>
+  <text x="300" y="318" text-anchor="middle" font-size="9" fill="#B8892A" font-weight="600">Für Bewohnerinnen: Was heute gepflanzt wird, spendet in 20 Jahren Schatten</text>
+</svg>
