@@ -1,0 +1,52 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4A2E">Wann blüht was? — Blühkalender für Frühjahrszwiebeln</text>
+
+  <!-- Monate Jan - Jun -->
+  <g transform="translate(20, 44)">
+    <text x="0"   y="0" font-size="9" fill="#555" font-weight="700">Jan</text>
+    <text x="90"  y="0" font-size="9" fill="#555" font-weight="700">Feb</text>
+    <text x="180" y="0" font-size="9" fill="#555" font-weight="700">März</text>
+    <text x="275" y="0" font-size="9" fill="#555" font-weight="700">April</text>
+    <text x="372" y="0" font-size="9" fill="#555" font-weight="700">Mai</text>
+    <text x="465" y="0" font-size="9" fill="#555" font-weight="700">Juni</text>
+  </g>
+
+  <!-- Zeilen: je eine Sorte -->
+  <!-- Schneeglöckchen -->
+  <text x="20" y="75" font-size="10" font-weight="700" fill="#1C4A2E">⚪ Schneeglöckchen</text>
+  <rect x="20"  y="80" width="170" height="16" rx="6" fill="#aaddcc" opacity="0.8"/>
+  <text x="105" y="92" text-anchor="middle" font-size="8" fill="#1C4A2E" font-weight="600">Jan – Mitte März</text>
+  <text x="22" y="92" font-size="9">❄️</text>
+  <text x="20" y="106" font-size="8" fill="#555">Erste Blüte nach dem Frost — Zeichen des Frühlings</text>
+
+  <!-- Krokus -->
+  <text x="20" y="126" font-size="10" font-weight="700" fill="#7A2430">💜 Krokus</text>
+  <rect x="75"  y="130" width="190" height="16" rx="6" fill="#c090d0" opacity="0.7"/>
+  <text x="170" y="142" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Feb – Mitte April</text>
+  <text x="20" y="156" font-size="8" fill="#555">Verschiedenfarbig · verbreitet sich selbst (naturalisierende Sorte)</text>
+
+  <!-- Narzisse -->
+  <text x="20" y="176" font-size="10" font-weight="700" fill="#B8892A">🌼 Narzisse</text>
+  <rect x="170" y="180" width="200" height="16" rx="6" fill="#F4C430" opacity="0.75"/>
+  <text x="270" y="192" text-anchor="middle" font-size="8" fill="#6B4423" font-weight="600">März – Mai</text>
+  <text x="20" y="206" font-size="8" fill="#555">Langlebig · von Wühlmäusen gemieden · ideal für den alten Park</text>
+
+  <!-- Blaustern -->
+  <text x="20" y="226" font-size="10" font-weight="700" fill="#4a90d9">🔵 Blaustern (Scilla)</text>
+  <rect x="170" y="230" width="130" height="16" rx="6" fill="#88aadd" opacity="0.75"/>
+  <text x="235" y="242" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">März – Apr</text>
+  <text x="20" y="256" font-size="8" fill="#555">Breitet sich unter Bäumen aus · idealer Bodendecker im alten Park</text>
+
+  <!-- Tulpe -->
+  <text x="20" y="276" font-size="10" font-weight="700" fill="#7A2430">🌷 Tulpe</text>
+  <rect x="275" y="280" width="200" height="16" rx="6" fill="#e07070" opacity="0.75"/>
+  <text x="375" y="292" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">April – Mai</text>
+
+  <!-- Linie Heute: August = jetzt pflanzen -->
+  <line x1="20" y1="40" x2="20" y2="295" stroke="#8B6914" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="555" y1="40" x2="555" y2="295" stroke="#ddd" stroke-width="1"/>
+  <!-- Sept Linie (wo man jetzt gerade ist) -->
+  <rect x="0" y="40" width="20" height="255" fill="#8B6914" opacity="0.05"/>
+  <text x="10" y="60" font-size="7" fill="#8B6914" transform="rotate(-90,10,60)">Sep →</text>
+</svg>
