@@ -1,0 +1,60 @@
+<svg viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="310" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">2. Heckenschnitt im August — das Jahresergebnis entscheidet sich jetzt</text>
+
+  <!-- Zeitstrahl oben -->
+  <line x1="40" y1="55" x2="560" y2="55" stroke="#1C4A2E" stroke-width="2"/>
+  <!-- Punkte -->
+  <circle cx="80"  cy="55" r="7" fill="#3a9a4a"/>
+  <circle cx="230" cy="55" r="7" fill="#7A2430"/>
+  <circle cx="380" cy="55" r="9" fill="#1C4A2E"/>
+  <circle cx="530" cy="55" r="7" fill="#B8892A" opacity="0.5"/>
+  <text x="80"  y="44" text-anchor="middle" font-size="9" fill="#3a9a4a" font-weight="700">Mai</text>
+  <text x="230" y="44" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="700">Brutzeit</text>
+  <text x="380" y="44" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="700">August ★</text>
+  <text x="530" y="44" text-anchor="middle" font-size="9" fill="#555" font-weight="700">Oktober</text>
+  <text x="80"  y="70" text-anchor="middle" font-size="8" fill="#3a9a4a">1. Schnitt</text>
+  <text x="230" y="70" text-anchor="middle" font-size="8" fill="#7A2430">kein Schnitt</text>
+  <text x="380" y="70" text-anchor="middle" font-size="8" fill="#1C4A2E">2. Schnitt</text>
+  <text x="530" y="70" text-anchor="middle" font-size="8" fill="#555">ggf. Korrektiv</text>
+  <!-- Brutzeit-Sperre -->
+  <rect x="155" y="47" width="150" height="16" rx="4" fill="#7A2430" opacity="0.15"/>
+  <text x="230" y="58" text-anchor="middle" font-size="8" fill="#7A2430">März – Aug: §39 BNatSchG</text>
+
+  <!-- Hecke VORHER (gewachsen) -->
+  <text x="145" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="#555">Vorher: nach 3 Monaten</text>
+  <rect x="40" y="112" width="210" height="120" rx="4" fill="#3a9a4a"/>
+  <!-- unregelmäßige Oberkante -->
+  <path d="M40,112 Q70,100 100,108 Q130,96 160,110 Q190,102 220,108 Q240,100 250,112 Z" fill="#2d7a3a"/>
+  <!-- Austriebe sichtbar -->
+  <g fill="#5aba6a" opacity="0.7">
+    <circle cx="75"  cy="105" r="8"/>
+    <circle cx="120" cy="100" r="10"/>
+    <circle cx="165" cy="106" r="7"/>
+    <circle cx="210" cy="102" r="9"/>
+  </g>
+  <text x="145" y="198" text-anchor="middle" font-size="9" fill="#fff">30–40 cm Zuwachs</text>
+  <text x="145" y="212" text-anchor="middle" font-size="9" fill="#fff">unregelmäßige Form</text>
+  <text x="145" y="226" text-anchor="middle" font-size="9" fill="#fff">Seitentriebe weit raus</text>
+
+  <!-- Hecke NACHHER (geschnitten) -->
+  <text x="445" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Nachher: kompakt + dicht</text>
+  <!-- Trapezform korrekt -->
+  <polygon points="350,230 350,112 480,112 480,230" fill="#2d7a3a"/>
+  <!-- Leichte Schräge (Trapez) -->
+  <polygon points="345,230 352,112 478,112 485,230" fill="#2d7a3a"/>
+  <polygon points="352,112 478,112 470,105 360,105" fill="#3a9a4a"/>
+  <text x="445" y="170" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Trapezform</text>
+  <text x="445" y="185" text-anchor="middle" font-size="9" fill="#c8f0c8">oben schmaler</text>
+  <text x="445" y="200" text-anchor="middle" font-size="9" fill="#c8f0c8">als unten</text>
+  <text x="445" y="218" text-anchor="middle" font-size="9" fill="#fff">→ Licht bis unten</text>
+
+  <!-- Pfeil -->
+  <text x="305" y="175" text-anchor="middle" font-size="28" fill="#1C4A2E">→</text>
+
+  <!-- Wichtig-Box -->
+  <rect x="40" y="248" width="520" height="50" rx="8" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="264" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Warum August ideal ist: Gehölze bilden bis Oktober kein neues Laub mehr — Schnitt bleibt scharf</text>
+  <text x="300" y="280" text-anchor="middle" font-size="10" fill="#555">Frisch geschnitten geht die Hecke in den Winter — sieht ordentlich aus bis März</text>
+  <text x="300" y="294" text-anchor="middle" font-size="10" fill="#7A2430">⚠ Kein Schnitt nach September (Spätaustriebe erfrieren) · Nicht bei über 30 °C schneiden</text>
+</svg>
