@@ -1,0 +1,88 @@
+<svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="340" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Kompost anlegen: Die richtige Schichtung</text>
+
+  <!-- Kompostbehälter Umriss -->
+  <rect x="80" y="42" width="260" height="260" rx="4" fill="none" stroke="#8B6914" stroke-width="2.5"/>
+  <!-- Holzlatten-Optik -->
+  <line x1="80" y1="75" x2="340" y2="75" stroke="#8B6914" stroke-width="0.5" opacity="0.4"/>
+  <line x1="80" y1="108" x2="340" y2="108" stroke="#8B6914" stroke-width="0.5" opacity="0.4"/>
+  <line x1="80" y1="141" x2="340" y2="141" stroke="#8B6914" stroke-width="0.5" opacity="0.4"/>
+  <line x1="80" y1="174" x2="340" y2="174" stroke="#8B6914" stroke-width="0.5" opacity="0.4"/>
+  <line x1="80" y1="207" x2="340" y2="207" stroke="#8B6914" stroke-width="0.5" opacity="0.4"/>
+  <line x1="80" y1="240" x2="340" y2="240" stroke="#8B6914" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- SCHICHT 1: Grob (Häckselmaterial) - Boden -->
+  <rect x="82" y="272" width="256" height="28" fill="#7a5c2e" rx="0 0 3 3"/>
+  <text x="210" y="290" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Grobes Material (Äste, Zweige) — Drainage</text>
+
+  <!-- SCHICHT 2: Braun - Karton/Laub -->
+  <rect x="82" y="242" width="256" height="28" fill="#B8892A"/>
+  <text x="210" y="259" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">🍂 Braun: Laub, Karton, Stroh</text>
+
+  <!-- SCHICHT 3: Grün - Küchenabfälle -->
+  <rect x="82" y="212" width="256" height="28" fill="#3a7a2a"/>
+  <text x="210" y="229" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">🥦 Grün: Küchenabfälle, Grasschnitt</text>
+
+  <!-- SCHICHT 4: Braun -->
+  <rect x="82" y="182" width="256" height="28" fill="#B8892A"/>
+  <text x="210" y="199" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">🍂 Braun: Laub, Karton, Stroh</text>
+
+  <!-- SCHICHT 5: Grün -->
+  <rect x="82" y="152" width="256" height="28" fill="#3a7a2a"/>
+  <text x="210" y="169" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">🥦 Grün: Küchenabfälle, Rasenschnitt</text>
+
+  <!-- SCHICHT 6: Braun -->
+  <rect x="82" y="122" width="256" height="28" fill="#B8892A"/>
+  <text x="210" y="139" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">🍂 Braun: Häcksel, Sägespäne</text>
+
+  <!-- SCHICHT 7: Grün (oben) -->
+  <rect x="82" y="92" width="256" height="28" fill="#3a7a2a"/>
+  <text x="210" y="109" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">🥦 Grün: Gartenabfälle</text>
+
+  <!-- Abdeckung oben -->
+  <rect x="82" y="44" width="256" height="46" fill="#5a3a10" opacity="0.7" rx="3 3 0 0"/>
+  <text x="210" y="72" text-anchor="middle" font-size="10" fill="#d4b870" font-weight="600">Abdeckung (Karton/Laub) — hält Feuchtigkeit</text>
+
+  <!-- Legende rechts -->
+  <text x="380" y="55" font-size="12" font-weight="700" fill="#1C4A2E">Verhältnis</text>
+
+  <rect x="380" y="65" width="20" height="14" rx="3" fill="#B8892A"/>
+  <text x="408" y="77" font-size="11" fill="#555">Braun: 2 Teile</text>
+  <text x="408" y="91" font-size="10" fill="#888">C-reich, trockne Masse</text>
+
+  <rect x="380" y="100" width="20" height="14" rx="3" fill="#3a7a2a"/>
+  <text x="408" y="112" font-size="11" fill="#555">Grün: 1 Teil</text>
+  <text x="408" y="126" font-size="10" fill="#888">N-reich, feuchte Masse</text>
+
+  <!-- Pfeile Belüftung -->
+  <text x="380" y="155" font-size="12" font-weight="700" fill="#1C4A2E">Prozess</text>
+
+  <g fill="none" stroke="#4a90d9" stroke-width="1.5">
+    <path d="M385,170 Q395,160 405,170"/>
+    <path d="M405,170 L400,165 M405,170 L410,165"/>
+  </g>
+  <text x="418" y="174" font-size="10" fill="#4a90d9">Luft</text>
+
+  <text x="385" y="195" font-size="10" fill="#888">→ alle 4–6 Wochen</text>
+  <text x="385" y="209" font-size="10" fill="#888">umschichten / belüften</text>
+
+  <text x="385" y="232" font-size="10" fill="#888">→ feucht, aber nicht</text>
+  <text x="385" y="246" font-size="10" fill="#888">nass halten</text>
+
+  <text x="385" y="269" font-size="10" fill="#888">→ nach 6–12 Monaten</text>
+  <text x="385" y="283" font-size="10" fill="#888">fertige Komposterde</text>
+
+  <!-- Bitte NICHT hinein -->
+  <rect x="370" y="296" width="200" height="38" rx="6" fill="#7A2430" opacity="0.12"/>
+  <text x="470" y="312" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">Nicht kompostieren:</text>
+  <text x="470" y="328" text-anchor="middle" font-size="9" fill="#7A2430">Fleisch, Milch, Hundekot, Wurzelunkräuter</text>
+
+  <!-- Bodenabstand-Hinweis -->
+  <rect x="82" y="302" width="50" height="28" fill="none" stroke="#4a90d9" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="55" y="318" text-anchor="middle" font-size="9" fill="#4a90d9" transform="rotate(-90,55,318)">Drainage</text>
+
+  <!-- Zeitachse unten -->
+  <rect x="30" y="318" width="540" height="18" rx="6" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="331" text-anchor="middle" font-size="10" fill="#1C4A2E" font-weight="600">Reife Komposterde: dunkel, krümelig, erdiger Geruch — kein Schimmel- oder Fäulnisgeruch</text>
+</svg>
