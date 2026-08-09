@@ -1,0 +1,51 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Dünger verstehen: N – P – K</text>
+
+  <!-- N Block -->
+  <rect x="30" y="42" width="170" height="200" rx="10" fill="#2d7a3a" opacity="0.12"/>
+  <text x="115" y="70" text-anchor="middle" font-size="42" font-weight="900" fill="#2d7a3a">N</text>
+  <text x="115" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#2d7a3a">Stickstoff</text>
+  <line x1="50" y1="100" x2="180" y2="100" stroke="#2d7a3a" stroke-width="1" opacity="0.3"/>
+  <text x="115" y="118" text-anchor="middle" font-size="11" fill="#1C4A2E">↑ Blatt- &amp; Triebwachstum</text>
+  <text x="115" y="134" text-anchor="middle" font-size="11" fill="#1C4A2E">↑ Satteres Grün</text>
+  <text x="115" y="150" text-anchor="middle" font-size="11" fill="#1C4A2E">Frühjahr + Sommer</text>
+  <rect x="50" y="165" width="130" height="22" rx="6" fill="#2d7a3a"/>
+  <text x="115" y="180" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Frühjahrs- &amp; Rasendünger</text>
+  <text x="115" y="215" text-anchor="middle" font-size="10" fill="#7A2430">⚠ Nicht im Herbst!</text>
+  <text x="115" y="229" text-anchor="middle" font-size="9" fill="#555">Zu viel N im Herbst</text>
+  <text x="115" y="241" text-anchor="middle" font-size="9" fill="#555">= Frostschäden</text>
+
+  <!-- P Block -->
+  <rect x="215" y="42" width="170" height="200" rx="10" fill="#B8892A" opacity="0.12"/>
+  <text x="300" y="70" text-anchor="middle" font-size="42" font-weight="900" fill="#B8892A">P</text>
+  <text x="300" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#8B6914">Phosphor</text>
+  <line x1="235" y1="100" x2="365" y2="100" stroke="#B8892A" stroke-width="1" opacity="0.3"/>
+  <text x="300" y="118" text-anchor="middle" font-size="11" fill="#1C4A2E">↑ Wurzelentwicklung</text>
+  <text x="300" y="134" text-anchor="middle" font-size="11" fill="#1C4A2E">↑ Blütenbildung</text>
+  <text x="300" y="150" text-anchor="middle" font-size="11" fill="#1C4A2E">Frühling + Herbst</text>
+  <rect x="235" y="165" width="130" height="22" rx="6" fill="#B8892A"/>
+  <text x="300" y="180" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Blumendünger, Kompost</text>
+  <text x="300" y="215" text-anchor="middle" font-size="10" fill="#555">In deutschen Böden</text>
+  <text x="300" y="229" text-anchor="middle" font-size="9" fill="#555">oft ausreichend</text>
+  <text x="300" y="241" text-anchor="middle" font-size="9" fill="#555">vorhanden</text>
+
+  <!-- K Block -->
+  <rect x="400" y="42" width="170" height="200" rx="10" fill="#7A2430" opacity="0.12"/>
+  <text x="485" y="70" text-anchor="middle" font-size="42" font-weight="900" fill="#7A2430">K</text>
+  <text x="485" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#7A2430">Kalium</text>
+  <line x1="420" y1="100" x2="550" y2="100" stroke="#7A2430" stroke-width="1" opacity="0.3"/>
+  <text x="485" y="118" text-anchor="middle" font-size="11" fill="#1C4A2E">↑ Frostfestigkeit</text>
+  <text x="485" y="134" text-anchor="middle" font-size="11" fill="#1C4A2E">↑ Krankheitsresistenz</text>
+  <text x="485" y="150" text-anchor="middle" font-size="11" fill="#1C4A2E">Herbst + Winter</text>
+  <rect x="420" y="165" width="130" height="22" rx="6" fill="#7A2430"/>
+  <text x="485" y="180" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Herbstdünger (K-betont)</text>
+  <text x="485" y="215" text-anchor="middle" font-size="10" fill="#1C4A2E">Stärkt Pflanzen</text>
+  <text x="485" y="229" text-anchor="middle" font-size="9" fill="#555">für den Winter</text>
+  <text x="485" y="241" text-anchor="middle" font-size="9" fill="#555">durch</text>
+
+  <!-- Faustregeln unten -->
+  <rect x="30" y="255" width="540" height="36" rx="8" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="270" text-anchor="middle" font-size="11" fill="#1C4A2E" font-weight="700">Faustregel: Frühjahr = Stickstoff (N) · Herbst = Kalium (K) · Phosphor (P) bei Neupflanzungen</text>
+  <text x="300" y="285" text-anchor="middle" font-size="10" fill="#555">Zuviel Dünger ist schlechter als zu wenig — immer Herstellerdosierung beachten</text>
+</svg>
