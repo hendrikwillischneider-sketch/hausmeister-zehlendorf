@@ -1,0 +1,85 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Nistkästen im Herbst kontrollieren und reinigen</text>
+
+  <!-- Jahreskreis Nistkasten -->
+  <text x="155" y="52" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Wann was tun?</text>
+
+  <!-- Zeitstrahl -->
+  <g transform="translate(20, 62)">
+    <!-- Sep-Okt: Reinigen -->
+    <rect x="0"   y="0" width="110" height="50" rx="6" fill="#B8892A" opacity="0.15"/>
+    <text x="55"  y="16" text-anchor="middle" font-size="9" font-weight="700" fill="#8B6914">Sept – Okt</text>
+    <text x="55"  y="30" text-anchor="middle" font-size="9" fill="#555">Reinigen &amp;</text>
+    <text x="55"  y="42" text-anchor="middle" font-size="9" fill="#555">Kontrollieren ✓</text>
+
+    <!-- Nov-Feb: Ruhe -->
+    <rect x="115" y="0" width="110" height="50" rx="6" fill="#4a90d9" opacity="0.1"/>
+    <text x="170" y="16" text-anchor="middle" font-size="9" font-weight="700" fill="#4a90d9">Nov – Feb</text>
+    <text x="170" y="30" text-anchor="middle" font-size="9" fill="#555">Überwinterung</text>
+    <text x="170" y="42" text-anchor="middle" font-size="9" fill="#555">Fledermäuse, Meisen</text>
+
+    <!-- März-Aug: Brutzeit -->
+    <rect x="230" y="0" width="110" height="50" rx="6" fill="#7A2430" opacity="0.1"/>
+    <text x="285" y="16" text-anchor="middle" font-size="9" font-weight="700" fill="#7A2430">März – Aug</text>
+    <text x="285" y="30" text-anchor="middle" font-size="9" fill="#555">Brutzeit — bitte</text>
+    <text x="285" y="42" text-anchor="middle" font-size="9" fill="#7A2430">NICHT öffnen!</text>
+
+    <!-- Pfeil wieder zu Sep -->
+    <text x="365" y="28" font-size="18" fill="#B8892A">↺</text>
+  </g>
+
+  <!-- Reinigungsschritte -->
+  <text x="155" y="132" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Reinigung Schritt für Schritt</text>
+
+  <!-- Schritt 1 -->
+  <rect x="20" y="142" width="260" height="36" rx="7" fill="#1C4A2E" opacity="0.07"/>
+  <text x="36" y="156" font-size="18">1️⃣</text>
+  <text x="58" y="154" font-size="10" font-weight="700" fill="#1C4A2E">Altes Nest komplett entfernen</text>
+  <text x="58" y="168" font-size="9" fill="#555">Schachteln reinigen — verhindert Parasiten (Vogelmilben)</text>
+
+  <!-- Schritt 2 -->
+  <rect x="20" y="185" width="260" height="36" rx="7" fill="#B8892A" opacity="0.1"/>
+  <text x="36" y="199" font-size="18">2️⃣</text>
+  <text x="58" y="197" font-size="10" font-weight="700" fill="#8B6914">Mit heißem Wasser ausspülen</text>
+  <text x="58" y="211" font-size="9" fill="#555">Kein Chemie! Heiß (60°) tötet Milben und Flöhe</text>
+
+  <!-- Schritt 3 -->
+  <rect x="20" y="228" width="260" height="36" rx="7" fill="#3a9a4a" opacity="0.09"/>
+  <text x="36" y="242" font-size="18">3️⃣</text>
+  <text x="58" y="240" font-size="10" font-weight="700" fill="#1C4A2E">Gut trocknen lassen</text>
+  <text x="58" y="254" font-size="9" fill="#555">Schachtel offen aufhängen — vollständig trocken</text>
+
+  <!-- Schritt 4 -->
+  <rect x="20" y="271" width="260" height="36" rx="7" fill="#4a90d9" opacity="0.08"/>
+  <text x="36" y="285" font-size="18">4️⃣</text>
+  <text x="58" y="283" font-size="10" font-weight="700" fill="#4a90d9">Wiederanbringen &amp; prüfen</text>
+  <text x="58" y="297" font-size="9" fill="#555">Einflugsloch klar · Befestigung sicher · 3–4 m Höhe</text>
+
+  <!-- TRENNLINIE -->
+  <line x1="296" y1="122" x2="296" y2="312" stroke="#ddd" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- Rechts: Nistkasten Illustration + Infos -->
+  <text x="450" y="132" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Nistkasten richtig angebracht</text>
+
+  <!-- Baum mit Nistkasten -->
+  <rect x="436" y="150" width="12" height="110" fill="#6B4423"/>
+  <!-- Krone -->
+  <ellipse cx="442" cy="148" rx="55" ry="40" fill="#2d7a3a" opacity="0.6"/>
+
+  <!-- Nistkasten -->
+  <rect x="452" y="195" width="38" height="42" rx="3" fill="#8B6914"/>
+  <polygon points="452,195 490,195 471,180" fill="#6B4423"/>
+  <!-- Einflugsloch -->
+  <circle cx="471" cy="210" r="5" fill="#2d1a05"/>
+  <text x="496" y="210" font-size="9" fill="#555">3–4 m Höhe</text>
+
+  <!-- Hinweis Richtung -->
+  <text x="452" y="255" font-size="9" fill="#555">Richtung: NO–O</text>
+  <text x="452" y="268" font-size="9" fill="#555">(Regen &amp; Sonne meiden)</text>
+
+  <!-- Bewohnerinnen-Hinweis -->
+  <rect x="305" y="278" width="285" height="34" rx="7" fill="#1C4A2E" opacity="0.08"/>
+  <text x="447" y="293" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Für Bewohnerinnen: Im Frühjahr wieder Vögel</text>
+  <text x="447" y="307" text-anchor="middle" font-size="9" fill="#555">Ein sauberer Kasten = neue Vogelbrut im nächsten Jahr</text>
+</svg>
