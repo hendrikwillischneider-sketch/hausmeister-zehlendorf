@@ -1,0 +1,110 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Baumscheibe & Mulch: So geht's richtig</text>
+
+  <!-- FALSCH links -->
+  <text x="145" y="50" text-anchor="middle" font-size="12" font-weight="700" fill="#7A2430">✗ Falsch</text>
+
+  <!-- Boden -->
+  <rect x="30" y="230" width="240" height="50" fill="#8B6914" rx="0 0 6 6"/>
+  <!-- Rasen bis zum Stamm -->
+  <rect x="30" y="218" width="240" height="14" fill="#4a7c2f"/>
+
+  <!-- Stamm (falsch: Rasen direkt am Stamm) -->
+  <rect x="128" y="90" width="34" height="140" fill="#8B5E3C" rx="4"/>
+  <!-- Rinde-Textur -->
+  <line x1="135" y1="95" x2="133" y2="225" stroke="#6B4423" stroke-width="1" opacity="0.5"/>
+  <line x1="148" y1="92" x2="148" y2="228" stroke="#6B4423" stroke-width="1" opacity="0.5"/>
+  <line x1="158" y1="95" x2="156" y2="225" stroke="#6B4423" stroke-width="1" opacity="0.5"/>
+
+  <!-- Krone -->
+  <ellipse cx="145" cy="80" rx="60" ry="45" fill="#2d7a3a"/>
+  <ellipse cx="110" cy="90" rx="40" ry="30" fill="#3a9a4a"/>
+  <ellipse cx="180" cy="88" rx="35" ry="28" fill="#3a9a4a"/>
+
+  <!-- Problem: Mulch am Stamm aufgehäuft (Volcano mulching) -->
+  <ellipse cx="145" cy="225" rx="60" ry="12" fill="#7a5c2e"/>
+  <!-- Mulch-Kegel direkt am Stamm -->
+  <polygon points="120,218 170,218 162,195 128,195" fill="#7a5c2e" opacity="0.8"/>
+  <text x="145" y="210" text-anchor="middle" font-size="8" fill="#d4b870">Vulkan!</text>
+
+  <!-- Wurzeln (falsch: flach, Stamm fault) -->
+  <g stroke="#5a3a10" stroke-width="1.2" opacity="0.4">
+    <line x1="115" y1="232" x2="80" y2="248"/>
+    <line x1="175" y1="232" x2="210" y2="248"/>
+  </g>
+
+  <!-- Fäulnis-Symbol am Stamm -->
+  <text x="100" y="215" font-size="13" fill="#7A2430">⚠</text>
+  <text x="83" y="275" text-anchor="middle" font-size="9" fill="#7A2430">Rinde fault durch</text>
+  <text x="83" y="287" text-anchor="middle" font-size="9" fill="#7A2430">Feuchte am Stamm</text>
+
+  <!-- Rasen-Konkurrenz -->
+  <text x="207" y="265" text-anchor="middle" font-size="9" fill="#7A2430">Rasen konkurriert</text>
+  <text x="207" y="277" text-anchor="middle" font-size="9" fill="#7A2430">um Nährstoffe</text>
+
+  <!-- RICHTIG rechts -->
+  <text x="450" y="50" text-anchor="middle" font-size="12" font-weight="700" fill="#1C4A2E">✓ Richtig</text>
+
+  <!-- Boden -->
+  <rect x="330" y="230" width="240" height="50" fill="#8B6914" rx="0 0 6 6"/>
+
+  <!-- Stamm (richtig) -->
+  <rect x="428" y="90" width="34" height="140" fill="#8B5E3C" rx="4"/>
+  <line x1="435" y1="95" x2="433" y2="225" stroke="#6B4423" stroke-width="1" opacity="0.5"/>
+  <line x1="448" y1="92" x2="448" y2="228" stroke="#6B4423" stroke-width="1" opacity="0.5"/>
+  <line x1="458" y1="95" x2="456" y2="225" stroke="#6B4423" stroke-width="1" opacity="0.5"/>
+
+  <!-- Krone -->
+  <ellipse cx="445" cy="80" rx="60" ry="45" fill="#2d7a3a"/>
+  <ellipse cx="410" cy="90" rx="40" ry="30" fill="#3a9a4a"/>
+  <ellipse cx="480" cy="88" rx="35" ry="28" fill="#3a9a4a"/>
+
+  <!-- Baumscheibe (freigehalten, kein Rasen) -->
+  <ellipse cx="445" cy="226" rx="85" ry="10" fill="#8B6914" opacity="0.8"/>
+
+  <!-- Mulch-Schicht (flach, Abstand zum Stamm) -->
+  <ellipse cx="445" cy="226" rx="78" ry="9" fill="#7a5c2e"/>
+  <!-- Lücke am Stamm sichtbar -->
+  <ellipse cx="445" cy="226" rx="25" ry="6" fill="#8B6914"/>
+
+  <!-- Mulch-Beschriftung -->
+  <rect x="348" y="218" width="68" height="14" rx="4" fill="#1C4A2E" opacity="0.8"/>
+  <text x="382" y="229" text-anchor="middle" font-size="8" fill="#fff">5–8 cm Mulch</text>
+
+  <!-- Abstand-Pfeil -->
+  <line x1="428" y1="234" x2="413" y2="234" stroke="#fff" stroke-width="1.5"/>
+  <line x1="413" y1="230" x2="413" y2="238" stroke="#fff" stroke-width="1.5"/>
+  <text x="395" y="248" text-anchor="middle" font-size="8" fill="#d4b870">5 cm</text>
+  <text x="395" y="258" text-anchor="middle" font-size="8" fill="#d4b870">Abstand</text>
+
+  <!-- Gesunde Wurzeln -->
+  <g stroke="#3a6010" stroke-width="1.5" opacity="0.8">
+    <line x1="400" y1="232" x2="355" y2="260"/>
+    <line x1="400" y1="232" x2="365" y2="272"/>
+    <line x1="445" y1="233" x2="445" y2="275"/>
+    <line x1="490" y1="232" x2="535" y2="260"/>
+    <line x1="490" y1="232" x2="520" y2="270"/>
+  </g>
+  <text x="445" y="295" text-anchor="middle" font-size="9" fill="#3a6010" font-weight="600">Tiefe, ausgedehnte Wurzeln</text>
+
+  <!-- Check-Symbole -->
+  <text x="448" y="213" font-size="13" fill="#1C4A2E">✓</text>
+
+  <!-- Trennlinie -->
+  <line x1="300" y1="42" x2="300" y2="305" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Nutzen-Liste rechts -->
+  <text x="358" y="160" font-size="9" fill="#1C4A2E">✓ Hält Feuchtigkeit</text>
+  <text x="358" y="175" font-size="9" fill="#1C4A2E">✓ Unterdrückt Unkraut</text>
+  <text x="358" y="190" font-size="9" fill="#1C4A2E">✓ Schützt vor Frost</text>
+  <text x="358" y="205" font-size="9" fill="#1C4A2E">✓ Liefert Nährstoffe</text>
+
+  <!-- Mulch-Materialien -->
+  <text x="358" y="142" font-size="9" fill="#888">Geeignet: Rindenmulch,</text>
+  <text x="358" y="153" font-size="9" fill="#888">Holzhäcksel, Laub</text>
+
+  <!-- Unterste Infozeile -->
+  <rect x="30" y="308" width="540" height="10" rx="4" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="316" text-anchor="middle" font-size="9" fill="#1C4A2E">Mulch nie direkt an den Stamm häufen — Feuchtigkeit fördert Rindenfäule und Schädlingsbefall</text>
+</svg>
