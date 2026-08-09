@@ -1,0 +1,51 @@
+<svg viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="310" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#7A2430">Warum täglich aufsammeln? — Der Kreislauf der Schädlinge</text>
+
+  <!-- Kreislauf-Pfeil-System -->
+  <!-- Zentrales Symbol: Apfel am Boden -->
+  <circle cx="300" cy="150" r="38" fill="#c0522a" opacity="0.85"/>
+  <text x="300" y="145" text-anchor="middle" font-size="22">🍎</text>
+  <text x="300" y="165" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">Fallobst</text>
+  <text x="300" y="178" text-anchor="middle" font-size="9" fill="#fff">am Boden</text>
+
+  <!-- Kreispfeile -->
+  <path d="M 300,110 A 100,100 0 0,1 388,175" fill="none" stroke="#7A2430" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)"/>
+  <path d="M 388,175 A 100,100 0 0,1 300,240" fill="none" stroke="#7A2430" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)"/>
+  <path d="M 300,240 A 100,100 0 0,1 212,175" fill="none" stroke="#7A2430" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)"/>
+  <path d="M 212,175 A 100,100 0 0,1 300,110" fill="none" stroke="#7A2430" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)"/>
+
+  <defs>
+    <marker id="arr-r" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <polygon points="0,0 7,3.5 0,7" fill="#7A2430"/>
+    </marker>
+  </defs>
+
+  <!-- Schädling 1: oben -->
+  <rect x="215" y="38" width="170" height="55" rx="8" fill="#fff" opacity="0.7"/>
+  <text x="300" y="57" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">🐛 Apfelwickler</text>
+  <text x="300" y="72" text-anchor="middle" font-size="9" fill="#555">Larven überwintern im Fallobst</text>
+  <text x="300" y="85" text-anchor="middle" font-size="9" fill="#555">→ nächstes Jahr mehr Maden</text>
+
+  <!-- Schädling 2: rechts -->
+  <rect x="405" y="130" width="165" height="55" rx="8" fill="#fff" opacity="0.7"/>
+  <text x="487" y="149" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">🍄 Monilia</text>
+  <text x="487" y="164" text-anchor="middle" font-size="9" fill="#555">Fruchtfäule-Pilz</text>
+  <text x="487" y="177" text-anchor="middle" font-size="9" fill="#555">sportet auf liegendem Obst</text>
+
+  <!-- Schädling 3: unten -->
+  <rect x="215" y="218" width="170" height="55" rx="8" fill="#fff" opacity="0.7"/>
+  <text x="300" y="237" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">🐝 Wespen/Fruchtfliege</text>
+  <text x="300" y="252" text-anchor="middle" font-size="9" fill="#555">Massenansammlungen</text>
+  <text x="300" y="265" text-anchor="middle" font-size="9" fill="#555">→ Stichgefahr, Hygiene</text>
+
+  <!-- Schädling 4: links -->
+  <rect x="30" y="130" width="165" height="55" rx="8" fill="#fff" opacity="0.7"/>
+  <text x="112" y="149" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">🐀 Nager</text>
+  <text x="112" y="164" text-anchor="middle" font-size="9" fill="#555">Mäuse &amp; Ratten</text>
+  <text x="112" y="177" text-anchor="middle" font-size="9" fill="#555">siedeln sich an</text>
+
+  <!-- Lösung Banner -->
+  <rect x="30" y="278" width="540" height="25" rx="8" fill="#1C4A2E"/>
+  <text x="300" y="295" text-anchor="middle" font-size="11" fill="#fff" font-weight="700">Lösung: täglich aufsammeln — unterbricht alle 4 Kreisläufe gleichzeitig</text>
+</svg>
