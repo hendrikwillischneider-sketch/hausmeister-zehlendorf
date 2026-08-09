@@ -1,0 +1,85 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Werkzeugpflege vor dem Winter — einmal richtig, jahrelang haltbar</text>
+
+  <!-- 6 Werkzeuge als Kacheln -->
+  <!-- Zeile 1 -->
+
+  <!-- Spaten -->
+  <g transform="translate(20, 42)">
+    <rect x="0" y="0" width="168" height="118" rx="8" fill="#1C4A2E" opacity="0.07"/>
+    <text x="84" y="22" text-anchor="middle" font-size="26">🔧</text>
+    <text x="84" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Spaten &amp; Grabgabel</text>
+    <text x="84" y="56" text-anchor="middle" font-size="9" fill="#555">① Erde abkratzen (trocken)</text>
+    <text x="84" y="70" text-anchor="middle" font-size="9" fill="#555">② Mit grobem Schleifpapier blank</text>
+    <text x="84" y="84" text-anchor="middle" font-size="9" fill="#555">③ Leinöl auf Metall &amp; Stiel</text>
+    <rect x="15" y="95" width="138" height="16" rx="4" fill="#3a9a4a" opacity="0.2"/>
+    <text x="84" y="107" text-anchor="middle" font-size="8" fill="#1C4A2E" font-weight="600">→ Rostschutz für den Winter</text>
+  </g>
+
+  <!-- Heckenschere / Schneidwerkzeug -->
+  <g transform="translate(204, 42)">
+    <rect x="0" y="0" width="168" height="118" rx="8" fill="#B8892A" opacity="0.07"/>
+    <text x="84" y="22" text-anchor="middle" font-size="26">✂️</text>
+    <text x="84" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#8B6914">Scheren &amp; Messer</text>
+    <text x="84" y="56" text-anchor="middle" font-size="9" fill="#555">① Säubern mit Terpentin</text>
+    <text x="84" y="70" text-anchor="middle" font-size="9" fill="#555">② Schleifen (Wetzstein / Feile)</text>
+    <text x="84" y="84" text-anchor="middle" font-size="9" fill="#555">③ Gelenke ölen (Kamelienöl)</text>
+    <rect x="15" y="95" width="138" height="16" rx="4" fill="#B8892A" opacity="0.2"/>
+    <text x="84" y="107" text-anchor="middle" font-size="8" fill="#8B6914" font-weight="600">→ Schnitt-Qualität bleibt erhalten</text>
+  </g>
+
+  <!-- Rasenmäher -->
+  <g transform="translate(388, 42)">
+    <rect x="0" y="0" width="192" height="118" rx="8" fill="#7A2430" opacity="0.06"/>
+    <text x="96" y="22" text-anchor="middle" font-size="26">🚜</text>
+    <text x="96" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">Rasenmäher</text>
+    <text x="96" y="56" text-anchor="middle" font-size="9" fill="#555">① Kraftstoff ablassen (Vergaser)</text>
+    <text x="96" y="70" text-anchor="middle" font-size="9" fill="#555">② Unterseite reinigen, Messer prüfen</text>
+    <text x="96" y="84" text-anchor="middle" font-size="9" fill="#555">③ Luftfilter &amp; Zündkerze wechseln</text>
+    <rect x="15" y="95" width="162" height="16" rx="4" fill="#7A2430" opacity="0.12"/>
+    <text x="96" y="107" text-anchor="middle" font-size="8" fill="#7A2430" font-weight="600">→ Startet im März sofort</text>
+  </g>
+
+  <!-- Zeile 2 -->
+
+  <!-- Schlauch & Bewässerung -->
+  <g transform="translate(20, 172)">
+    <rect x="0" y="0" width="168" height="118" rx="8" fill="#4a90d9" opacity="0.07"/>
+    <text x="84" y="22" text-anchor="middle" font-size="26">🚿</text>
+    <text x="84" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#4a90d9">Schlauch &amp; Düsen</text>
+    <text x="84" y="56" text-anchor="middle" font-size="9" fill="#555">① Vollständig entleeren</text>
+    <text x="84" y="70" text-anchor="middle" font-size="9" fill="#555">② Aufgerollt frostfrei lagern</text>
+    <text x="84" y="84" text-anchor="middle" font-size="9" fill="#555">③ Düsen auf Verschleiß prüfen</text>
+    <rect x="15" y="95" width="138" height="16" rx="4" fill="#4a90d9" opacity="0.15"/>
+    <text x="84" y="107" text-anchor="middle" font-size="8" fill="#4a90d9" font-weight="600">→ Frost zerplatzt Schläuche!</text>
+  </g>
+
+  <!-- Motorsäge/Astschere -->
+  <g transform="translate(204, 172)">
+    <rect x="0" y="0" width="168" height="118" rx="8" fill="#3a9a4a" opacity="0.07"/>
+    <text x="84" y="22" text-anchor="middle" font-size="26">🪚</text>
+    <text x="84" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Sägen &amp; Astschere</text>
+    <text x="84" y="56" text-anchor="middle" font-size="9" fill="#555">① Harzreste mit Terpentin lösen</text>
+    <text x="84" y="70" text-anchor="middle" font-size="9" fill="#555">② Sägeblätter schärfen lassen</text>
+    <text x="84" y="84" text-anchor="middle" font-size="9" fill="#555">③ Kettensäge: Öl, Kette prüfen</text>
+    <rect x="15" y="95" width="138" height="16" rx="4" fill="#3a9a4a" opacity="0.15"/>
+    <text x="84" y="107" text-anchor="middle" font-size="8" fill="#1C4A2E" font-weight="600">→ Sauberer Schnitt schützt Bäume</text>
+  </g>
+
+  <!-- Lagerung -->
+  <g transform="translate(388, 172)">
+    <rect x="0" y="0" width="192" height="118" rx="8" fill="#6B4423" opacity="0.07"/>
+    <text x="96" y="22" text-anchor="middle" font-size="26">🏚️</text>
+    <text x="96" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#6B4423">Richtig lagern</text>
+    <text x="96" y="56" text-anchor="middle" font-size="9" fill="#555">✓ Trocken &amp; frostgeschützt</text>
+    <text x="96" y="70" text-anchor="middle" font-size="9" fill="#555">✓ Stiele senkrecht (verhindert Werfen)</text>
+    <text x="96" y="84" text-anchor="middle" font-size="9" fill="#555">✓ Schnittwerkzeug geschlossen</text>
+    <rect x="15" y="95" width="162" height="16" rx="4" fill="#6B4423" opacity="0.1"/>
+    <text x="96" y="107" text-anchor="middle" font-size="8" fill="#6B4423" font-weight="600">→ Werkzeug ist Kapital — pflegen!</text>
+  </g>
+
+  <!-- Unterste Leiste -->
+  <rect x="20" y="298" width="560" height="18" rx="6" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="311" text-anchor="middle" font-size="10" fill="#1C4A2E" font-weight="600">Gepflegtes Werkzeug spart Kraft, schützt Pflanzen und hält 20+ Jahre</text>
+</svg>
