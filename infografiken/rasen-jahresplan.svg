@@ -1,0 +1,110 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Rasenpflege: Was wann zu tun ist</text>
+
+  <!-- Monatsspalten -->
+  <defs>
+    <style>.mlab{font-size:9px;text-anchor:middle;fill:#555;}</style>
+  </defs>
+
+  <!-- Monate Kopf -->
+  <rect x="30" y="32" width="540" height="20" fill="#1C4A2E" rx="4 4 0 0" opacity="0.12"/>
+  <text x="75"  y="46" class="mlab" font-weight="700" fill="#1C4A2E">Jan</text>
+  <text x="120" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Feb</text>
+  <text x="165" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Mär</text>
+  <text x="210" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Apr</text>
+  <text x="255" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Mai</text>
+  <text x="300" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Jun</text>
+  <text x="345" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Jul</text>
+  <text x="390" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Aug</text>
+  <text x="435" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Sep</text>
+  <text x="480" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Okt</text>
+  <text x="525" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Nov</text>
+  <text x="570" y="46" class="mlab" font-weight="700" fill="#1C4A2E">Dez</text>
+
+  <!-- Gitterlinien -->
+  <g stroke="#ddd" stroke-width="0.5">
+    <line x1="97" y1="52" x2="97" y2="285"/>
+    <line x1="142" y1="52" x2="142" y2="285"/>
+    <line x1="187" y1="52" x2="187" y2="285"/>
+    <line x1="232" y1="52" x2="232" y2="285"/>
+    <line x1="277" y1="52" x2="277" y2="285"/>
+    <line x1="322" y1="52" x2="322" y2="285"/>
+    <line x1="367" y1="52" x2="367" y2="285"/>
+    <line x1="412" y1="52" x2="412" y2="285"/>
+    <line x1="457" y1="52" x2="457" y2="285"/>
+    <line x1="502" y1="52" x2="502" y2="285"/>
+    <line x1="547" y1="52" x2="547" y2="285"/>
+  </g>
+
+  <!-- Zeile: Mähen -->
+  <text x="28" y="72" text-anchor="end" font-size="10" fill="#1C4A2E" font-weight="600">Mähen</text>
+  <!-- Gelegentlich März -->
+  <rect x="188" y="60" width="44" height="14" rx="3" fill="#2d7a3a" opacity="0.4"/>
+  <!-- Regelmäßig Apr–Okt -->
+  <rect x="232" y="60" width="270" height="14" rx="3" fill="#2d7a3a"/>
+  <text x="367" y="71" text-anchor="middle" font-size="8" fill="#fff">Wöchentlich</text>
+  <!-- Gelegentlich Nov -->
+  <rect x="502" y="60" width="44" height="14" rx="3" fill="#2d7a3a" opacity="0.4"/>
+
+  <!-- Zeile: Düngen -->
+  <text x="28" y="99" text-anchor="end" font-size="10" fill="#1C4A2E" font-weight="600">Düngen</text>
+  <!-- Frühlingsdüng. Apr -->
+  <rect x="232" y="86" width="45" height="14" rx="3" fill="#B8892A"/>
+  <text x="254" y="97" text-anchor="middle" font-size="7" fill="#fff">Frühjahr-N</text>
+  <!-- Sommerdüng. Jun/Jul -->
+  <rect x="322" y="86" width="90" height="14" rx="3" fill="#B8892A" opacity="0.7"/>
+  <text x="367" y="97" text-anchor="middle" font-size="7" fill="#fff">Sommer</text>
+  <!-- Herbstdüng. Sep -->
+  <rect x="457" y="86" width="45" height="14" rx="3" fill="#7A2430"/>
+  <text x="479" y="97" text-anchor="middle" font-size="7" fill="#fff">Herbst-K</text>
+
+  <!-- Zeile: Vertikutieren -->
+  <text x="28" y="126" text-anchor="end" font-size="10" fill="#1C4A2E" font-weight="600">Vertikutieren</text>
+  <rect x="187" y="113" width="90" height="14" rx="3" fill="#4a90d9"/>
+  <text x="232" y="124" text-anchor="middle" font-size="7" fill="#fff">April–Mai</text>
+  <rect x="412" y="113" width="90" height="14" rx="3" fill="#4a90d9" opacity="0.6"/>
+  <text x="457" y="124" text-anchor="middle" font-size="7" fill="#fff">Sept (opt.)</text>
+
+  <!-- Zeile: Nachsäen -->
+  <text x="28" y="153" text-anchor="end" font-size="10" fill="#1C4A2E" font-weight="600">Nachsäen</text>
+  <rect x="187" y="140" width="90" height="14" rx="3" fill="#3a9a4a" opacity="0.7"/>
+  <text x="232" y="151" text-anchor="middle" font-size="7" fill="#fff">Frühling</text>
+  <rect x="412" y="140" width="90" height="14" rx="3" fill="#3a9a4a"/>
+  <text x="457" y="151" text-anchor="middle" font-size="7" fill="#fff">Sept ★ Ideal</text>
+
+  <!-- Zeile: Wässern -->
+  <text x="28" y="180" text-anchor="end" font-size="10" fill="#1C4A2E" font-weight="600">Wässern</text>
+  <rect x="277" y="167" width="225" height="14" rx="3" fill="#4a90d9" opacity="0.5"/>
+  <text x="390" y="178" text-anchor="middle" font-size="7" fill="#fff">Bei Trockenheit Mai–Sep</text>
+
+  <!-- Zeile: Schnitthöhe -->
+  <text x="28" y="207" text-anchor="end" font-size="10" fill="#1C4A2E" font-weight="600">Schnitthöhe</text>
+  <!-- Frühling/Herbst: 4 cm -->
+  <rect x="187" y="194" width="90" height="14" rx="3" fill="#888" opacity="0.5"/>
+  <text x="232" y="205" text-anchor="middle" font-size="7" fill="#fff">4–5 cm</text>
+  <!-- Sommer: 6 cm -->
+  <rect x="277" y="194" width="180" height="14" rx="3" fill="#555" opacity="0.7"/>
+  <text x="367" y="205" text-anchor="middle" font-size="7" fill="#fff">5–6 cm Sommer (Hitzeschutz)</text>
+  <!-- Herbst: 4 cm -->
+  <rect x="457" y="194" width="90" height="14" rx="3" fill="#888" opacity="0.5"/>
+  <text x="502" y="205" text-anchor="middle" font-size="7" fill="#fff">4–5 cm</text>
+
+  <!-- Jahreszeiten-Balken -->
+  <rect x="30" y="220" width="540" height="12" rx="0" fill="none"/>
+  <rect x="30" y="220" width="157" height="12" fill="#4a90d9" opacity="0.3" rx="4 0 0 0"/>
+  <rect x="187" y="220" width="180" height="12" fill="#2d7a3a" opacity="0.4"/>
+  <rect x="367" y="220" width="135" height="12" fill="#B8892A" opacity="0.4"/>
+  <rect x="502" y="220" width="68" height="12" fill="#4a90d9" opacity="0.3" rx="0 0 4 0"/>
+  <text x="108" y="230" text-anchor="middle" font-size="8" fill="#4a90d9" font-weight="600">Winter/Frühjahr</text>
+  <text x="277" y="230" text-anchor="middle" font-size="8" fill="#1C4A2E" font-weight="600">Hauptsaison</text>
+  <text x="434" y="230" text-anchor="middle" font-size="8" fill="#8B6914" font-weight="600">Herbst</text>
+  <text x="536" y="230" text-anchor="middle" font-size="8" fill="#4a90d9" font-weight="600">Winter</text>
+
+  <!-- Hinweis -->
+  <rect x="30" y="242" width="540" height="68" rx="8" fill="#1C4A2E" opacity="0.06"/>
+  <text x="300" y="258" text-anchor="middle" font-size="11" fill="#1C4A2E" font-weight="700">Goldene Regeln</text>
+  <text x="300" y="273" text-anchor="middle" font-size="10" fill="#555">🌡 Erst mähen wenn Bodentemperatur über 8 °C (ca. März/April)</text>
+  <text x="300" y="288" text-anchor="middle" font-size="10" fill="#555">✂️ Nie mehr als ⅓ der Halmlänge auf einmal abschneiden</text>
+  <text x="300" y="303" text-anchor="middle" font-size="10" fill="#555">❄️ Letzter Schnitt Oktober/November: nicht unter 4 cm — Frost-Schutz für die Halme</text>
+</svg>
