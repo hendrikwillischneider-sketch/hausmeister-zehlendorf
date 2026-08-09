@@ -1,0 +1,85 @@
+<svg viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="310" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">August ist Planungsmonat — was jetzt entschieden wird, blüht im Frühjahr</text>
+
+  <!-- Timeline Aug → Dez → März -->
+  <line x1="50" y1="65" x2="550" y2="65" stroke="#1C4A2E" stroke-width="2.5"/>
+
+  <!-- August -->
+  <circle cx="80"  cy="65" r="10" fill="#B8892A"/>
+  <text x="80"  y="55" text-anchor="middle" font-size="10" font-weight="700" fill="#B8892A">August</text>
+  <text x="80"  y="80" text-anchor="middle" font-size="9" fill="#555">Planen &amp; Bestellen</text>
+
+  <!-- September -->
+  <circle cx="215" cy="65" r="10" fill="#3a9a4a"/>
+  <text x="215" y="55" text-anchor="middle" font-size="10" font-weight="700" fill="#3a9a4a">September</text>
+  <text x="215" y="80" text-anchor="middle" font-size="9" fill="#555">Pflanzen &amp; Säen</text>
+
+  <!-- Oktober -->
+  <circle cx="355" cy="65" r="10" fill="#c0522a"/>
+  <text x="355" y="55" text-anchor="middle" font-size="10" font-weight="700" fill="#c0522a">Oktober</text>
+  <text x="355" y="80" text-anchor="middle" font-size="9" fill="#555">Zwiebeln setzen</text>
+
+  <!-- März -->
+  <circle cx="520" cy="65" r="10" fill="#7A2430"/>
+  <text x="520" y="55" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">März/April</text>
+  <text x="520" y="80" text-anchor="middle" font-size="9" fill="#555">Ergebnis blüht!</text>
+
+  <!-- Pfeile zwischen Punkten -->
+  <text x="148" y="60" text-anchor="middle" font-size="14" fill="#ccc">→</text>
+  <text x="285" y="60" text-anchor="middle" font-size="14" fill="#ccc">→</text>
+  <text x="438" y="60" text-anchor="middle" font-size="14" fill="#ccc">→</text>
+
+  <!-- Was jetzt zu planen ist -->
+  <text x="300" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#1C4A2E">Was der August-Plan umfasst</text>
+
+  <!-- 4 Kacheln -->
+  <g transform="translate(55,120)">
+    <rect x="0" y="0" width="120" height="115" rx="8" fill="#3a9a4a" opacity="0.1"/>
+    <text x="60" y="18" text-anchor="middle" font-size="22">🌱</text>
+    <text x="60" y="35" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Neupflanzungen</text>
+    <text x="60" y="52" text-anchor="middle" font-size="9" fill="#555">Welche Lücken im Park</text>
+    <text x="60" y="65" text-anchor="middle" font-size="9" fill="#555">werden bepflanzt?</text>
+    <text x="60" y="82" text-anchor="middle" font-size="9" fill="#555">Sträucher, Stauden,</text>
+    <text x="60" y="95" text-anchor="middle" font-size="9" fill="#555">Bodendecker</text>
+    <text x="60" y="109" text-anchor="middle" font-size="8" fill="#3a9a4a">→ Sep bestellen</text>
+  </g>
+
+  <g transform="translate(195,120)">
+    <rect x="0" y="0" width="120" height="115" rx="8" fill="#B8892A" opacity="0.1"/>
+    <text x="60" y="18" text-anchor="middle" font-size="22">🌷</text>
+    <text x="60" y="35" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Blumenzwiebeln</text>
+    <text x="60" y="52" text-anchor="middle" font-size="9" fill="#555">Wo sollen im Frühjahr</text>
+    <text x="60" y="65" text-anchor="middle" font-size="9" fill="#555">Farbtupfer entstehen?</text>
+    <text x="60" y="82" text-anchor="middle" font-size="9" fill="#555">Tulpen, Narzissen,</text>
+    <text x="60" y="95" text-anchor="middle" font-size="9" fill="#555">Krokusse planen</text>
+    <text x="60" y="109" text-anchor="middle" font-size="8" fill="#B8892A">→ Okt setzen</text>
+  </g>
+
+  <g transform="translate(335,120)">
+    <rect x="0" y="0" width="120" height="115" rx="8" fill="#7A2430" opacity="0.08"/>
+    <text x="60" y="18" text-anchor="middle" font-size="22">🌳</text>
+    <text x="60" y="35" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Alte Gehölze</text>
+    <text x="60" y="52" text-anchor="middle" font-size="9" fill="#555">Welche Bäume brauchen</text>
+    <text x="60" y="65" text-anchor="middle" font-size="9" fill="#555">Baumpfleger-Kontrolle?</text>
+    <text x="60" y="82" text-anchor="middle" font-size="9" fill="#555">Standsicherheit,</text>
+    <text x="60" y="95" text-anchor="middle" font-size="9" fill="#555">Totholz, Kronenpflege</text>
+    <text x="60" y="109" text-anchor="middle" font-size="8" fill="#7A2430">→ Herbst beauftragen</text>
+  </g>
+
+  <g transform="translate(475,120)">
+    <rect x="0" y="0" width="100" height="115" rx="8" fill="#4a90d9" opacity="0.08"/>
+    <text x="50" y="18" text-anchor="middle" font-size="22">🛠</text>
+    <text x="50" y="35" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Material</text>
+    <text x="50" y="52" text-anchor="middle" font-size="9" fill="#555">Mulch, Erde,</text>
+    <text x="50" y="65" text-anchor="middle" font-size="9" fill="#555">Streumittel,</text>
+    <text x="50" y="82" text-anchor="middle" font-size="9" fill="#555">Wintervlies,</text>
+    <text x="50" y="95" text-anchor="middle" font-size="9" fill="#555">Zwiebeln</text>
+    <text x="50" y="109" text-anchor="middle" font-size="8" fill="#4a90d9">→ Sep bestellen</text>
+  </g>
+
+  <rect x="30" y="248" width="540" height="50" rx="8" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="264" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Für Bewohner: Was Sie im Frühjahr sehen, entscheidet sich jetzt</text>
+  <text x="300" y="280" text-anchor="middle" font-size="10" fill="#555">Alte Parkanlagen brauchen behutsame Ergänzung, keine komplette Umgestaltung</text>
+  <text x="300" y="294" text-anchor="middle" font-size="10" fill="#555">Ziel: natürliche Blühphasen stärken, was bereits gut wächst, unterstützen</text>
+</svg>
