@@ -1,0 +1,69 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Obstbaum schneiden: Die wichtigsten Schnitte</text>
+
+  <!-- FALSCH: Kopfweide / zu radikal -->
+  <text x="120" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#7A2430">✗ Zu radikal</text>
+
+  <!-- Baumstamm -->
+  <rect x="108" y="90" width="24" height="140" fill="#8B5E3C" rx="3"/>
+  <!-- Abgehackte Äste -->
+  <line x1="108" y1="115" x2="60" y2="95" stroke="#8B5E3C" stroke-width="8" stroke-linecap="round"/>
+  <line x1="132" y1="110" x2="180" y2="88" stroke="#8B5E3C" stroke-width="8" stroke-linecap="round"/>
+  <line x1="108" y1="145" x2="55" y2="130" stroke="#8B5E3C" stroke-width="7" stroke-linecap="round"/>
+  <line x1="132" y1="140" x2="185" y2="125" stroke="#8B5E3C" stroke-width="7" stroke-linecap="round"/>
+  <!-- Schnittflächen (Wunden) -->
+  <circle cx="60" cy="95" r="6" fill="#c0522a"/>
+  <circle cx="180" cy="88" r="6" fill="#c0522a"/>
+  <circle cx="55" cy="130" r="5" fill="#c0522a"/>
+  <circle cx="185" cy="125" r="5" fill="#c0522a"/>
+  <text x="120" y="205" text-anchor="middle" font-size="10" fill="#7A2430">Mehr als 1/3 der Krone</text>
+  <text x="120" y="218" text-anchor="middle" font-size="10" fill="#7A2430">auf einmal entfernt</text>
+  <text x="120" y="233" text-anchor="middle" font-size="10" fill="#7A2430">→ Wucherstöbe, Stress</text>
+
+  <!-- RICHTIG: Auslichten -->
+  <text x="300" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#1C4A2E">✓ Auslichten</text>
+
+  <rect x="288" y="90" width="24" height="140" fill="#8B5E3C" rx="3"/>
+  <!-- Gesunde Krone mit Licht in Mitte -->
+  <ellipse cx="300" cy="110" rx="55" ry="45" fill="#2d7a3a" opacity="0.85"/>
+  <!-- Entfernte Äste (gestrichelt) -->
+  <line x1="288" y1="130" x2="250" y2="118" stroke="#7A2430" stroke-width="2" stroke-dasharray="4,3"/>
+  <line x1="312" y1="125" x2="350" y2="112" stroke="#7A2430" stroke-width="2" stroke-dasharray="4,3"/>
+  <!-- Lichtkegel in Mitte -->
+  <ellipse cx="300" cy="110" rx="18" ry="16" fill="#fff9e6" opacity="0.5"/>
+  <text x="300" y="114" text-anchor="middle" font-size="9" fill="#B8892A">Licht</text>
+  <text x="300" y="205" text-anchor="middle" font-size="10" fill="#1C4A2E">Kreuzende + einwärts</text>
+  <text x="300" y="218" text-anchor="middle" font-size="10" fill="#1C4A2E">wachsende Äste weg</text>
+  <text x="300" y="233" text-anchor="middle" font-size="10" fill="#1C4A2E">→ Licht in die Krone</text>
+
+  <!-- RICHTIG: Schnittstelle -->
+  <text x="470" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#1C4A2E">✓ Schnittstelle</text>
+
+  <!-- Ast mit korrekter Schnittführung -->
+  <line x1="400" y1="170" x2="540" y2="170" stroke="#8B5E3C" stroke-width="12" stroke-linecap="round"/>
+  <!-- Kleiner seitlicher Ast -->
+  <line x1="450" y1="170" x2="430" y2="120" stroke="#8B5E3C" stroke-width="7" stroke-linecap="round"/>
+  <!-- Astring -->
+  <ellipse cx="452" cy="170" rx="8" ry="6" fill="#6B4423" opacity="0.6"/>
+  <!-- Schere -->
+  <text x="475" y="145" font-size="20">✂️</text>
+  <!-- Schnittlinie korrekt (knapp über Astansatz) -->
+  <line x1="458" y1="155" x2="462" y2="183" stroke="#1C4A2E" stroke-width="2" stroke-dasharray="3,2"/>
+  <text x="510" y="140" text-anchor="middle" font-size="9" fill="#1C4A2E">Knapp über dem</text>
+  <text x="510" y="152" text-anchor="middle" font-size="9" fill="#1C4A2E">Astring schneiden</text>
+  <!-- Falsche Variante -->
+  <text x="410" y="100" text-anchor="middle" font-size="9" fill="#7A2430">✗ nicht zu weit</text>
+  <text x="410" y="112" text-anchor="middle" font-size="9" fill="#7A2430">vom Stamm</text>
+  <line x1="440" y1="155" x2="444" y2="183" stroke="#7A2430" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>
+
+  <!-- Trennlinien -->
+  <line x1="215" y1="42" x2="215" y2="255" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="395" y1="42" x2="395" y2="255" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Zeitfenster -->
+  <rect x="30" y="258" width="540" height="50" rx="8" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="275" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Beste Schnittzeit: Januar–März (frostfreie Tage, kein Laub = beste Übersicht)</text>
+  <text x="300" y="291" text-anchor="middle" font-size="10" fill="#555">Kirschen &amp; Pflaumen: NUR im Sommer nach der Ernte schneiden (Scharkakrankheit!)</text>
+  <text x="300" y="307" text-anchor="middle" font-size="10" fill="#555">Nie mehr als ⅓ der Krone in einer Saison entfernen</text>
+</svg>
