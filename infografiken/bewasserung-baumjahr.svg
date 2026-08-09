@@ -1,0 +1,68 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Junge Bäume richtig wässern</text>
+
+  <!-- Baum 1: 1. Jahr -->
+  <g transform="translate(80,60)">
+    <rect x="-55" y="-15" width="110" height="200" rx="8" fill="#4a90d9" opacity="0.08"/>
+    <text x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#4a90d9">1. Standjahr</text>
+    <!-- Baumsilhouette klein -->
+    <ellipse cx="0" cy="40" rx="28" ry="32" fill="#3a9a4a"/>
+    <rect x="-5" y="68" width="10" height="30" fill="#8B5E3C"/>
+    <!-- Wassermenge -->
+    <text x="0" y="118" text-anchor="middle" font-size="22" font-weight="900" fill="#4a90d9">30 L</text>
+    <text x="0" y="134" text-anchor="middle" font-size="10" fill="#555">pro Wässerung</text>
+    <text x="0" y="150" text-anchor="middle" font-size="10" fill="#555">2–3× pro Woche</text>
+    <text x="0" y="166" text-anchor="middle" font-size="10" fill="#7A2430" font-weight="600">bei Hitze täglich</text>
+    <!-- Eimer-Icons -->
+    <text x="-22" y="188" font-size="16">🪣</text>
+    <text x="-4" y="188" font-size="16">🪣</text>
+    <text x="14" y="188" font-size="16">🪣</text>
+  </g>
+
+  <!-- Baum 2: 2.–3. Jahr -->
+  <g transform="translate(220,60)">
+    <rect x="-65" y="-15" width="130" height="200" rx="8" fill="#4a90d9" opacity="0.06"/>
+    <text x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#4a90d9">2.–3. Standjahr</text>
+    <ellipse cx="0" cy="37" rx="36" ry="38" fill="#3a9a4a"/>
+    <rect x="-6" y="70" width="12" height="32" fill="#8B5E3C"/>
+    <text x="0" y="118" text-anchor="middle" font-size="22" font-weight="900" fill="#4a90d9">20 L</text>
+    <text x="0" y="134" text-anchor="middle" font-size="10" fill="#555">pro Wässerung</text>
+    <text x="0" y="150" text-anchor="middle" font-size="10" fill="#555">1× pro Woche</text>
+    <text x="0" y="166" text-anchor="middle" font-size="10" fill="#555">bei Trockenheit öfter</text>
+    <text x="-12" y="188" font-size="16">🪣</text>
+    <text x="6" y="188" font-size="16">🪣</text>
+  </g>
+
+  <!-- Baum 3: Ab 4. Jahr -->
+  <g transform="translate(380,60)">
+    <rect x="-65" y="-15" width="130" height="200" rx="8" fill="#2d7a3a" opacity="0.08"/>
+    <text x="0" y="0" text-anchor="middle" font-size="11" font-weight="700" fill="#2d7a3a">Ab 4. Jahr</text>
+    <ellipse cx="0" cy="34" rx="46" ry="44" fill="#2d7a3a"/>
+    <rect x="-7" y="73" width="14" height="34" fill="#8B5E3C"/>
+    <text x="0" y="118" text-anchor="middle" font-size="22" font-weight="900" fill="#2d7a3a">Selbst-</text>
+    <text x="0" y="138" text-anchor="middle" font-size="22" font-weight="900" fill="#2d7a3a">ständig</text>
+    <text x="0" y="155" text-anchor="middle" font-size="10" fill="#555">Nur bei Extremhitze</text>
+    <text x="0" y="168" text-anchor="middle" font-size="10" fill="#555">oder Dürre wässern</text>
+    <text x="-4" y="188" font-size="22">🌳</text>
+  </g>
+
+  <!-- Trennpfeile -->
+  <text x="163" y="155" font-size="20" fill="#ccc">→</text>
+  <text x="303" y="155" font-size="20" fill="#ccc">→</text>
+
+  <!-- Richtig wässern Hinweis -->
+  <rect x="430" y="60" width="150" height="120" rx="8" fill="#1C4A2E" opacity="0.08"/>
+  <text x="505" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Wie wässern?</text>
+  <text x="505" y="96" text-anchor="middle" font-size="10" fill="#555">Langsam + tief</text>
+  <text x="505" y="110" text-anchor="middle" font-size="10" fill="#555">Am Stammfuß</text>
+  <text x="505" y="124" text-anchor="middle" font-size="10" fill="#555">Nicht auf Blätter</text>
+  <text x="505" y="138" text-anchor="middle" font-size="10" fill="#555">Morgens besser</text>
+  <text x="505" y="152" text-anchor="middle" font-size="10" fill="#555">als abends</text>
+  <text x="505" y="168" text-anchor="middle" font-size="9" fill="#7A2430">Mulch spart Wasser!</text>
+
+  <!-- Untere Infozeile -->
+  <rect x="30" y="265" width="540" height="28" rx="8" fill="#4a90d9" opacity="0.1"/>
+  <text x="300" y="279" text-anchor="middle" font-size="11" fill="#1C4A2E" font-weight="600">Lieber selten &amp; viel als oft &amp; wenig — tiefes Wässern fördert tiefe Wurzeln</text>
+  <text x="300" y="292" text-anchor="middle" font-size="10" fill="#555">Finger-Test: 5 cm tief in Erde — ist sie noch feucht, braucht der Baum kein Wasser</text>
+</svg>
