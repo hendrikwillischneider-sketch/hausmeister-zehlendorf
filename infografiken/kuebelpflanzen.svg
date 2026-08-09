@@ -1,0 +1,83 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Kübelpflanzen winterfest machen — bevor der Frost kommt</text>
+
+  <!-- 3 Kategorien: Frosttolerant / Halbhart / Frostempfindlich -->
+  <text x="300" y="48" text-anchor="middle" font-size="10" fill="#555">Nicht alle Kübelpflanzen brauchen dasselbe — erst einordnen, dann schützen</text>
+
+  <!-- Kategorie 1: Frosttolerant -->
+  <g transform="translate(20, 58)">
+    <rect x="0" y="0" width="178" height="185" rx="9" fill="#4a90d9" opacity="0.09"/>
+    <text x="89" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#4a90d9">❄️ Frosttolerant</text>
+    <text x="89" y="34" text-anchor="middle" font-size="9" fill="#4a90d9">bis –10 °C</text>
+
+    <text x="89" y="60" text-anchor="middle" font-size="22">🌲</text>
+    <text x="89" y="78" text-anchor="middle" font-size="9" fill="#555">Buchsbaum, Eibe</text>
+    <text x="89" y="91" text-anchor="middle" font-size="9" fill="#555">Zwergkiefer, Lorbeer</text>
+    <text x="89" y="104" text-anchor="middle" font-size="9" fill="#555">Viele Gehölze</text>
+
+    <line x1="20" y1="115" x2="158" y2="115" stroke="#ddd" stroke-width="1"/>
+    <text x="89" y="130" text-anchor="middle" font-size="9" font-weight="700" fill="#4a90d9">Maßnahmen:</text>
+    <text x="89" y="144" text-anchor="middle" font-size="9" fill="#555">Kübel isolieren</text>
+    <text x="89" y="157" text-anchor="middle" font-size="9" fill="#555">(Jutesack, Noppenmatte)</text>
+    <text x="89" y="170" text-anchor="middle" font-size="9" fill="#555">Kein Stau-Wasser!</text>
+    <text x="89" y="183" text-anchor="middle" font-size="9" fill="#4a90d9" font-weight="600">→ draußen lassen ✓</text>
+  </g>
+
+  <!-- Kategorie 2: Halbhart -->
+  <g transform="translate(212, 58)">
+    <rect x="0" y="0" width="178" height="185" rx="9" fill="#B8892A" opacity="0.09"/>
+    <text x="89" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">🌡️ Halbhart</text>
+    <text x="89" y="34" text-anchor="middle" font-size="9" fill="#8B6914">bis –5 °C</text>
+
+    <text x="89" y="60" text-anchor="middle" font-size="22">🌿</text>
+    <text x="89" y="78" text-anchor="middle" font-size="9" fill="#555">Oleander, Lavendel</text>
+    <text x="89" y="91" text-anchor="middle" font-size="9" fill="#555">Agapanthus, Fuchsie</text>
+    <text x="89" y="104" text-anchor="middle" font-size="9" fill="#555">Hortensie (Topf)</text>
+
+    <line x1="20" y1="115" x2="158" y2="115" stroke="#ddd" stroke-width="1"/>
+    <text x="89" y="130" text-anchor="middle" font-size="9" font-weight="700" fill="#8B6914">Maßnahmen:</text>
+    <text x="89" y="144" text-anchor="middle" font-size="9" fill="#555">Ins Treppenhaus oder</text>
+    <text x="89" y="157" text-anchor="middle" font-size="9" fill="#555">kühlen Keller (5–8°C)</text>
+    <text x="89" y="170" text-anchor="middle" font-size="9" fill="#555">Wenig gießen</text>
+    <text x="89" y="183" text-anchor="middle" font-size="9" fill="#8B6914" font-weight="600">→ geschützt überwintern</text>
+  </g>
+
+  <!-- Kategorie 3: Frostempfindlich -->
+  <g transform="translate(404, 58)">
+    <rect x="0" y="0" width="178" height="185" rx="9" fill="#7A2430" opacity="0.08"/>
+    <text x="89" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">🔥 Frostempfindlich</text>
+    <text x="89" y="34" text-anchor="middle" font-size="9" fill="#7A2430">ab 0 °C Schaden</text>
+
+    <text x="89" y="60" text-anchor="middle" font-size="22">🌺</text>
+    <text x="89" y="78" text-anchor="middle" font-size="9" fill="#555">Bougainvillea, Dattelpalme</text>
+    <text x="89" y="91" text-anchor="middle" font-size="9" fill="#555">Zitrus, Agave</text>
+    <text x="89" y="104" text-anchor="middle" font-size="9" fill="#555">Tropische Pflanzen</text>
+
+    <line x1="20" y1="115" x2="158" y2="115" stroke="#ddd" stroke-width="1"/>
+    <text x="89" y="130" text-anchor="middle" font-size="9" font-weight="700" fill="#7A2430">Maßnahmen:</text>
+    <text x="89" y="144" text-anchor="middle" font-size="9" fill="#555">Ins Warme (min. 10°C)</text>
+    <text x="89" y="157" text-anchor="middle" font-size="9" fill="#555">Vor Mitte Oktober rein</text>
+    <text x="89" y="170" text-anchor="middle" font-size="9" fill="#555">Helles Winterquartier!</text>
+    <text x="89" y="183" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">→ Innenraum nötig</text>
+  </g>
+
+  <!-- Kübel-Schutz Illustration unten -->
+  <rect x="20" y="252" width="560" height="62" rx="8" fill="#1C4A2E" opacity="0.06"/>
+  <text x="300" y="270" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Kübel-Schutz für draußen:</text>
+
+  <text x="85"  y="292" text-anchor="middle" font-size="22">🧣</text>
+  <text x="85"  y="308" text-anchor="middle" font-size="9" fill="#555">Jute um Kübel</text>
+
+  <text x="185" y="292" text-anchor="middle" font-size="22">🪵</text>
+  <text x="185" y="308" text-anchor="middle" font-size="9" fill="#555">Holzfüße darunter</text>
+
+  <text x="285" y="292" text-anchor="middle" font-size="22">💧</text>
+  <text x="285" y="308" text-anchor="middle" font-size="9" fill="#555">Untersetzer entfernen</text>
+
+  <text x="385" y="292" text-anchor="middle" font-size="22">🌿</text>
+  <text x="385" y="308" text-anchor="middle" font-size="9" fill="#555">Vlies um Krone</text>
+
+  <text x="500" y="292" text-anchor="middle" font-size="22">✂️</text>
+  <text x="500" y="308" text-anchor="middle" font-size="9" fill="#555">Vor dem Einwintern</text>
+</svg>
