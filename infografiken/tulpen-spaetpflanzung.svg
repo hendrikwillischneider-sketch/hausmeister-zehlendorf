@@ -1,0 +1,65 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4A2E">Tulpen: Warum später pflanzen besser ist</text>
+
+  <!-- Timeline Oktober → November mit Erklärungen -->
+
+  <!-- Zeitstrahl -->
+  <line x1="50" y1="80" x2="550" y2="80" stroke="#ccc" stroke-width="2"/>
+
+  <!-- Oktober früh -->
+  <circle cx="90" cy="80" r="10" fill="#7A2430"/>
+  <text x="90" y="68" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="700">Okt früh</text>
+  <text x="90" y="98" text-anchor="middle" font-size="8" fill="#555">zu warm</text>
+  <!-- Problem -->
+  <rect x="30" y="108" width="122" height="60" rx="6" fill="#7A2430" opacity="0.07"/>
+  <text x="91" y="122" text-anchor="middle" font-size="8" font-weight="700" fill="#7A2430">Problem: Pilz!</text>
+  <text x="91" y="136" text-anchor="middle" font-size="8" fill="#555">Boden über 10°C →</text>
+  <text x="91" y="149" text-anchor="middle" font-size="8" fill="#555">Tulpenfäule (Botrytis)</text>
+  <text x="91" y="162" text-anchor="middle" font-size="8" fill="#7A2430">Zwiebel fault vor</text>
+  <text x="91" y="173" text-anchor="middle" font-size="8" fill="#7A2430">dem Austrieb</text>
+
+  <!-- Oktober Mitte -->
+  <circle cx="230" cy="80" r="10" fill="#B8892A"/>
+  <text x="230" y="68" text-anchor="middle" font-size="9" fill="#B8892A" font-weight="700">Okt Mitte</text>
+  <text x="230" y="98" text-anchor="middle" font-size="8" fill="#555">ca. 10°C</text>
+  <rect x="170" y="108" width="122" height="60" rx="6" fill="#B8892A" opacity="0.09"/>
+  <text x="231" y="122" text-anchor="middle" font-size="8" font-weight="700" fill="#B8892A">Noch zu früh</text>
+  <text x="231" y="136" text-anchor="middle" font-size="8" fill="#555">Schwankend warm/</text>
+  <text x="231" y="149" text-anchor="middle" font-size="8" fill="#555">kalt — Zwiebel</text>
+  <text x="231" y="162" text-anchor="middle" font-size="8" fill="#555">treibt zu früh aus</text>
+  <text x="231" y="173" text-anchor="middle" font-size="8" fill="#555">Frost trifft Trieb</text>
+
+  <!-- Oktober Ende / November -->
+  <circle cx="390" cy="80" r="12" fill="#1C4A2E"/>
+  <text x="390" y="66" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="700">Okt Ende</text>
+  <text x="390" y="100" text-anchor="middle" font-size="8" fill="#1C4A2E">✓ IDEAL</text>
+  <rect x="330" y="108" width="122" height="60" rx="6" fill="#1C4A2E" opacity="0.09"/>
+  <text x="391" y="122" text-anchor="middle" font-size="8" font-weight="700" fill="#1C4A2E">Perfekter Moment</text>
+  <text x="391" y="136" text-anchor="middle" font-size="8" fill="#555">Boden 5–8°C →</text>
+  <text x="391" y="149" text-anchor="middle" font-size="8" fill="#555">Kein Pilz, keine</text>
+  <text x="391" y="162" text-anchor="middle" font-size="8" fill="#555">Frühtriebe · Wurzeln</text>
+  <text x="391" y="173" text-anchor="middle" font-size="8" fill="#1C4A2E">wachsen langsam ✓</text>
+
+  <!-- November -->
+  <circle cx="520" cy="80" r="10" fill="#4a90d9"/>
+  <text x="520" y="68" text-anchor="middle" font-size="9" fill="#4a90d9" font-weight="700">November</text>
+  <text x="520" y="98" text-anchor="middle" font-size="8" fill="#555">noch ok</text>
+  <rect x="458" y="108" width="122" height="60" rx="6" fill="#4a90d9" opacity="0.07"/>
+  <text x="519" y="122" text-anchor="middle" font-size="8" font-weight="700" fill="#4a90d9">Noch möglich</text>
+  <text x="519" y="136" text-anchor="middle" font-size="8" fill="#555">Bis Boden friert</text>
+  <text x="519" y="149" text-anchor="middle" font-size="8" fill="#555">pflanzen möglich</text>
+  <text x="519" y="162" text-anchor="middle" font-size="8" fill="#555">Blüte evtl. etwas</text>
+  <text x="519" y="173" text-anchor="middle" font-size="8" fill="#555">später</text>
+
+  <!-- Merksatz -->
+  <rect x="20" y="186" width="560" height="40" rx="8" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="203" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Merksatz: Tulpe pflanzen wenn man nachts keine T-Shirt mehr trägt</text>
+  <text x="300" y="220" text-anchor="middle" font-size="9" fill="#555">Boden unter 10 °C = grünes Licht · Thermometer im Beet, nicht im Freien messen</text>
+
+  <!-- Sortenhinweis -->
+  <rect x="20" y="238" width="560" height="52" rx="8" fill="#B8892A" opacity="0.08"/>
+  <text x="300" y="255" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">Tipp für den alten Park: Langlebige Sorten wählen</text>
+  <text x="300" y="270" text-anchor="middle" font-size="9" fill="#555">„Naturalisierende" Tulpen (Darwin-Hybrid, Greigii) kommen mehrere Jahre — weniger Nachpflanzung</text>
+  <text x="300" y="284" text-anchor="middle" font-size="9" fill="#555">Standard-Tulpen: jährlich neu pflanzen — für den Parkbetrieb nicht ideal</text>
+</svg>
