@@ -1,0 +1,67 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Herbstpflanzung: Warum September der beste Pflanzmonat ist</text>
+
+  <!-- Vergleich: Frühling vs Herbst -->
+  <text x="140" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#7A2430">Frühjahr pflanzen</text>
+  <text x="460" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#1C4A2E">Herbst pflanzen ✓ Besser!</text>
+
+  <!-- Frühjahr: Pflanze kämpft im Sommer -->
+  <g transform="translate(20, 60)">
+    <rect x="0" y="0" width="243" height="185" rx="9" fill="#7A2430" opacity="0.06"/>
+    <!-- Pflanze mit Hitzestress -->
+    <text x="121" y="30" text-anchor="middle" font-size="28">🌱</text>
+    <!-- Pfeile: Was passiert -->
+    <rect x="15" y="42" width="212" height="24" rx="5" fill="#F4C430" opacity="0.3"/>
+    <text x="121" y="58" text-anchor="middle" font-size="9" fill="#8B6914">① Sofort Sommerhitze und Trockenheit</text>
+    <rect x="15" y="72" width="212" height="24" rx="5" fill="#F4C430" opacity="0.2"/>
+    <text x="121" y="88" text-anchor="middle" font-size="9" fill="#8B6914">② Wurzeln müssen Wasserversorgung aufbauen</text>
+    <rect x="15" y="102" width="212" height="24" rx="5" fill="#7A2430" opacity="0.1"/>
+    <text x="121" y="118" text-anchor="middle" font-size="9" fill="#7A2430">③ Kein Wachstum — Pflanze kämpft ums Überleben</text>
+    <rect x="15" y="132" width="212" height="24" rx="5" fill="#7A2430" opacity="0.1"/>
+    <text x="121" y="148" text-anchor="middle" font-size="9" fill="#7A2430">④ Viel Gießen nötig, sonst Kümmerwuchs</text>
+    <text x="121" y="175" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">Ergebnis: langsames Anwachsen</text>
+  </g>
+
+  <!-- TRENNLINIE -->
+  <line x1="300" y1="50" x2="300" y2="255" stroke="#ddd" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- Herbst: Pflanze wächst entspannt -->
+  <g transform="translate(310, 60)">
+    <rect x="0" y="0" width="270" height="185" rx="9" fill="#1C4A2E" opacity="0.06"/>
+    <!-- Pflanze gesund -->
+    <text x="135" y="30" text-anchor="middle" font-size="28">🌿</text>
+    <!-- Vorteile -->
+    <rect x="15" y="42" width="242" height="24" rx="5" fill="#3a9a4a" opacity="0.15"/>
+    <text x="136" y="58" text-anchor="middle" font-size="9" fill="#1C4A2E">① Kühle Luft — kein Verdunstungsstress</text>
+    <rect x="15" y="72" width="242" height="24" rx="5" fill="#3a9a4a" opacity="0.12"/>
+    <text x="136" y="88" text-anchor="middle" font-size="9" fill="#1C4A2E">② Boden noch warm → Wurzeln wachsen bis Frost</text>
+    <rect x="15" y="102" width="242" height="24" rx="5" fill="#4a90d9" opacity="0.1"/>
+    <text x="136" y="118" text-anchor="middle" font-size="9" fill="#1C4A2E">③ Herbstregen übernimmt die Bewässerung</text>
+    <rect x="15" y="132" width="242" height="24" rx="5" fill="#3a9a4a" opacity="0.12"/>
+    <text x="136" y="148" text-anchor="middle" font-size="9" fill="#1C4A2E">④ Im März startet die Pflanze mit fertigen Wurzeln</text>
+    <text x="136" y="175" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Ergebnis: Kraftvolles Frühjahrsaustrieb ✓</text>
+  </g>
+
+  <!-- Was jetzt pflanzen? -->
+  <rect x="20" y="258" width="560" height="56" rx="8" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="276" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Was jetzt im Wohnheimpark gut gepflanzt werden kann:</text>
+
+  <text x="80"  y="295" text-anchor="middle" font-size="22">🌳</text>
+  <text x="80"  y="310" text-anchor="middle" font-size="9" fill="#555">Sträucher</text>
+
+  <text x="175" y="295" text-anchor="middle" font-size="22">🌸</text>
+  <text x="175" y="310" text-anchor="middle" font-size="9" fill="#555">Rosen</text>
+
+  <text x="270" y="295" text-anchor="middle" font-size="22">🌾</text>
+  <text x="270" y="310" text-anchor="middle" font-size="9" fill="#555">Gräser</text>
+
+  <text x="365" y="295" text-anchor="middle" font-size="22">🌿</text>
+  <text x="365" y="310" text-anchor="middle" font-size="9" fill="#555">Bodendecker</text>
+
+  <text x="460" y="295" text-anchor="middle" font-size="22">🎋</text>
+  <text x="460" y="310" text-anchor="middle" font-size="9" fill="#555">Gehölze</text>
+
+  <text x="545" y="295" text-anchor="middle" font-size="22">🌲</text>
+  <text x="545" y="310" text-anchor="middle" font-size="9" fill="#555">Hecken</text>
+</svg>
