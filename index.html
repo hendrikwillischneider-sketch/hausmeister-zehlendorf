@@ -308,9 +308,33 @@ html{scroll-behavior:smooth}
 .baum-detail-dl{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:14px;margin:12px 0}
 .baum-detail-dl dt{color:var(--text-muted);font-weight:600;white-space:nowrap}
 .baum-detail-dl dd{color:var(--text);margin:0}
+
+/* ── PASSWORT-GATE ─────────────────────────────── */
+#pw-gate{position:fixed;inset:0;z-index:9999;background:var(--green-d);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;padding:24px;}
+#pw-gate .pw-box{background:var(--card);border-radius:14px;padding:36px 32px;max-width:360px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.35);}
+#pw-gate .pw-logo{font-family:var(--serif);font-size:1.1rem;color:var(--gold);letter-spacing:.05em;margin-bottom:6px;}
+#pw-gate h2{font-family:var(--serif);font-size:1.4rem;color:var(--green);margin-bottom:6px;}
+#pw-gate p{font-size:.9rem;color:var(--stone);margin-bottom:20px;}
+#pw-gate input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;background:var(--cream);color:var(--ink);outline:none;text-align:center;letter-spacing:.1em;}
+#pw-gate input:focus{border-color:var(--green);}
+#pw-gate button{margin-top:14px;width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;}
+#pw-gate button:hover{background:var(--green-d);}
+#pw-gate .pw-err{color:var(--burg);font-size:.85rem;margin-top:8px;min-height:1.2em;}
 </style>
 </head>
 <body>
+
+<div id="pw-gate">
+  <div class="pw-box">
+    <div class="pw-logo">Sidonie-Scharfe-Stiftung</div>
+    <h2>Serviceportal</h2>
+    <p>Bitte gib das Zugangskennwort ein,<br>um das Bewohnerportal zu öffnen.</p>
+    <input type="password" id="pw-input" placeholder="Kennwort" autocomplete="current-password"/>
+    <button onclick="checkPw()">Einloggen</button>
+    <div class="pw-err" id="pw-err"></div>
+  </div>
+</div>
+
 
 <nav class="site-nav">
   <a href="#willkommen">Willkommen</a>
@@ -841,7 +865,7 @@ function openArtikelData(idx){
     `<p class="modal-p">${s.p}</p>`
   ).join('');
   box.innerHTML=`
-    ${a.bild?`<img class="modal-hero" src="${IMG_BASE}${a.bild}" alt="${a.kat||''}" loading="lazy">`:''}
+    ${a.bild?`<img class="modal-hero" src="${a.bild.startsWith('http')?a.bild:IMG_BASE+a.bild}" alt="${a.kat||''}" loading="lazy">`:''}
     <div class="modal-inner">
       <div class="modal-kat-line">${a.ico||''} ${a.kat||''}</div>
       <div class="modal-h1">${a.titel}</div>
@@ -892,7 +916,7 @@ async function renderArtikel(){
     window._artikelData=data;
     if(!data.length){g.innerHTML=`<p style="color:var(--stone);font-size:14px;font-family:var(--sans)">Im ${MO_NAMEN[mo-1]} stehen keine besonderen Maßnahmen an.</p>`;return;}
     g.innerHTML=data.map((a,i)=>`<div class="artikel-card" onclick="openArtikelData(${i})">
-      ${a.bild?`<img class="artikel-img" src="${IMG_BASE}${a.bild}" alt="${a.kat||''}" loading="lazy">`:''}
+      ${a.bild?`<img class="artikel-img" src="${a.bild.startsWith('http')?a.bild:IMG_BASE+a.bild}" alt="${a.kat||''}" loading="lazy">`:''}
       <div class="artikel-head">
         <span class="artikel-ico">${a.ico||''}</span>
         <span class="artikel-kat">${a.kat||''}</span>
@@ -1166,5 +1190,28 @@ function openBaumPub(idx) {
 
 function closeBaumPub() { document.getElementById('baum-pub-modal').style.display='none'; }
 </script>
+
+<script>
+(function(){
+  const PW_KEY = 'bw_pw';
+  const PW_HASH = 'c8451cdc7d3a9d0fd9e98ffe3c2d3ca7'; // MD5('Bewohner26') — nur Obfuskation
+  const CORRECT = 'Bewohner26';
+  const gate = document.getElementById('pw-gate');
+  if(localStorage.getItem(PW_KEY) === 'ok') gate.style.display = 'none';
+  document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key === 'Enter') checkPw(); });
+  window.checkPw = function(){
+    const v = document.getElementById('pw-input').value;
+    if(v === CORRECT){
+      localStorage.setItem(PW_KEY,'ok');
+      gate.style.display='none';
+    } else {
+      document.getElementById('pw-err').textContent='Falsches Kennwort. Bitte erneut versuchen.';
+      document.getElementById('pw-input').value='';
+      document.getElementById('pw-input').focus();
+    }
+  };
+})();
+</script>
+
 </body>
 </html>
