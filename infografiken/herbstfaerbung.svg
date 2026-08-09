@@ -1,0 +1,73 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Warum leuchten die Blätter im Herbst? — Die Wissenschaft dahinter</text>
+
+  <!-- Blatt-Illustration mit Farbverlauf -->
+  <!-- Sommer-Blatt links -->
+  <text x="110" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Sommer</text>
+  <!-- Blatt grün -->
+  <path d="M110,70 C80,85 60,120 75,150 C88,175 130,185 145,165 C160,145 155,95 130,75 Z" fill="#2d7a3a" opacity="0.85"/>
+  <!-- Chlorophyll-Label -->
+  <rect x="38" y="115" width="62" height="28" rx="5" fill="#2d7a3a" opacity="0.8"/>
+  <text x="69" y="127" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">Chlorophyll</text>
+  <text x="69" y="138" text-anchor="middle" font-size="7" fill="#d0f0d0">dominiert</text>
+  <line x1="100" y1="128" x2="90" y2="128" stroke="#2d7a3a" stroke-width="1.5"/>
+  <!-- Versteckte Pigmente -->
+  <rect x="168" y="103" width="70" height="28" rx="5" fill="#B8892A" opacity="0.7"/>
+  <text x="203" y="115" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">Xanthophyll</text>
+  <text x="203" y="126" text-anchor="middle" font-size="7" fill="#ffe0a0">verborgen</text>
+  <line x1="168" y1="115" x2="140" y2="122" stroke="#B8892A" stroke-width="1.5"/>
+
+  <!-- Pfeil UMWANDLUNG -->
+  <text x="260" y="128" text-anchor="middle" font-size="13" fill="#555">→</text>
+  <text x="260" y="142" text-anchor="middle" font-size="8" fill="#555">Tage</text>
+  <text x="260" y="153" text-anchor="middle" font-size="8" fill="#555">kürzer +</text>
+  <text x="260" y="164" text-anchor="middle" font-size="8" fill="#555">kälter</text>
+
+  <!-- Herbst-Blatt rechts -->
+  <text x="430" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#c0522a">Herbst</text>
+  <!-- Blatt orange-rot -->
+  <path d="M430,70 C400,85 380,120 395,150 C408,175 450,185 465,165 C480,145 475,95 450,75 Z" fill="#c0522a" opacity="0.8"/>
+  <!-- Akzent-Töne -->
+  <path d="M420,90 C408,100 400,125 408,145 C415,160 438,165 445,152" fill="#8B6914" opacity="0.4"/>
+  <!-- Anthocyan -->
+  <rect x="346" y="88" width="70" height="28" rx="5" fill="#7A2430" opacity="0.8"/>
+  <text x="381" y="100" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">Anthocyan</text>
+  <text x="381" y="111" text-anchor="middle" font-size="7" fill="#ffb0b0">neu gebildet</text>
+  <line x1="394" y1="100" x2="407" y2="108" stroke="#7A2430" stroke-width="1.5"/>
+
+  <rect x="470" y="103" width="70" height="28" rx="5" fill="#B8892A" opacity="0.8"/>
+  <text x="505" y="115" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">Carotin</text>
+  <text x="505" y="126" text-anchor="middle" font-size="7" fill="#ffe0a0">sichtbar!</text>
+  <line x1="470" y1="115" x2="460" y2="122" stroke="#B8892A" stroke-width="1.5"/>
+
+  <!-- Mittelteil: Erklärung des Prozesses -->
+  <rect x="20" y="198" width="560" height="115" rx="10" fill="#1C4A2E" opacity="0.05"/>
+  <text x="300" y="218" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Was passiert im Blatt?</text>
+
+  <!-- 3 Spalten -->
+  <text x="110" y="240" text-anchor="middle" font-size="22">🌞</text>
+  <text x="110" y="260" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">Weniger Licht</text>
+  <text x="110" y="275" text-anchor="middle" font-size="9" fill="#555">Baum bremst</text>
+  <text x="110" y="288" text-anchor="middle" font-size="9" fill="#555">Chlorophyll-Produktion</text>
+  <text x="110" y="301" text-anchor="middle" font-size="9" fill="#555">Grün verblasst</text>
+
+  <text x="300" y="240" text-anchor="middle" font-size="22">🍂</text>
+  <text x="300" y="260" text-anchor="middle" font-size="10" font-weight="700" fill="#c0522a">Trennschicht bildet sich</text>
+  <text x="300" y="275" text-anchor="middle" font-size="9" fill="#555">Baum kappt die Verbindung</text>
+  <text x="300" y="288" text-anchor="middle" font-size="9" fill="#555">Zucker staut sich → Anthocyan</text>
+  <text x="300" y="301" text-anchor="middle" font-size="9" fill="#555">= leuchtend Rot &amp; Violett</text>
+
+  <text x="490" y="240" text-anchor="middle" font-size="22">🌳</text>
+  <text x="490" y="260" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Alten Park besonders</text>
+  <text x="490" y="275" text-anchor="middle" font-size="9" fill="#555">Alte Bäume = mehr Vielfalt</text>
+  <text x="490" y="288" text-anchor="middle" font-size="9" fill="#555">Linde: gelb · Ahorn: orange</text>
+  <text x="490" y="301" text-anchor="middle" font-size="9" fill="#555">Eiche: braun · Kirsche: rot</text>
+
+  <!-- Trennlinien zwischen Spalten -->
+  <line x1="215" y1="208" x2="215" y2="308" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="390" y1="208" x2="390" y2="308" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <rect x="20" y="312" width="560" height="8" rx="4" fill="#B8892A" opacity="0.2"/>
+  <text x="300" y="319" text-anchor="middle" font-size="8" fill="#8B6914" font-weight="600">Für Bewohnerinnen: Die Leuchtkraft des Herbstes ist Chemie — und ein Abschiedsgeschenk der Bäume</text>
+</svg>
