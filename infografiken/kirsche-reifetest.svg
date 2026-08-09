@@ -1,0 +1,81 @@
+<svg viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="310" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Kirschen ernten: So prüfst du die Reife</text>
+
+  <!-- Test 1: Farbe -->
+  <g transform="translate(75,50)">
+    <rect x="-60" y="0" width="120" height="195" rx="8" fill="#7A2430" opacity="0.08"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">① Farbe</text>
+    <!-- Farbverlauf Kirsche -->
+    <circle cx="-18" cy="65" r="24" fill="#FF6B6B"/>
+    <line x1="-18" y1="41" x2="-22" y2="28" stroke="#2d7a3a" stroke-width="2"/>
+    <circle cx="18" cy="65" r="24" fill="#7A2430"/>
+    <line x1="18" y1="41" x2="14" y2="28" stroke="#2d7a3a" stroke-width="2"/>
+    <text x="-18" y="103" text-anchor="middle" font-size="9" fill="#7A2430">Noch nicht</text>
+    <text x="18" y="103" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="600">Reif ✓</text>
+    <text x="0" y="122" text-anchor="middle" font-size="9" fill="#555">Sauerkirsche:</text>
+    <text x="0" y="135" text-anchor="middle" font-size="9" fill="#555">leuchtend rot</text>
+    <text x="0" y="150" text-anchor="middle" font-size="9" fill="#555">Süßkirsche:</text>
+    <text x="0" y="163" text-anchor="middle" font-size="9" fill="#555">dunkelrot bis</text>
+    <text x="0" y="176" text-anchor="middle" font-size="9" fill="#555">schwarzrot</text>
+  </g>
+
+  <!-- Test 2: Drucktest -->
+  <g transform="translate(210,50)">
+    <rect x="-60" y="0" width="120" height="195" rx="8" fill="#B8892A" opacity="0.08"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">② Drucktest</text>
+    <circle cx="0" cy="65" r="28" fill="#7A2430"/>
+    <line x1="0" y1="37" x2="-4" y2="25" stroke="#2d7a3a" stroke-width="2"/>
+    <!-- Finger drückt -->
+    <path d="M-15,55 Q-5,45 5,55" stroke="#555" stroke-width="2" fill="none"/>
+    <text x="0" y="35" font-size="14">👆</text>
+    <text x="0" y="108" text-anchor="middle" font-size="9" fill="#555">Leichter Druck:</text>
+    <text x="0" y="121" text-anchor="middle" font-size="9" fill="#555">gibt leicht nach</text>
+    <text x="0" y="138" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="600">→ reif ✓</text>
+    <text x="0" y="155" text-anchor="middle" font-size="9" fill="#7A2430">Steinhart:</text>
+    <text x="0" y="168" text-anchor="middle" font-size="9" fill="#7A2430">noch nicht reif</text>
+    <text x="0" y="181" text-anchor="middle" font-size="9" fill="#7A2430">Matsch: überreif</text>
+  </g>
+
+  <!-- Test 3: Stiel -->
+  <g transform="translate(345,50)">
+    <rect x="-60" y="0" width="120" height="195" rx="8" fill="#2d7a3a" opacity="0.07"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">③ Stiel-Test</text>
+    <circle cx="0" cy="72" r="26" fill="#7A2430"/>
+    <!-- Langer grüner Stiel = gut -->
+    <line x1="0" y1="46" x2="-5" y2="22" stroke="#2d7a3a" stroke-width="3"/>
+    <text x="0" y="115" text-anchor="middle" font-size="9" fill="#555">Stiel noch</text>
+    <text x="0" y="128" text-anchor="middle" font-size="9" fill="#555">grün + fest:</text>
+    <text x="0" y="141" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="600">→ frisch ✓</text>
+    <text x="0" y="158" text-anchor="middle" font-size="9" fill="#7A2430">Stiel braun/</text>
+    <text x="0" y="171" text-anchor="middle" font-size="9" fill="#7A2430">welk: alt</text>
+    <text x="0" y="188" text-anchor="middle" font-size="9" fill="#7A2430">Kein Stiel: überreif</text>
+  </g>
+
+  <!-- Zeitfenster -->
+  <g transform="translate(490,50)">
+    <rect x="-80" y="0" width="160" height="195" rx="8" fill="#1C4A2E" opacity="0.07"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">④ Zeitfenster</text>
+    <text x="0" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">Sauerkirsche</text>
+    <text x="0" y="70" text-anchor="middle" font-size="10" fill="#555">Juni – Juli</text>
+    <text x="0" y="84" text-anchor="middle" font-size="9" fill="#555">Reifezeit: 7–10 Tage</text>
+    <line x1="-50" y1="95" x2="50" y2="95" stroke="#ddd" stroke-width="1"/>
+    <text x="0" y="113" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">Süßkirsche</text>
+    <text x="0" y="128" text-anchor="middle" font-size="10" fill="#555">Mai – Juli</text>
+    <text x="0" y="142" text-anchor="middle" font-size="9" fill="#555">je nach Sorte</text>
+    <line x1="-50" y1="153" x2="50" y2="153" stroke="#ddd" stroke-width="1"/>
+    <text x="0" y="168" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">⚠ Nicht zu lang</text>
+    <text x="0" y="181" text-anchor="middle" font-size="9" fill="#7A2430">warten: Vögel</text>
+    <text x="0" y="194" text-anchor="middle" font-size="9" fill="#7A2430">ernten zuerst!</text>
+  </g>
+
+  <!-- Trennlinien -->
+  <line x1="148" y1="45" x2="148" y2="252" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="283" y1="45" x2="283" y2="252" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="418" y1="45" x2="418" y2="252" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Unten -->
+  <rect x="30" y="258" width="540" height="40" rx="8" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="273" text-anchor="middle" font-size="11" fill="#1C4A2E" font-weight="700">Ernte morgens — Kirschen sind dann kühler und fester · Mit Stiel pflücken, nicht abreißen</text>
+  <text x="300" y="289" text-anchor="middle" font-size="10" fill="#555">Ertrag 2–3 Tage kühl lagern · Am besten ungewaschen lagern, erst vor dem Essen waschen</text>
+</svg>
