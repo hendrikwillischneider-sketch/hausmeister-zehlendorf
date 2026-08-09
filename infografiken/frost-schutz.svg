@@ -1,0 +1,89 @@
+<svg viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="310" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Frostschutz: Was braucht Schutz und wie?</text>
+
+  <!-- Kübelpflanzen -->
+  <g transform="translate(75,50)">
+    <rect x="-60" y="0" width="120" height="195" rx="8" fill="#4a90d9" opacity="0.08"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Kübelpflanzen</text>
+    <!-- Topf mit Pflanze -->
+    <rect x="-20" y="40" width="40" height="30" rx="3" fill="#8B6914"/>
+    <ellipse cx="0" cy="50" rx="25" ry="30" fill="#3a9a4a"/>
+    <!-- Schutz: Vlies umwickelt -->
+    <path d="M-28,38 Q-35,60 -28,82 L28,82 Q35,60 28,38 Z" fill="none" stroke="#c8d8f0" stroke-width="3" stroke-dasharray="4,2" opacity="0.8"/>
+    <rect x="-18" y="72" width="36" height="8" fill="#d4b870" opacity="0.6" rx="2"/>
+    <text x="0" y="102" text-anchor="middle" font-size="9" fill="#555">Vlies / Jutesack</text>
+    <text x="0" y="116" text-anchor="middle" font-size="9" fill="#555">um Topf + Pflanze</text>
+    <rect x="-18" y="70" width="36" height="22" fill="#8B6914" opacity="0.3" rx="2"/>
+    <text x="0" y="140" text-anchor="middle" font-size="9" fill="#555">Styropor unter</text>
+    <text x="0" y="153" text-anchor="middle" font-size="9" fill="#555">den Topf stellen</text>
+    <text x="0" y="167" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">Ab −3 °C drinnen!</text>
+    <text x="0" y="185" text-anchor="middle" font-size="9" fill="#555">Oleander, Agave,</text>
+    <text x="0" y="197" text-anchor="middle" font-size="9" fill="#555">Citrus, Lorbeer</text>
+  </g>
+
+  <!-- Rosen / Stauden -->
+  <g transform="translate(215,50)">
+    <rect x="-65" y="0" width="130" height="195" rx="8" fill="#7A2430" opacity="0.07"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Rosen &amp; Stauden</text>
+    <!-- Rose angehäufelt -->
+    <line x1="0" y1="100" x2="0" y2="45" stroke="#6B4423" stroke-width="4"/>
+    <line x1="0" y1="65" x2="-18" y2="45" stroke="#6B4423" stroke-width="3"/>
+    <line x1="0" y1="65" x2="18" y2="48" stroke="#6B4423" stroke-width="3"/>
+    <!-- Angehäufelter Hügel -->
+    <ellipse cx="0" cy="105" rx="30" ry="12" fill="#8B6914"/>
+    <path d="M-30,105 Q0,82 30,105" fill="#8B6914"/>
+    <text x="0" y="125" text-anchor="middle" font-size="9" fill="#555">Erde anhäufeln</text>
+    <text x="0" y="138" text-anchor="middle" font-size="9" fill="#555">(15–20 cm hoch)</text>
+    <!-- Tannenreisig -->
+    <text x="0" y="158" text-anchor="middle" font-size="9" fill="#555">Tannenreisig</text>
+    <text x="0" y="171" text-anchor="middle" font-size="9" fill="#555">drüber legen</text>
+    <text x="0" y="187" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">Rosen ab Nov. kürzen</text>
+    <text x="0" y="200" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">auf 30–40 cm</text>
+  </g>
+
+  <!-- Wasserleitungen -->
+  <g transform="translate(360,50)">
+    <rect x="-60" y="0" width="120" height="195" rx="8" fill="#555" opacity="0.07"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Wasserleitungen</text>
+    <!-- Rohr-Schaubild -->
+    <rect x="-25" y="35" width="50" height="12" rx="6" fill="#888"/>
+    <rect x="-8" y="47" width="16" height="40" fill="#888"/>
+    <rect x="-14" y="87" width="28" height="8" rx="4" fill="#4a90d9" opacity="0.5"/>
+    <!-- Absperrventil -->
+    <rect x="-12" y="58" width="24" height="16" rx="3" fill="#555"/>
+    <text x="0" y="70" text-anchor="middle" font-size="8" fill="#fff">STOP</text>
+    <text x="0" y="110" text-anchor="middle" font-size="9" fill="#555">Außenhahn</text>
+    <text x="0" y="123" text-anchor="middle" font-size="9" fill="#555">absperren &amp; entleeren</text>
+    <text x="0" y="140" text-anchor="middle" font-size="9" fill="#555">Schlauch komplett</text>
+    <text x="0" y="153" text-anchor="middle" font-size="9" fill="#555">leeren &amp; einlagern</text>
+    <text x="0" y="170" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">Ab Prognose</text>
+    <text x="0" y="183" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">dauerhaft unter 0 °C</text>
+  </g>
+
+  <!-- Empfindliche Pflanzen -->
+  <g transform="translate(500,50)">
+    <rect x="-60" y="0" width="120" height="195" rx="8" fill="#2d7a3a" opacity="0.07"/>
+    <text x="0" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Neupflanzungen</text>
+    <!-- Kleiner Baum mit Vlies -->
+    <rect x="-5" y="85" width="10" height="40" fill="#8B5E3C" rx="2"/>
+    <ellipse cx="0" cy="70" rx="28" ry="32" fill="#3a9a4a" opacity="0.7"/>
+    <!-- Vlies drumherum -->
+    <path d="M-35,55 L-30,125 L30,125 L35,55 Q0,40 -35,55 Z" fill="none" stroke="#c8d8f0" stroke-width="2.5" stroke-dasharray="4,2"/>
+    <text x="0" y="143" text-anchor="middle" font-size="9" fill="#555">Vlies locker</text>
+    <text x="0" y="156" text-anchor="middle" font-size="9" fill="#555">drum binden</text>
+    <text x="0" y="172" text-anchor="middle" font-size="9" fill="#555">Mulch auf</text>
+    <text x="0" y="185" text-anchor="middle" font-size="9" fill="#555">die Wurzelzone</text>
+  </g>
+
+  <!-- Trennlinien -->
+  <line x1="153" y1="45" x2="153" y2="255" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="293" y1="45" x2="293" y2="255" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="433" y1="45" x2="433" y2="255" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Unten -->
+  <rect x="30" y="258" width="540" height="42" rx="8" fill="#1C4A2E" opacity="0.08"/>
+  <text x="300" y="274" text-anchor="middle" font-size="11" fill="#1C4A2E" font-weight="700">Timing: Oktober–November · Nicht zu früh — Pflanzen brauchen Abhärtung durch erste Kälte</text>
+  <text x="300" y="290" text-anchor="middle" font-size="10" fill="#555">Vlies: luftdurchlässig, kein Plastikfolie (Schimmelgefahr!)</text>
+  <text x="300" y="303" text-anchor="middle" font-size="10" fill="#555">Schutz im März/April wieder entfernen — nicht zu spät, sonst Hitzestau</text>
+</svg>
