@@ -1,0 +1,93 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="320" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#1C4A2E">Letzter Rasenschnitt im Oktober — die richtige Höhe entscheidet</text>
+
+  <!-- Drei Szenarien nebeneinander -->
+
+  <!-- ZU KURZ (links) -->
+  <text x="95" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#7A2430">✗ Zu kurz</text>
+  <text x="95" y="65" text-anchor="middle" font-size="9" fill="#555">unter 4 cm</text>
+
+  <rect x="20" y="72" width="150" height="160" rx="8" fill="#7A2430" opacity="0.06"/>
+
+  <!-- Kurzes Gras -->
+  <rect x="25" y="200" width="140" height="25" fill="#8B6914" opacity="0.45"/>
+  <rect x="25" y="190" width="140" height="12" fill="#4a7a2f" opacity="0.6"/>
+  <g stroke="#4a7a2f" stroke-width="1.5" stroke-linecap="round">
+    <line x1="45" y1="190" x2="44" y2="183"/>
+    <line x1="65" y1="190" x2="66" y2="182"/>
+    <line x1="85" y1="190" x2="84" y2="183"/>
+    <line x1="105" y1="190" x2="106" y2="181"/>
+    <line x1="125" y1="190" x2="124" y2="183"/>
+    <line x1="145" y1="190" x2="146" y2="182"/>
+  </g>
+  <!-- Frost-Symbol -->
+  <text x="95" y="115" text-anchor="middle" font-size="28">❄️</text>
+  <text x="95" y="145" text-anchor="middle" font-size="9" fill="#7A2430">Frost dringt direkt</text>
+  <text x="95" y="158" text-anchor="middle" font-size="9" fill="#7A2430">in die Wurzeln ein</text>
+  <text x="95" y="178" text-anchor="middle" font-size="9" fill="#555">Kahle Stellen</text>
+  <text x="95" y="190" text-anchor="middle" font-size="9" fill="#555">im Frühjahr</text>
+
+  <!-- RICHTIG (mitte) -->
+  <text x="300" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#1C4A2E">✓ Richtig</text>
+  <text x="300" y="65" text-anchor="middle" font-size="9" fill="#555">5–6 cm — Winterhöhe</text>
+
+  <rect x="215" y="72" width="170" height="160" rx="8" fill="#1C4A2E" opacity="0.07"/>
+
+  <!-- Mittellanges Gras -->
+  <rect x="220" y="200" width="160" height="25" fill="#5a3a10" opacity="0.45"/>
+  <rect x="220" y="182" width="160" height="20" fill="#3a7a2a" opacity="0.6"/>
+  <g stroke="#2d6a20" stroke-width="2" stroke-linecap="round">
+    <line x1="240" y1="182" x2="238" y2="157"/>
+    <line x1="258" y1="182" x2="260" y2="155"/>
+    <line x1="276" y1="182" x2="274" y2="158"/>
+    <line x1="295" y1="182" x2="297" y2="154"/>
+    <line x1="313" y1="182" x2="311" y2="157"/>
+    <line x1="332" y1="182" x2="334" y2="155"/>
+    <line x1="350" y1="182" x2="348" y2="158"/>
+    <line x1="368" y1="182" x2="370" y2="155"/>
+  </g>
+  <!-- Schneeschutz -->
+  <path d="M220,180 Q260,168 300,170 Q340,168 380,180" stroke="#B8892A" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>
+  <text x="300" y="100" text-anchor="middle" font-size="22">🛡️</text>
+  <text x="300" y="125" text-anchor="middle" font-size="9" fill="#1C4A2E">Halmlänge bildet</text>
+  <text x="300" y="138" text-anchor="middle" font-size="9" fill="#1C4A2E">natürlichen Frostschutz</text>
+  <text x="300" y="157" text-anchor="middle" font-size="9" fill="#555">Wurzeln isoliert</text>
+  <text x="300" y="170" text-anchor="middle" font-size="9" fill="#555">→ kräftiger Austrieb im März</text>
+
+  <!-- ZU LANG (rechts) -->
+  <text x="500" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#c0522a">! Zu lang</text>
+  <text x="500" y="65" text-anchor="middle" font-size="9" fill="#555">über 10 cm</text>
+
+  <rect x="420" y="72" width="160" height="160" rx="8" fill="#c0522a" opacity="0.05"/>
+
+  <!-- Langes Gras -->
+  <rect x="425" y="200" width="150" height="25" fill="#5a3a10" opacity="0.45"/>
+  <g stroke="#2d6a20" stroke-width="2.5" stroke-linecap="round">
+    <line x1="445" y1="200" x2="440" y2="148"/>
+    <line x1="463" y1="200" x2="465" y2="143"/>
+    <line x1="481" y1="200" x2="478" y2="150"/>
+    <line x1="500" y1="200" x2="503" y2="142"/>
+    <line x1="518" y1="200" x2="515" y2="149"/>
+    <line x1="537" y1="200" x2="540" y2="144"/>
+    <line x1="555" y1="200" x2="552" y2="150"/>
+  </g>
+  <!-- Pilzsymbol -->
+  <text x="500" y="105" text-anchor="middle" font-size="24">🍄</text>
+  <text x="500" y="130" text-anchor="middle" font-size="9" fill="#c0522a">Feuchtes langes Gras</text>
+  <text x="500" y="143" text-anchor="middle" font-size="9" fill="#c0522a">= Pilzkrankheiten</text>
+  <text x="500" y="163" text-anchor="middle" font-size="9" fill="#555">Schneeschimmel</text>
+  <text x="500" y="176" text-anchor="middle" font-size="9" fill="#555">im Winter</text>
+  <text x="500" y="189" text-anchor="middle" font-size="9" fill="#555">Mäusegänge bilden sich</text>
+
+  <!-- Trennlinien -->
+  <line x1="207" y1="50" x2="207" y2="240" stroke="#ddd" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <line x1="412" y1="50" x2="412" y2="240" stroke="#ddd" stroke-width="1.2" stroke-dasharray="4,3"/>
+
+  <!-- Unten: Timing -->
+  <rect x="20" y="248" width="560" height="62" rx="8" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="265" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Wann ist der letzte Schnitt? — Wenn der Boden noch nicht gefroren ist</text>
+  <text x="300" y="281" text-anchor="middle" font-size="9" fill="#555">Oktober: letzter regulärer Schnitt auf 5–6 cm · Danach nur noch Laubblasen und Wege freihalten</text>
+  <text x="300" y="297" text-anchor="middle" font-size="9" fill="#555">Nie bei Frost mähen — gefrorene Grashalme brechen und verletzen sich dauerhaft</text>
+  <text x="300" y="311" text-anchor="middle" font-size="9" fill="#B8892A" font-weight="600">Für Bewohnerinnen: Der Rasen »schläft« jetzt — das ist normal und gewollt</text>
+</svg>
