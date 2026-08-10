@@ -1,0 +1,61 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4A2E">Außenwasser winterfest machen — Schritt für Schritt</text>
+
+  <!-- Schritt 1 -->
+  <rect x="12" y="36" width="132" height="230" rx="9" fill="#7A2430" opacity="0.07"/>
+  <text x="78" y="60" text-anchor="middle" font-size="24">①</text>
+  <text x="78" y="80" text-anchor="middle" font-size="28">🔴</text>
+  <text x="78" y="108" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">Innenventil</text>
+  <text x="78" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">schließen</text>
+  <text x="78" y="142" text-anchor="middle" font-size="8" fill="#555">Absperrventil im</text>
+  <text x="78" y="155" text-anchor="middle" font-size="8" fill="#555">Keller oder Technik-</text>
+  <text x="78" y="168" text-anchor="middle" font-size="8" fill="#555">raum zudrehen</text>
+  <text x="78" y="185" text-anchor="middle" font-size="8" fill="#555">Leitung von der</text>
+  <text x="78" y="198" text-anchor="middle" font-size="8" fill="#555">Quelle trennen</text>
+  <text x="78" y="220" text-anchor="middle" font-size="8" fill="#7A2430" font-weight="600">Zuerst!</text>
+
+  <!-- Schritt 2 -->
+  <rect x="154" y="36" width="132" height="230" rx="9" fill="#B8892A" opacity="0.08"/>
+  <text x="220" y="60" text-anchor="middle" font-size="24">②</text>
+  <text x="220" y="80" text-anchor="middle" font-size="28">🚿</text>
+  <text x="220" y="108" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">Außenhahn</text>
+  <text x="220" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">öffnen &amp; leeren</text>
+  <text x="220" y="142" text-anchor="middle" font-size="8" fill="#555">Außenhahn auf-</text>
+  <text x="220" y="155" text-anchor="middle" font-size="8" fill="#555">drehen — Restwasser</text>
+  <text x="220" y="168" text-anchor="middle" font-size="8" fill="#555">läuft raus</text>
+  <text x="220" y="185" text-anchor="middle" font-size="8" fill="#555">Gefrierendes Wasser</text>
+  <text x="220" y="198" text-anchor="middle" font-size="8" fill="#555">dehnt Leitungen aus</text>
+  <text x="220" y="220" text-anchor="middle" font-size="8" fill="#8B6914" font-weight="600">Hahn offen lassen!</text>
+
+  <!-- Schritt 3 -->
+  <rect x="296" y="36" width="132" height="230" rx="9" fill="#4a90d9" opacity="0.08"/>
+  <text x="362" y="60" text-anchor="middle" font-size="24">③</text>
+  <text x="362" y="80" text-anchor="middle" font-size="28">🌀</text>
+  <text x="362" y="108" text-anchor="middle" font-size="10" font-weight="700" fill="#4a90d9">Schläuche</text>
+  <text x="362" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#4a90d9">abhängen</text>
+  <text x="362" y="142" text-anchor="middle" font-size="8" fill="#555">Gartenschlauch ab-</text>
+  <text x="362" y="155" text-anchor="middle" font-size="8" fill="#555">schrauben, aufrollen</text>
+  <text x="362" y="168" text-anchor="middle" font-size="8" fill="#555">und im Trockenen</text>
+  <text x="362" y="181" text-anchor="middle" font-size="8" fill="#555">lagern (Keller, Hütte)</text>
+  <text x="362" y="198" text-anchor="middle" font-size="8" fill="#555">Angeschlossener Schlauch</text>
+  <text x="362" y="211" text-anchor="middle" font-size="8" fill="#555">verhindert Leerlaufen</text>
+  <text x="362" y="228" text-anchor="middle" font-size="8" fill="#4a90d9" font-weight="600">Schlauch schützt</text>
+
+  <!-- Schritt 4 -->
+  <rect x="438" y="36" width="150" height="230" rx="9" fill="#1C4A2E" opacity="0.07"/>
+  <text x="513" y="60" text-anchor="middle" font-size="24">④</text>
+  <text x="513" y="80" text-anchor="middle" font-size="28">✅</text>
+  <text x="513" y="108" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Bewässerungs-</text>
+  <text x="513" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">system entleeren</text>
+  <text x="513" y="142" text-anchor="middle" font-size="8" fill="#555">Tröpfchensysteme:</text>
+  <text x="513" y="155" text-anchor="middle" font-size="8" fill="#555">Alle Leitungen durch-</text>
+  <text x="513" y="168" text-anchor="middle" font-size="8" fill="#555">blasen oder an tiefster</text>
+  <text x="513" y="181" text-anchor="middle" font-size="8" fill="#555">Stelle ablassen</text>
+  <text x="513" y="198" text-anchor="middle" font-size="8" fill="#555">Ventile vor Frost</text>
+  <text x="513" y="211" text-anchor="middle" font-size="8" fill="#555">ausbauen &amp; einlagern</text>
+  <text x="513" y="228" text-anchor="middle" font-size="8" fill="#1C4A2E" font-weight="600">Saisonende!</text>
+
+  <rect x="12" y="272" width="576" height="22" rx="7" fill="#7A2430" opacity="0.08"/>
+  <text x="300" y="287" text-anchor="middle" font-size="10" fill="#7A2430" font-weight="600">Wichtig: Hahn nach außen offen lassen im Winter — sonst sammelt sich Restwasser und friert ein</text>
+</svg>
