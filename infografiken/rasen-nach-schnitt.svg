@@ -1,0 +1,69 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4A2E">Nach dem letzten Schnitt — Was jetzt noch zu tun ist</text>
+
+  <!-- Checkliste in 2 Spalten -->
+
+  <!-- Links -->
+  <text x="150" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Sofort nach dem Mähen</text>
+
+  <g transform="translate(14, 52)">
+    <rect x="0" y="0"   width="264" height="32" rx="6" fill="#3a9a4a" opacity="0.11"/>
+    <text x="20" y="15" font-size="14">🌿</text>
+    <text x="44" y="12" font-size="9" font-weight="700" fill="#1C4A2E">Rasenschnitt entfernen</text>
+    <text x="44" y="25" font-size="8" fill="#555">Auf nassen Boden → sonst Fäulnis + Moos</text>
+
+    <rect x="0" y="36"  width="264" height="32" rx="6" fill="#3a9a4a" opacity="0.10"/>
+    <text x="20" y="51" font-size="14">🔪</text>
+    <text x="44" y="48" font-size="9" font-weight="700" fill="#1C4A2E">Rasenkanten nachschneiden</text>
+    <text x="44" y="61" font-size="8" fill="#555">Letzter sauberer Abschluss bis April</text>
+
+    <rect x="0" y="72"  width="264" height="32" rx="6" fill="#3a9a4a" opacity="0.09"/>
+    <text x="20" y="87" font-size="14">💧</text>
+    <text x="44" y="84" font-size="9" font-weight="700" fill="#1C4A2E">Trockene Stellen tränken</text>
+    <text x="44" y="97" font-size="8" fill="#555">Vor dem ersten Frost noch einmal wässern</text>
+
+    <rect x="0" y="108" width="264" height="32" rx="6" fill="#B8892A" opacity="0.09"/>
+    <text x="20" y="123" font-size="14">🍂</text>
+    <text x="44" y="120" font-size="9" font-weight="700" fill="#8B6914">Laub vollständig entfernen</text>
+    <text x="44" y="133" font-size="8" fill="#555">Laub dauerhaft → Gras stirbt darunter ab</text>
+  </g>
+
+  <line x1="296" y1="38" x2="296" y2="270" stroke="#ddd" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- Rechts -->
+  <text x="448" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">In den nächsten Tagen</text>
+
+  <g transform="translate(308, 52)">
+    <rect x="0" y="0"   width="278" height="32" rx="6" fill="#4a90d9" opacity="0.09"/>
+    <text x="20" y="15" font-size="14">🔧</text>
+    <text x="44" y="12" font-size="9" font-weight="700" fill="#4a90d9">Vertikutieren prüfen</text>
+    <text x="44" y="25" font-size="8" fill="#555">Nur wenn Rasen stark verfilzt · sonst im April</text>
+
+    <rect x="0" y="36"  width="278" height="32" rx="6" fill="#4a90d9" opacity="0.08"/>
+    <text x="20" y="51" font-size="14">🌱</text>
+    <text x="44" y="48" font-size="9" font-weight="700" fill="#4a90d9">Kahle Stellen nachsäen</text>
+    <text x="44" y="61" font-size="8" fill="#555">Bis Mitte Nov möglich wenn Boden &gt; 5°C</text>
+
+    <rect x="0" y="72"  width="278" height="32" rx="6" fill="#1C4A2E" opacity="0.08"/>
+    <text x="20" y="87" font-size="14">🚫</text>
+    <text x="44" y="84" font-size="9" font-weight="700" fill="#1C4A2E">Rasen schonen ab Frost</text>
+    <text x="44" y="97" font-size="8" fill="#555">Gefrorenes Gras brechen → braune Stellen</text>
+
+    <rect x="0" y="108" width="278" height="32" rx="6" fill="#1C4A2E" opacity="0.07"/>
+    <text x="20" y="123" font-size="14">🗓</text>
+    <text x="44" y="120" font-size="9" font-weight="700" fill="#1C4A2E">Kalender-Eintrag März</text>
+    <text x="44" y="133" font-size="8" fill="#555">Erster Schnitt + Dünger eintragen, sobald &gt; 5°C</text>
+  </g>
+
+  <!-- Mäherhöhe-Reminder -->
+  <rect x="14" y="196" width="572" height="38" rx="8" fill="#B8892A" opacity="0.09"/>
+  <text x="300" y="211" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">Schnitthöhe für den Winter: 5–6 cm stehen lassen</text>
+  <text x="300" y="226" text-anchor="middle" font-size="9" fill="#555">Zu kurz (unter 4 cm) → Gras friert leichter aus · Zu lang (über 8 cm) → Mäusegänge und Fäulnis</text>
+
+  <!-- Was gar nicht mehr geht -->
+  <rect x="14" y="242" width="572" height="50" rx="8" fill="#7A2430" opacity="0.06"/>
+  <text x="300" y="258" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">Was jetzt nicht mehr gemacht wird</text>
+  <text x="300" y="273" text-anchor="middle" font-size="9" fill="#555">Kein Dünger mehr (Stickstoff treibt Wachstum → Frost trifft weiche Triebe)</text>
+  <text x="300" y="286" text-anchor="middle" font-size="9" fill="#555">Kein Mähen bei Temperaturen unter 5°C · Kein Betreten von gefrorenem Rasen</text>
+</svg>
