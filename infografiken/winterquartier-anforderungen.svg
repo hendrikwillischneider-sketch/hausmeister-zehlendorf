@@ -1,0 +1,62 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4A2E">Was ein gutes Winterquartier braucht</text>
+
+  <!-- Drei Anforderungen als Säulen: Licht, Temperatur, Feuchtigkeit -->
+
+  <!-- Säule 1: Licht -->
+  <rect x="18" y="36" width="172" height="200" rx="9" fill="#B8892A" opacity="0.09"/>
+  <text x="104" y="65" text-anchor="middle" font-size="34">☀️</text>
+  <text x="104" y="90" text-anchor="middle" font-size="11" font-weight="700" fill="#8B6914">Licht</text>
+  <line x1="40" y1="98" x2="168" y2="98" stroke="#B8892A" stroke-width="1" opacity="0.4"/>
+  <text x="104" y="115" text-anchor="middle" font-size="9" fill="#555">Helles, frostfreies</text>
+  <text x="104" y="128" text-anchor="middle" font-size="9" fill="#555">Fenster oder</text>
+  <text x="104" y="141" text-anchor="middle" font-size="9" fill="#555">Gewächshaus</text>
+  <text x="104" y="162" text-anchor="middle" font-size="9" fill="#8B6914" font-weight="600">✓ Hell = Südfenster</text>
+  <text x="104" y="177" text-anchor="middle" font-size="9" fill="#7A2430" font-weight="600">✗ Dunkler Keller</text>
+  <text x="104" y="192" text-anchor="middle" font-size="9" fill="#555">(nur für laubabwerfende</text>
+  <text x="104" y="205" text-anchor="middle" font-size="9" fill="#555">Pflanzen geeignet)</text>
+  <rect x="28" y="218" width="152" height="14" rx="5" fill="#B8892A" opacity="0.12"/>
+  <text x="104" y="229" text-anchor="middle" font-size="8" fill="#8B6914">Oleander, Lorbeer: hell!</text>
+
+  <!-- Säule 2: Temperatur -->
+  <rect x="202" y="36" width="196" height="200" rx="9" fill="#4a90d9" opacity="0.08"/>
+  <text x="300" y="65" text-anchor="middle" font-size="34">🌡</text>
+  <text x="300" y="90" text-anchor="middle" font-size="11" font-weight="700" fill="#4a90d9">Temperatur</text>
+  <line x1="222" y1="98" x2="378" y2="98" stroke="#4a90d9" stroke-width="1" opacity="0.4"/>
+  <!-- Temperatur-Skala -->
+  <g transform="translate(222, 108)">
+    <rect x="0"   y="0" width="152" height="18" rx="4" fill="#7A2430" opacity="0.12"/>
+    <text x="76" y="13" text-anchor="middle" font-size="8" fill="#7A2430">unter 0°C → Frostschäden</text>
+    <rect x="0"   y="22" width="152" height="18" rx="4" fill="#B8892A" opacity="0.12"/>
+    <text x="76" y="35" text-anchor="middle" font-size="8" fill="#8B6914">0–5°C → Kalthaus / Garage</text>
+    <rect x="0"   y="44" width="152" height="18" rx="4" fill="#3a9a4a" opacity="0.14"/>
+    <text x="76" y="57" text-anchor="middle" font-size="8" fill="#1C4A2E" font-weight="600">5–10°C → Ideal für die meisten</text>
+    <rect x="0"   y="66" width="152" height="18" rx="4" fill="#B8892A" opacity="0.09"/>
+    <text x="76" y="79" text-anchor="middle" font-size="8" fill="#8B6914">10–15°C → Warm, weniger Ruhe</text>
+    <rect x="0"   y="88" width="152" height="18" rx="4" fill="#7A2430" opacity="0.09"/>
+    <text x="76" y="101" text-anchor="middle" font-size="8" fill="#7A2430">über 15°C → Zu warm, treibt aus</text>
+  </g>
+  <rect x="212" y="218" width="176" height="14" rx="5" fill="#4a90d9" opacity="0.10"/>
+  <text x="300" y="229" text-anchor="middle" font-size="8" fill="#4a90d9">Schwankungen tolerierbar</text>
+
+  <!-- Säule 3: Feuchtigkeit + Kontrolle -->
+  <rect x="410" y="36" width="172" height="200" rx="9" fill="#1C4A2E" opacity="0.07"/>
+  <text x="496" y="65" text-anchor="middle" font-size="34">💧</text>
+  <text x="496" y="90" text-anchor="middle" font-size="11" font-weight="700" fill="#1C4A2E">Pflege im Winter</text>
+  <line x1="430" y1="98" x2="568" y2="98" stroke="#1C4A2E" stroke-width="1" opacity="0.3"/>
+  <text x="496" y="115" text-anchor="middle" font-size="9" fill="#555">Wenig gießen!</text>
+  <text x="496" y="128" text-anchor="middle" font-size="9" fill="#555">Erde fast trocken,</text>
+  <text x="496" y="141" text-anchor="middle" font-size="9" fill="#555">nie staubnass</text>
+  <text x="496" y="160" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="600">Alle 2 Wochen prüfen:</text>
+  <text x="496" y="175" text-anchor="middle" font-size="9" fill="#555">Schädlinge? (Weiße</text>
+  <text x="496" y="188" text-anchor="middle" font-size="9" fill="#555">Fliegen, Schildläuse)</text>
+  <text x="496" y="203" text-anchor="middle" font-size="9" fill="#555">Düngen: erst ab Feb</text>
+  <rect x="420" y="218" width="152" height="14" rx="5" fill="#1C4A2E" opacity="0.09"/>
+  <text x="496" y="229" text-anchor="middle" font-size="8" fill="#1C4A2E">Kein Dünger Nov–Jan!</text>
+
+  <rect x="18" y="244" width="564" height="50" rx="8" fill="#1C4A2E" opacity="0.06"/>
+  <text x="300" y="261" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Pflanzen mit Überwinterung im Wohnheim: Oleander, Palmen, Bananenstaude, Agave</text>
+  <text x="300" y="276" text-anchor="middle" font-size="9" fill="#555">Standort: Treppenhaus (kühler, hell), Keller nur für winterharte Arten mit Laubabwurf</text>
+  <text x="300" y="289" text-anchor="middle" font-size="9" fill="#555">→ Beschriften: Pflanzname + Standort auf Zettel am Topf befestigen</text>
+</svg>
