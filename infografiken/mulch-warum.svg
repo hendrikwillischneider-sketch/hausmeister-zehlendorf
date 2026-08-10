@@ -1,0 +1,49 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4A2E">Warum mulchen? — 4 Gründe die den Winter entscheiden</text>
+
+  <!-- 4 große Kacheln 2x2 -->
+
+  <!-- Kachel 1: Wärmeschutz -->
+  <rect x="12" y="36" width="280" height="112" rx="9" fill="#B8892A" opacity="0.09"/>
+  <text x="44" y="72" font-size="32">🌡</text>
+  <text x="72" y="58" font-size="10" font-weight="700" fill="#8B6914">① Bodenwärme halten</text>
+  <text x="72" y="73" font-size="9" fill="#555">10 cm Mulch wirken wie eine Decke:</text>
+  <text x="72" y="86" font-size="9" fill="#555">Boden kühlt langsamer aus, bleibt</text>
+  <text x="72" y="99" font-size="9" fill="#555">auch bei -10°C über 0°C</text>
+  <text x="72" y="116" font-size="9" fill="#8B6914" font-weight="600">→ Wurzeln überstehen Frost</text>
+  <text x="72" y="130" font-size="9" fill="#8B6914" font-weight="600">→ Keine Frostgare beim Auftauen</text>
+
+  <!-- Kachel 2: Feuchtigkeit -->
+  <rect x="308" y="36" width="280" height="112" rx="9" fill="#4a90d9" opacity="0.08"/>
+  <text x="340" y="72" font-size="32">💧</text>
+  <text x="368" y="58" font-size="10" font-weight="700" fill="#4a90d9">② Feuchtigkeit speichern</text>
+  <text x="368" y="73" font-size="9" fill="#555">Mulch verdunstet 3× weniger</text>
+  <text x="368" y="86" font-size="9" fill="#555">Wasser als nackter Boden</text>
+  <text x="368" y="99" font-size="9" fill="#555">Wurzeln bleiben gleichmäßig</text>
+  <text x="368" y="112" font-size="9" fill="#555">feucht — kein Trockenstress</text>
+  <text x="368" y="128" font-size="9" fill="#4a90d9" font-weight="600">→ Weniger gießen im Frühjahr</text>
+
+  <!-- Kachel 3: Unkraut -->
+  <rect x="12" y="160" width="280" height="112" rx="9" fill="#3a9a4a" opacity="0.09"/>
+  <text x="44" y="196" font-size="32">🌿</text>
+  <text x="72" y="182" font-size="10" font-weight="700" fill="#1C4A2E">③ Unkraut unterdrücken</text>
+  <text x="72" y="197" font-size="9" fill="#555">Licht blockiert → Unkrautsamen</text>
+  <text x="72" y="210" font-size="9" fill="#555">keimen nicht · spart Jäten im</text>
+  <text x="72" y="223" font-size="9" fill="#555">Frühjahr (Hauptsaison für Unkraut)</text>
+  <text x="72" y="240" font-size="9" fill="#1C4A2E" font-weight="600">→ 70 % weniger Unkrautarbeit</text>
+  <text x="72" y="253" font-size="9" fill="#1C4A2E" font-weight="600">→ Baumscheibe bleibt sauber</text>
+
+  <!-- Kachel 4: Bodenbiologie -->
+  <rect x="308" y="160" width="280" height="112" rx="9" fill="#6B4423" opacity="0.09"/>
+  <text x="340" y="196" font-size="32">🪱</text>
+  <text x="368" y="182" font-size="10" font-weight="700" fill="#6B4423">④ Boden beleben</text>
+  <text x="368" y="197" font-size="9" fill="#555">Verrottender Mulch = Nahrung</text>
+  <text x="368" y="210" font-size="9" fill="#555">für Regenwürmer · Bodenstruktur</text>
+  <text x="368" y="223" font-size="9" fill="#555">verbessert sich · Humus entsteht</text>
+  <text x="368" y="240" font-size="9" fill="#6B4423" font-weight="600">→ Natürliche Düngung</text>
+  <text x="368" y="253" font-size="9" fill="#6B4423" font-weight="600">→ Lockerer, lebendiger Boden</text>
+
+  <rect x="12" y="278" width="576" height="18" rx="5" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="291" text-anchor="middle" font-size="9" fill="#1C4A2E" font-weight="600">Material: Holzhäcksel, Rindenmulch oder Laub — 8–12 cm hoch, Stammfuß frei lassen</text>
+</svg>
