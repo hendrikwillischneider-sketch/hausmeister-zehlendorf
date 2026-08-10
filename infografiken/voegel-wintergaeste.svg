@@ -1,0 +1,64 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+  <rect width="600" height="300" fill="#F6F1E9" rx="12"/>
+  <text x="300" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1C4A2E">Unsere Wintergäste — Wer bleibt in Zehlendorf?</text>
+
+  <!-- 6 Vogelkarten 3x2 -->
+  <!-- Zeile 1 -->
+  <g transform="translate(15,34)">
+    <rect width="178" height="110" rx="8" fill="#1C4A2E" opacity="0.07"/>
+    <text x="89" y="28" text-anchor="middle" font-size="28">🦢</text>
+    <text x="89" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Kohlmeise</text>
+    <text x="89" y="67" text-anchor="middle" font-size="8" fill="#555">Ganzjährig · Mag Sonnen-</text>
+    <text x="89" y="79" text-anchor="middle" font-size="8" fill="#555">blumenkerne + Erdnüsse</text>
+    <text x="89" y="96" text-anchor="middle" font-size="8" fill="#3a9a4a" font-weight="600">✓ Häufig im Park</text>
+  </g>
+
+  <g transform="translate(205,34)">
+    <rect width="178" height="110" rx="8" fill="#B8892A" opacity="0.08"/>
+    <text x="89" y="28" text-anchor="middle" font-size="28">🐦</text>
+    <text x="89" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#8B6914">Rotkehlchen</text>
+    <text x="89" y="67" text-anchor="middle" font-size="8" fill="#555">Ganzjährig · Bodenfresser</text>
+    <text x="89" y="79" text-anchor="middle" font-size="8" fill="#555">Mag Äpfel &amp; Beeren</text>
+    <text x="89" y="96" text-anchor="middle" font-size="8" fill="#3a9a4a" font-weight="600">✓ Auch im Gebüsch</text>
+  </g>
+
+  <g transform="translate(395,34)">
+    <rect width="178" height="110" rx="8" fill="#4a90d9" opacity="0.08"/>
+    <text x="89" y="28" text-anchor="middle" font-size="28">🦅</text>
+    <text x="89" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#4a90d9">Amsel</text>
+    <text x="89" y="67" text-anchor="middle" font-size="8" fill="#555">Ganzjährig · Bodenjäger</text>
+    <text x="89" y="79" text-anchor="middle" font-size="8" fill="#555">Würmer, Beeren, Früchte</text>
+    <text x="89" y="96" text-anchor="middle" font-size="8" fill="#3a9a4a" font-weight="600">✓ Häufig unterm Strauch</text>
+  </g>
+
+  <!-- Zeile 2 -->
+  <g transform="translate(15,156)">
+    <rect width="178" height="110" rx="8" fill="#7A2430" opacity="0.07"/>
+    <text x="89" y="28" text-anchor="middle" font-size="28">🦉</text>
+    <text x="89" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#7A2430">Spatz (Haussperling)</text>
+    <text x="89" y="67" text-anchor="middle" font-size="8" fill="#555">Standvogel · Körner, Brot</text>
+    <text x="89" y="79" text-anchor="middle" font-size="8" fill="#555">Lebt in Kolonien in Hecken</text>
+    <text x="89" y="96" text-anchor="middle" font-size="8" fill="#B8892A" font-weight="600">⚠ Rotes-Liste-Art schützen!</text>
+  </g>
+
+  <g transform="translate(205,156)">
+    <rect width="178" height="110" rx="8" fill="#1C4A2E" opacity="0.07"/>
+    <text x="89" y="28" text-anchor="middle" font-size="28">🐓</text>
+    <text x="89" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#1C4A2E">Blaumeise</text>
+    <text x="89" y="67" text-anchor="middle" font-size="8" fill="#555">Ganzjährig · Äste-Akrobat</text>
+    <text x="89" y="79" text-anchor="middle" font-size="8" fill="#555">Meisenknödel, Hanfsamen</text>
+    <text x="89" y="96" text-anchor="middle" font-size="8" fill="#3a9a4a" font-weight="600">✓ Nistkästen nutzen</text>
+  </g>
+
+  <g transform="translate(395,156)">
+    <rect width="178" height="110" rx="8" fill="#6B4423" opacity="0.08"/>
+    <text x="89" y="28" text-anchor="middle" font-size="28">🦜</text>
+    <text x="89" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#6B4423">Elster &amp; Krähe</text>
+    <text x="89" y="67" text-anchor="middle" font-size="8" fill="#555">Ganzjährig · Allesfresser</text>
+    <text x="89" y="79" text-anchor="middle" font-size="8" fill="#555">Kein Zufüttern nötig</text>
+    <text x="89" y="96" text-anchor="middle" font-size="8" fill="#aaa" font-weight="600">— Kommen von alleine</text>
+  </g>
+
+  <rect x="15" y="274" width="570" height="22" rx="6" fill="#1C4A2E" opacity="0.07"/>
+  <text x="300" y="289" text-anchor="middle" font-size="10" fill="#1C4A2E" font-weight="600">Für Bewohnerinnen: Nur Körnerfresser und Weichfresser füttern — Allesfresser kommen von alleine</text>
+</svg>
