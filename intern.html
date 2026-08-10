@@ -397,7 +397,10 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 <div class="view" id="view-artikel">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
     <div class="sec" style="margin:0">Artikel verwalten</div>
-    <button class="chip" onclick="openArtikelForm(null)" style="background:var(--green-mid);color:#fff;border-color:var(--green-mid)">+ Neuer Artikel</button>
+    <div style="display:flex;gap:6px">
+      <button class="chip" id="ak-publish-btn" onclick="publishSelectedMonth()" style="display:none;background:var(--green-mid);color:#fff;border-color:var(--green-mid)">✓ Monat freigeben</button>
+      <button class="chip" onclick="openArtikelForm(null)" style="background:var(--green-mid);color:#fff;border-color:var(--green-mid)">+ Neuer Artikel</button>
+    </div>
   </div>
   <div class="chips" id="ak-monat-filter" style="margin-bottom:10px"></div>
   <div class="card" id="ak-list"></div>
@@ -1973,6 +1976,9 @@ function setAkMonat(m, btn) {
   document.querySelectorAll('#ak-monat-filter .chip').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderAkList();
+  // Show "Monat freigeben" button only when a specific month is selected
+  const pb = document.getElementById('ak-publish-btn');
+  if (pb) pb.style.display = (m > 0) ? '' : 'none';
 }
 
 function renderAkList() {
@@ -1981,13 +1987,14 @@ function renderAkList() {
   const el = document.getElementById('ak-list');
   if (!list.length) { el.innerHTML='<div class="empty"><p>Keine Artikel gefunden.</p></div>'; return; }
   el.innerHTML = list.map(a => `
-    <div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+    <div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border);opacity:${a.aktiv?1:0.6}">
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">${a.ico||''} ${MN[a.monat]} · ${a.kat||'–'}</div>
         <div style="font-size:14px;font-weight:600;color:var(--text)">${a.titel}</div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.teaser||''}</div>
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px;align-items:center">
+        <button onclick="toggleArtikelAktiv('${a.id}',${a.aktiv})" title="${a.aktiv?'Verbergen':'Veröffentlichen'}" style="font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid ${a.aktiv?'var(--green-mid)':'var(--border)'};background:${a.aktiv?'var(--green-mid)':'none'};color:${a.aktiv?'#fff':'var(--text-muted)'};cursor:pointer;white-space:nowrap">${a.aktiv?'✓ Live':'○ Entwurf'}</button>
         <button onclick="openArtikelForm(${JSON.stringify(a).replace(/"/g,'&quot;')})" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
         <button onclick="deleteArtikel('${a.id}')" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
       </div>
@@ -2033,8 +2040,8 @@ async function saveArtikel() {
     tipp:   document.getElementById('ak-tipp').value.trim(),
     dauer:  document.getElementById('ak-dauer').value.trim(),
     fuer_bewohnerinnen: document.getElementById('ak-bew').value.trim(),
-    aktiv: true
   };
+  if (!id) payload.aktiv = false; // neue Artikel starten als Entwurf
   try {
     if (id) {
       await sbReq(`artikel?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
@@ -2051,6 +2058,21 @@ async function saveArtikel() {
 async function deleteArtikel(id) {
   if (!confirm('Artikel wirklich löschen?')) return;
   await sbReq(`artikel?id=eq.${id}`, {method:'DELETE'});
+  loadArtikel();
+}
+
+async function toggleArtikelAktiv(id, current) {
+  await sbReq(`artikel?id=eq.${id}`, {method:'PATCH', body:JSON.stringify({aktiv: !current})});
+  loadArtikel();
+}
+
+async function publishSelectedMonth() {
+  if (!_akMonat) return;
+  const MN=['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const drafts = _akData.filter(a => a.monat === _akMonat && !a.aktiv);
+  if (!drafts.length) { alert(`Alle ${MN[_akMonat]}-Artikel sind bereits live.`); return; }
+  if (!confirm(`${drafts.length} Entwurf-Artikel im ${MN[_akMonat]} jetzt veröffentlichen?`)) return;
+  await sbReq(`artikel?monat=eq.${_akMonat}&aktiv=eq.false`, {method:'PATCH', body:JSON.stringify({aktiv: true})});
   loadArtikel();
 }
 
