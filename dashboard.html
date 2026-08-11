@@ -765,7 +765,7 @@ const DEFAULT_SERVICES = [
 ];
 let filterMode = 'alle';
 let editItem = null;
-let bgtEntries = JSON.parse(localStorage.getItem('bgt_entries') || '[]');
+let bgtEntries = [];
 let bgtCaps = JSON.parse(localStorage.getItem('bgt_caps') || '{"wartung":150,"park":300}');
 let taskState = JSON.parse(localStorage.getItem('task_state_' + wkKey()) || '{}');
 
@@ -903,6 +903,7 @@ async function loadData(){
     loadBuchungen();
     loadZeitfenster();
     loadServices();
+    loadBgtEntries();
   }catch{
     setSyncDot('err');
     renderAll();
@@ -926,6 +927,17 @@ async function loadZeitfenster(forceRender){
     zeitfenster=await r.json();
     if(forceRender)renderTermine();
   }catch{/* silent */}
+}
+
+async function loadBgtEntries(){
+  try{
+    const r=await sbReq('budget_eintraege?order=datum.desc&limit=500');
+    if(!r.ok)throw 0;
+    const data=await r.json();
+    bgtEntries=data.map(e=>({id:e.id,kat:e.kat,betrag:parseFloat(e.betrag),desc:e.beschreibung||'',date:e.datum}));
+    renderBudget();
+    renderOverview();
+  }catch{/* Tabelle noch nicht angelegt — bleibt leer */}
 }
 
 async function loadServices(forceRender){
@@ -1476,23 +1488,46 @@ function openBgtModal(){
   document.getElementById('bgt-modal').classList.remove('gone');
 }
 
-function saveBgtEntry(){
+async function saveBgtEntry(){
   const kat=document.getElementById('bgt-kat').value;
   const betrag=parseFloat(document.getElementById('bgt-betrag').value);
   const desc=document.getElementById('bgt-desc').value.trim();
   const date=document.getElementById('bgt-date').value;
   if(isNaN(betrag)||betrag<=0){alert('Bitte gültigen Betrag eingeben.');return;}
   if(!desc){alert('Bitte Beschreibung eingeben.');return;}
-  bgtEntries.push({id:Date.now()+'',kat,betrag,desc,date});
-  localStorage.setItem('bgt_entries',JSON.stringify(bgtEntries));
+  setSyncDot('busy');
+  try{
+    const r=await sbReq('budget_eintraege',{
+      method:'POST',
+      headers:{Prefer:'return=representation'},
+      body:JSON.stringify({kat,betrag,beschreibung:desc,datum:date})
+    });
+    if(!r.ok)throw 0;
+    const [neu]=await r.json();
+    bgtEntries.unshift({id:neu.id,kat,betrag,desc,date});
+    setSyncDot('ok');
+  }catch{
+    setSyncDot('err');
+    alert('Fehler beim Speichern — Eintrag konnte nicht gespeichert werden.');
+    return;
+  }
   closeModal('bgt-modal');
   renderBudget();
   renderOverview();
 }
 
-function delBgtEntry(id){
-  bgtEntries=bgtEntries.filter(e=>e.id!==id);
-  localStorage.setItem('bgt_entries',JSON.stringify(bgtEntries));
+async function delBgtEntry(id){
+  setSyncDot('busy');
+  try{
+    const r=await sbReq('budget_eintraege?id=eq.'+id,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+    if(!r.ok)throw 0;
+    bgtEntries=bgtEntries.filter(e=>e.id!==id);
+    setSyncDot('ok');
+  }catch{
+    setSyncDot('err');
+    alert('Löschen fehlgeschlagen.');
+    return;
+  }
   renderBudget();
   renderOverview();
 }
