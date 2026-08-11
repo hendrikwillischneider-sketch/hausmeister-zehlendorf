@@ -245,6 +245,25 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .dm-teile-sw{font-size:14px;font-weight:600;color:var(--accent);padding:6px 2px;border-top:1px solid var(--border);margin-top:4px;margin-bottom:12px}
 
+/* ZEITFENSTER / TERMINE */
+.zt-group{margin-bottom:16px}
+.zt-date-hdr{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);padding:10px 13px 6px;border-bottom:1px solid var(--border)}
+.zt-slot{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--border)}
+.zt-slot:last-child{border:none}
+.zt-time{font-size:13.5px;font-weight:600;min-width:100px;color:var(--text)}
+.zt-svc{font-size:12px;color:var(--text-muted);flex:1}
+.zt-badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap}
+.zt-frei{background:var(--green-pale);color:var(--green-mid)}
+.zt-gebucht{background:var(--yellow-pale);color:var(--yellow)}
+.zt-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:15px;padding:3px 6px;border-radius:5px;opacity:.55;line-height:1}
+.zt-del:hover{opacity:1;background:var(--red-pale);color:var(--red)}
+.zt-form{padding:14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--border)}
+.zt-inp{padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13.5px;font-family:inherit;width:100%}
+.zt-inp:focus{outline:none;border-color:var(--accent)}
+.zt-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.zt-add{padding:11px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.zt-add:disabled{opacity:.5;cursor:not-allowed}
+
 /* BUCHUNGEN */
 .bk-item{padding:12px 13px;border-bottom:1px solid var(--border);cursor:pointer}
 .bk-item:last-child{border:none}
@@ -403,6 +422,33 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <div class="eink-total" id="eink-total"></div>
     </div>
     <div class="card" id="eink-list"></div>
+  </div>
+
+  <!-- TERMINE / ZEITFENSTER -->
+  <div class="view" id="v-termine">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="sec" style="margin:0">Verfügbare Termine</div>
+      <button class="set-btn" onclick="loadZeitfenster(true)">↻ Laden</button>
+    </div>
+    <div class="card" id="zt-list"></div>
+    <div class="sec" style="margin-top:16px">Neuen Slot anlegen</div>
+    <div class="card" style="padding:0">
+      <div class="zt-form">
+        <select class="zt-inp" id="zt-svc">
+          <option value="">Service wählen …</option>
+          <option value="sperrmuell">📦 Sperrmüll</option>
+          <option value="moebel">🛋️ Möbel & Aufbau</option>
+          <option value="kleiner_auftrag">🔧 Kleiner Auftrag</option>
+          <option value="paket">📬 Paketzustellung</option>
+        </select>
+        <input class="zt-inp" id="zt-datum" type="date">
+        <div class="zt-row2">
+          <input class="zt-inp" id="zt-von" type="time" placeholder="Von" title="Von">
+          <input class="zt-inp" id="zt-bis" type="time" placeholder="Bis" title="Bis">
+        </div>
+        <button class="zt-add" id="zt-add-btn" onclick="addSlot()">+ Slot anlegen</button>
+      </div>
+    </div>
   </div>
 
   <!-- BUCHUNGEN -->
@@ -658,6 +704,7 @@ const TASKS = [
 let role = null; // 'hm' | 'sw'
 let schaden = [];
 let buchungen = [];
+let zeitfenster = [];
 let filterMode = 'alle';
 let editItem = null;
 let bgtEntries = JSON.parse(localStorage.getItem('bgt_entries') || '[]');
@@ -734,9 +781,9 @@ function initApp(){
   // Build nav
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
-       {id:'budget',lbl:'💰 Budget'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},
-       {id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
-    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'budget',lbl:'💰 Budget'}];
+       {id:'termine',lbl:'📅 Termine'},{id:'budget',lbl:'💰 Budget'},{id:'pflegeplan',lbl:'Pflegeplan'},
+       {id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'budget',lbl:'💰 Budget'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
 
@@ -765,6 +812,7 @@ function showTab(id){
   if(id==='settings')renderSettings();
   if(id==='einkauf')renderEinkauf();
   if(id==='buchungen')renderBuchungen();
+  if(id==='termine')renderTermine();
 }
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
@@ -794,6 +842,7 @@ async function loadData(){
     localStorage.setItem('db_last_sync', new Date().toISOString());
     renderAll();
     loadBuchungen();
+    loadZeitfenster();
   }catch{
     setSyncDot('err');
     renderAll();
@@ -808,6 +857,103 @@ async function loadBuchungen(forceRender){
     renderOverview();
     if(forceRender)renderBuchungen();
   }catch{/* silent */}
+}
+
+async function loadZeitfenster(forceRender){
+  try{
+    const r=await sbReq('zeitfenster?order=datum.asc,von.asc&select=*,buchungen(zimmer,service_label,status)');
+    if(!r.ok)throw 0;
+    zeitfenster=await r.json();
+    if(forceRender)renderTermine();
+  }catch{/* silent */}
+}
+
+const ZT_SVC_LABEL={sperrmuell:'📦 Sperrmüll',moebel:'🛋️ Möbel & Aufbau',kleiner_auftrag:'🔧 Kleiner Auftrag',paket:'📬 Paketzustellung'};
+
+function renderTermine(){
+  const el=document.getElementById('zt-list');
+  if(!el) return;
+
+  // Setze Mindestdatum im Formular
+  const today=new Date().toISOString().slice(0,10);
+  const datInp=document.getElementById('zt-datum');
+  if(datInp&&!datInp.min) datInp.min=today;
+
+  if(!zeitfenster.length){
+    el.innerHTML='<div class="empty" style="padding:16px">Noch keine Slots angelegt.</div>';
+    return;
+  }
+
+  // Gruppieren nach Datum
+  const groups={};
+  zeitfenster.forEach(z=>{
+    const key=z.datum;
+    if(!groups[key]) groups[key]=[];
+    groups[key].push(z);
+  });
+
+  el.innerHTML=Object.entries(groups).map(([dat,slots])=>{
+    const d=new Date(dat+'T12:00:00');
+    const dayStr=d.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
+    const rows=slots.map(z=>{
+      const booked=!!z.buchung_id;
+      const bInfo=z.buchungen;
+      return `<div class="zt-slot">
+        <div class="zt-time">${z.von.slice(0,5)} – ${z.bis.slice(0,5)} Uhr</div>
+        <div class="zt-svc">${ZT_SVC_LABEL[z.service]||z.service}${booked&&bInfo?` · Suite ${escHtml(String(bInfo.zimmer||'?'))}`:''}</div>
+        <span class="zt-badge ${booked?'zt-gebucht':'zt-frei'}">${booked?'Gebucht':'Frei'}</span>
+        ${!booked?`<button class="zt-del" onclick="deleteSlot('${z.id}')" title="Slot löschen">×</button>`:''}
+      </div>`;
+    }).join('');
+    return `<div class="zt-group"><div class="zt-date-hdr">${dayStr}</div>${rows}</div>`;
+  }).join('');
+}
+
+async function addSlot(){
+  const svc  = document.getElementById('zt-svc').value;
+  const dat  = document.getElementById('zt-datum').value;
+  const von  = document.getElementById('zt-von').value;
+  const bis  = document.getElementById('zt-bis').value;
+  if(!svc||!dat||!von||!bis){ alert('Bitte alle Felder ausfüllen.'); return; }
+  if(von>=bis){ alert('„Bis" muss nach „Von" liegen.'); return; }
+  const btn=document.getElementById('zt-add-btn');
+  btn.disabled=true; btn.textContent='Wird gespeichert …';
+  setSyncDot('busy');
+  try{
+    const r=await sbReq('zeitfenster',{
+      method:'POST',
+      headers:{Prefer:'return=representation'},
+      body:JSON.stringify({service:svc,datum:dat,von,bis})
+    });
+    if(!r.ok) throw 0;
+    const [neu]=await r.json();
+    neu.buchungen=null;
+    zeitfenster.push(neu);
+    zeitfenster.sort((a,b)=>a.datum.localeCompare(b.datum)||a.von.localeCompare(b.von));
+    renderTermine();
+    setSyncDot('ok');
+    // Formular leeren
+    document.getElementById('zt-svc').value='';
+    document.getElementById('zt-datum').value='';
+    document.getElementById('zt-von').value='';
+    document.getElementById('zt-bis').value='';
+  }catch{
+    setSyncDot('err');
+    alert('Fehler beim Speichern.');
+  }finally{
+    btn.disabled=false; btn.textContent='+ Slot anlegen';
+  }
+}
+
+async function deleteSlot(id){
+  setSyncDot('busy');
+  try{
+    const r=await sbReq('zeitfenster?id=eq.'+id,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+    if(!r.ok) throw 0;
+    zeitfenster=zeitfenster.filter(z=>z.id!==id);
+    renderTermine();
+    setSyncDot('ok');
+  }catch{ setSyncDot('err'); }
 }
 
 async function syncNow(){

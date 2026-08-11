@@ -157,6 +157,34 @@ textarea.f-input{resize:vertical;min-height:88px;line-height:1.6;padding-top:6px
 .s-new{margin-top:24px;display:inline-block;padding:12px 24px;background:var(--green);
   color:#fff;border:none;border-radius:7px;font-size:15px;cursor:pointer;font-family:var(--sans)}
 
+/* SLOT PICKER */
+.slot-card{border:1.5px solid var(--border);border-radius:10px;padding:13px 15px;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.slot-card:hover{border-color:var(--green);background:var(--green-pale,#eaf3ed)}
+.slot-card.active{border-color:var(--green);background:var(--green);color:#fff}
+.slot-card.active .slot-time{color:#fff}
+.slot-card.active .slot-date{color:rgba(255,255,255,.8)}
+.slot-dot{width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0}
+.slot-card.active .slot-dot{background:#fff}
+.slot-date{font-size:13px;color:var(--stone);margin-bottom:2px}
+.slot-time{font-size:15px;font-weight:600;color:var(--ink)}
+.slot-free-btn{width:100%;padding:11px;background:none;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--stone);cursor:pointer;font-family:var(--sans);margin-top:6px}
+
+/* MEINE AUFTRÄGE */
+.ma-empty{text-align:center;padding:32px 16px;color:var(--stone);font-size:14px}
+.ma-item{padding:14px 16px;border-bottom:1px solid var(--border)}
+.ma-item:last-child{border:none}
+.ma-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
+.ma-title{font-size:15px;font-weight:600;color:var(--ink)}
+.ma-meta{font-size:12.5px;color:var(--stone);margin-bottom:6px}
+.ma-antwort{font-size:13px;background:var(--cream);border-left:3px solid var(--green);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:8px;line-height:1.5;color:var(--ink-soft)}
+.ma-badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.ma-neu{background:#fef3cd;color:#856404}
+.ma-bestaetigt{background:#d1e7dd;color:#0a5c36}
+.ma-arbeit{background:#d1ecf1;color:#0c5460}
+.ma-erledigt{background:#d4edda;color:#155724}
+.ma-slot{font-size:13px;color:var(--green);font-weight:500;margin-top:4px}
+.ma-login-hint{text-align:center;padding:36px 20px;color:var(--stone);font-size:14px;line-height:1.6}
+
 /* FOOTER */
 footer{max-width:600px;margin:0 auto;padding:16px 16px 28px;border-top:1px solid var(--border);
   display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
@@ -340,10 +368,13 @@ html{scroll-behavior:smooth}
 
 <nav class="site-nav">
   <a href="#willkommen">Willkommen</a>
-  <a href="#aktuell">Aktuell</a>
+  <a href="#melden">Schaden melden</a>
+  <a href="#service-buchen">Service buchen</a>
+  <a href="#meine-auftraege">Meine Aufträge</a>
+  <!-- RELEASE 3
   <a href="#jahresplan">Jahresplan</a>
   <a href="#unser-park">Unser Park</a>
-  <a href="#melden">Etwas melden</a>
+  -->
 </nav>
 
 <div class="hero">
@@ -382,11 +413,11 @@ html{scroll-behavior:smooth}
   </div>
 </section>
 
-<section class="aktuell-section" id="aktuell">
-  <p class="section-eyebrow">Was machen wir gerade?</p>
-  <h2 class="section-heading">Aktuell im <span id="monat-name">…</span></h2>
-  <div class="artikel-grid" id="artikel-grid"></div>
-</section>
+
+<!-- ═══════════════════════════════════════════════════
+     RELEASE 2 · 01.09.2026 · Park & Garten
+     Zum Aktivieren: diesen Kommentarblock entfernen
+     ═══════════════════════════════════════════════════
 
 <section class="jahres-section" id="jahresplan">
   <p class="section-eyebrow">Jahresplan Park & Garten</p>
@@ -394,19 +425,13 @@ html{scroll-behavior:smooth}
   <div class="mo-grid" id="mo-grid"></div>
 </section>
 
-
-<!-- UNSER PARK -->
 <section class="park-section" id="unser-park">
   <p class="section-eyebrow">Unsere Pflanzen &amp; Bäume</p>
   <h2 class="section-heading">Unser Park</h2>
-
-  <!-- Tab-Switcher -->
   <div class="park-tabs" id="park-tabs">
     <button class="park-tab active" onclick="switchParkTab('pflanzen',this)">🌱 Pflanzen</button>
     <button class="park-tab" onclick="switchParkTab('baeume',this)">🌳 Bäume</button>
   </div>
-
-  <!-- Pflanzen-Ansicht -->
   <div id="park-view-pflanzen">
     <div class="park-search-wrap">
       <span class="park-search-icon">🔍</span>
@@ -417,8 +442,6 @@ html{scroll-behavior:smooth}
       <p style="color:var(--text-muted);font-size:14px">Wird geladen …</p>
     </div>
   </div>
-
-  <!-- Bäume-Ansicht -->
   <div id="park-view-baeume" style="display:none">
     <div class="park-chips" id="baum-pub-filter"></div>
     <div id="baeume-pub-list">
@@ -426,6 +449,8 @@ html{scroll-behavior:smooth}
     </div>
   </div>
 </section>
+
+     ═══════════════════════════════════════════════════ -->
 
 <!-- PFLANZE DETAIL MODAL -->
 <div class="modal-ov" id="pfl-modal" style="display:none" onclick="if(event.target===this)closePfl()">
@@ -476,45 +501,36 @@ html{scroll-behavior:smooth}
 
   <!-- BEWOHNER -->
   <div class="card" id="bw-card">
-    <div class="sec-lbl">Wer sind Sie?</div>
+    <div class="sec-lbl">Ihre Suite</div>
     <div id="bw-sel" style="display:none">
-      <div class="bw-name" id="bw-disp-name"></div>
-      <div class="bw-room" id="bw-disp-room"></div>
-      <button class="bw-change" onclick="showSel()">Nicht Sie? Ändern →</button>
+      <div class="bw-room" id="bw-disp-name"></div>
+      <button class="bw-change" onclick="showSel()">Andere Suite? Ändern →</button>
     </div>
     <div id="bw-wrap" style="display:none">
       <select class="bw-select" id="bw-dd" onchange="onDDChange(this.value)">
-        <option value="">Name wählen …</option>
+        <option value="">Suite wählen …</option>
       </select>
       <button class="bw-confirm" id="bw-ok" onclick="confirmR()">Weiter →</button>
-      <button class="bw-anon" onclick="goAnon()">Ohne Namensangabe fortfahren</button>
+      <button class="bw-anon" onclick="goAnon()">Suite unbekannt / anonym</button>
     </div>
   </div>
 
+  <!-- NOTFALL -->
+  <a href="tel:+4917641167169" style="display:flex;align-items:center;gap:13px;background:var(--burg);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:16px;text-decoration:none;font-family:var(--sans)">
+    <span style="font-size:24px;flex-shrink:0">🚨</span>
+    <div>
+      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.82;margin-bottom:2px">Notfall / Sofort-Hilfe</div>
+      <div style="font-size:17px;font-weight:700;letter-spacing:.5px">0176 411 67 169</div>
+    </div>
+    <span style="margin-left:auto;font-size:20px;opacity:.9">📞</span>
+  </a>
+
   <!-- CATEGORY GRID -->
-  <div class="cat-grid" id="cat-grid">
+  <div class="cat-grid" id="cat-grid" style="grid-template-columns:1fr">
     <div class="cat-tile cat-schaden" onclick="selectKat(this,'Schaden','🔧','Schaden melden')">
       <div class="cat-icon">🔧</div>
       <div class="cat-title">Schaden melden</div>
       <div class="cat-desc">Etwas ist defekt, kaputt oder funktioniert nicht</div>
-      <span class="cat-arrow">›</span>
-    </div>
-    <div class="cat-tile cat-moebel" onclick="selectKat(this,'Möbel & Aufbau','🛋️','Möbel & Aufbau')">
-      <div class="cat-icon">🛋️</div>
-      <div class="cat-title">Möbel & Aufbau</div>
-      <div class="cat-desc">Möbel aufbauen, abbauen oder umstellen</div>
-      <span class="cat-arrow">›</span>
-    </div>
-    <div class="cat-tile cat-sperr" onclick="selectKat(this,'Sperrmüll','🗑️','Sperrmüll')">
-      <div class="cat-icon">🗑️</div>
-      <div class="cat-title">Sperrmüll</div>
-      <div class="cat-desc">Sperrige Gegenstände entsorgen lassen</div>
-      <span class="cat-arrow">›</span>
-    </div>
-    <div class="cat-tile cat-auftrag" onclick="selectKat(this,'Kleiner Auftrag','🔨','Kleiner Auftrag')">
-      <div class="cat-icon">🔨</div>
-      <div class="cat-title">Kleiner Auftrag</div>
-      <div class="cat-desc">Bild aufhängen, Regal montieren, Glühbirne wechseln …</div>
       <span class="cat-arrow">›</span>
     </div>
   </div>
@@ -649,6 +665,115 @@ html{scroll-behavior:smooth}
   </div>
 </div>
 
+<!-- ── SERVICE BUCHEN ──────────────────────────────────────────────── -->
+<div class="main" id="service-buchen" style="padding-top:28px;padding-bottom:48px">
+
+  <div class="form-cat-title" style="margin-bottom:4px">Service buchen</div>
+  <p style="font-size:14px;color:var(--stone);margin-bottom:22px;line-height:1.55">
+    Wählen Sie einen Service — wir melden uns mit einem Terminvorschlag bei Ihnen.
+  </p>
+
+  <!-- Schritt 1: Service wählen -->
+  <div id="bk-step-1">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="cat-tile" onclick="bkSelect(this,'sperrmuell','📦','Sperrmüll')">
+        <div style="font-size:26px;margin-bottom:7px">📦</div>
+        <div class="cat-title">Sperrmüll</div>
+        <div class="cat-desc" style="margin-top:4px">Sperrige Gegenstände abholen und entsorgen lassen</div>
+      </div>
+      <div class="cat-tile" onclick="bkSelect(this,'moebel','🛋️','Möbel & Aufbau')">
+        <div style="font-size:26px;margin-bottom:7px">🛋️</div>
+        <div class="cat-title">Möbel & Aufbau</div>
+        <div class="cat-desc" style="margin-top:4px">Möbel aufbauen, abbauen oder umstellen</div>
+      </div>
+      <div class="cat-tile" onclick="bkSelect(this,'kleiner_auftrag','🔧','Kleiner Auftrag')">
+        <div style="font-size:26px;margin-bottom:7px">🔧</div>
+        <div class="cat-title">Kleiner Auftrag</div>
+        <div class="cat-desc" style="margin-top:4px">Bild aufhängen, Regal montieren, Glühbirne wechseln …</div>
+      </div>
+      <div class="cat-tile" onclick="bkSelect(this,'paket','📬','Paketzustellung')">
+        <div style="font-size:26px;margin-bottom:7px">📬</div>
+        <div class="cat-title">Paketzustellung</div>
+        <div class="cat-desc" style="margin-top:4px">Paket wird am Eingang angenommen und auf Ihr Zimmer gebracht</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schritt 1.5: Zeitfenster wählen -->
+  <div id="bk-step-slots" style="display:none;margin-top:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <span id="bk-sl-icon" style="font-size:26px"></span>
+      <div>
+        <div class="form-cat-title" style="font-size:17px" id="bk-sl-title">—</div>
+        <button onclick="bkReset()" style="background:none;border:none;color:var(--stone);font-size:12px;cursor:pointer;padding:0;font-family:var(--sans)">← Anderen Service wählen</button>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--stone);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px">Verfügbare Termine</div>
+    <div id="bk-slot-list"></div>
+    <button class="slot-free-btn" onclick="bkShowStep2(false)">Anderen Termin wünschen →</button>
+  </div>
+
+  <!-- Schritt 2: Buchungsformular -->
+  <div id="bk-step-2" style="display:none;margin-top:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <span id="bk-icon" style="font-size:26px"></span>
+      <div>
+        <div class="form-cat-title" style="font-size:17px" id="bk-title">—</div>
+        <button onclick="bkReset()" style="background:none;border:none;color:var(--stone);font-size:12px;cursor:pointer;padding:0;font-family:var(--sans)">← Anderen Service wählen</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:600;color:var(--stone);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px">Ihre Suite</div>
+      <div id="bk-suite-disp" style="font-size:16px;color:var(--green);font-weight:500;padding:10px 0;border-bottom:1.5px solid var(--border)">—</div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:600;color:var(--stone);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px">Wunschtermin</div>
+      <div id="bk-slot-info" style="display:none;margin-bottom:4px"></div>
+      <div id="bk-freeform">
+        <input class="f-input" id="bk-datum" type="date" style="margin-bottom:8px">
+        <select class="f-input" id="bk-zeit">
+          <option value="">Uhrzeit egal</option>
+          <option value="morgens">Morgens (8–12 Uhr)</option>
+          <option value="mittags">Mittags (12–14 Uhr)</option>
+          <option value="nachmittags">Nachmittags (14–17 Uhr)</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;font-weight:600;color:var(--stone);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px">Details <span style="font-weight:400;text-transform:none">(optional)</span></div>
+      <textarea class="f-input" id="bk-desc" rows="3" placeholder="z. B. Schrank im Schlafzimmer, ca. 2 m breit …" style="resize:none;padding:10px 0;line-height:1.5"></textarea>
+    </div>
+
+    <div id="bk-err" style="display:none;color:#c1121f;font-size:13px;margin-bottom:10px;padding:8px 10px;background:#ffe5e5;border-radius:8px"></div>
+    <button class="sub-btn" id="bk-submit" onclick="saveBuchung()">Anfrage absenden →</button>
+  </div>
+
+  <!-- Schritt 3: Bestätigung -->
+  <div id="bk-step-3" style="display:none;text-align:center;padding:32px 0">
+    <div style="font-size:44px;margin-bottom:12px">✅</div>
+    <div class="form-cat-title" style="margin-bottom:8px">Anfrage eingegangen</div>
+    <p style="font-size:14px;color:var(--stone);line-height:1.6;max-width:300px;margin:0 auto 24px">
+      Wir melden uns in Kürze mit einem Terminvorschlag bei Ihnen.
+    </p>
+    <button class="s-new" onclick="bkReset()">Weiteren Service buchen</button>
+  </div>
+
+</div>
+
+<!-- ── MEINE AUFTRÄGE ──────────────────────────────────────── -->
+<div class="main" id="meine-auftraege" style="padding-top:28px;padding-bottom:48px;scroll-margin-top:44px">
+  <div class="form-cat-title" style="margin-bottom:4px">Meine Aufträge</div>
+  <p style="font-size:14px;color:var(--stone);margin-bottom:22px;line-height:1.55">
+    Alle Ihre Anfragen auf einen Blick — mit aktuellem Status und Rückmeldung.
+  </p>
+  <div id="ma-body">
+    <div class="ma-login-hint">Bitte wählen Sie oben Ihre Suite, um Ihre Aufträge zu sehen.</div>
+  </div>
+</div>
+
 <div class="modal-ov" id="art-ov">
   <button class="modal-close" onclick="closeArtikel()">&#x2715;</button>
   <div class="modal-box" id="art-box"></div>
@@ -657,7 +782,7 @@ html{scroll-behavior:smooth}
 <footer>
   <div class="f-addr">
     Sidonie-Scharfe-Stiftung · Scharfestraße 4–6 · 14163 Berlin-Zehlendorf<br>
-    © 2026 Sidonie-Scharfe-Stiftung
+    Hausmeister: <a href="tel:+4917641167169" style="color:inherit">0176 411 67 169</a> · © 2026 Sidonie-Scharfe-Stiftung
   </div>
   <a href="intern.html" class="f-lock">
     <svg width="11" height="13" viewBox="0 0 11 13" fill="none">
@@ -694,19 +819,18 @@ async function loadR(){
 }
 function fillDD(){
   const s=document.getElementById('bw-dd');
-  s.innerHTML='<option value="">Name wählen …</option>';
-  rs.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=`Suite ${r.zimmer} — ${r.name}`;s.appendChild(o);});
+  s.innerHTML='<option value="">Suite wählen …</option>';
+  rs.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=`Suite ${r.zimmer}`;s.appendChild(o);});
 }
 function onDDChange(v){document.getElementById('bw-ok').style.display=v?'block':'none';}
 function confirmR(){
   const id=document.getElementById('bw-dd').value;
   const r=rs.find(x=>x.id===id);if(!r)return;
-  sel=r;localStorage.setItem(BK,JSON.stringify(r));showSeld(r);
+  sel=r;localStorage.setItem(BK,JSON.stringify(r));showSeld(r);loadMeineAuftraege();
 }
 function goAnon(){sel=null;document.getElementById('bw-card').style.display='none';}
 function showSeld(r){
-  document.getElementById('bw-disp-name').textContent=r.name;
-  document.getElementById('bw-disp-room').textContent='Suite '+r.zimmer;
+  document.getElementById('bw-disp-name').textContent='Suite '+r.zimmer;
   document.getElementById('bw-sel').style.display='block';
   document.getElementById('bw-wrap').style.display='none';
 }
@@ -719,7 +843,7 @@ function showSel(){
 
 (async()=>{
   const sv=localStorage.getItem(BK);
-  if(sv){try{sel=JSON.parse(sv);showSeld(sel);loadR();return;}catch{localStorage.removeItem(BK);}}
+  if(sv){try{sel=JSON.parse(sv);showSeld(sel);loadR();loadMeineAuftraege();return;}catch{localStorage.removeItem(BK);}}
   document.getElementById('bw-wrap').style.display='block';
   await loadR();
 })();
@@ -808,7 +932,7 @@ async function doSubmit(e,kat){
   const now=new Date();
   const payload={
     datum:now.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}),
-    name:sel?.name||null,zimmer:sel?.zimmer||null,
+    zimmer:sel?.zimmer||null,
     ort,problem:prob,kategorie:kat,
     prio:'Mittel',von:'Bewohner',status:'Offen',
     foto:photos[photoKey]||null
@@ -909,39 +1033,6 @@ function renderMoGrid(){
   }).join('');
 }
 
-async function renderArtikel(){
-  const g=document.getElementById('artikel-grid');
-  const mn=document.getElementById('monat-name');
-  if(!g)return;
-  const mo=new Date().getMonth()+1;
-  if(mn)mn.textContent=MO_NAMEN[mo-1];
-  g.innerHTML='<p style="color:var(--stone);font-size:14px;font-family:var(--sans);padding:8px">Wird geladen …</p>';
-  try{
-    const r=await fetch(`https://rzpsmvczwaeraupnhhkx.supabase.co/rest/v1/artikel?monat=eq.${mo}&aktiv=eq.true&order=reihenfolge.asc`,
-      {headers:{'apikey':'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem','Authorization':'Bearer sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem'}});
-    const data=await r.json();
-    window._artikelData=data;
-    if(!data.length){g.innerHTML=`<p style="color:var(--stone);font-size:14px;font-family:var(--sans)">Im ${MO_NAMEN[mo-1]} stehen keine besonderen Maßnahmen an.</p>`;return;}
-    g.innerHTML=data.map((a,i)=>`<div class="artikel-card" onclick="openArtikelData(${i})">
-      ${a.bild?`<img class="artikel-img" src="${a.bild.startsWith('http')?a.bild:IMG_BASE+a.bild}" alt="${a.kat||''}" loading="lazy">`:''}
-      <div class="artikel-head">
-        <span class="artikel-ico">${a.ico||''}</span>
-        <span class="artikel-kat">${a.kat||''}</span>
-        <span class="artikel-badge">${MO_NAMEN[a.monat-1]}</span>
-      </div>
-      <div class="artikel-body">
-        <div class="artikel-titel">${a.titel}</div>
-        <p class="artikel-text">${a.teaser||''}</p>
-        <div class="artikel-tipp">${a.tipp||''}</div>
-        <div class="artikel-dauer">${a.dauer||''}</div>
-      </div>
-    </div>`).join('');
-  }catch(e){
-    g.innerHTML='<p style="color:var(--stone);font-size:14px;font-family:var(--sans)">Artikel konnten nicht geladen werden.</p>';
-  }
-}
-
-renderArtikel();
 renderMoGrid();
 
 function resetAll(){
@@ -1196,6 +1287,237 @@ function openBaumPub(idx) {
 }
 
 function closeBaumPub() { document.getElementById('baum-pub-modal').style.display='none'; }
+
+// ── SERVICE BUCHEN ───────────────────────────────────────────────────────────
+let bkService = null;
+
+// ── MEINE AUFTRÄGE ────────────────────────────────────────────────────
+const MA_ICON = {sperrmuell:'📦',moebel:'🛋️',kleiner_auftrag:'🔧',paket:'📬',handwerk:'🔨'};
+const MA_BADGE = {
+  'Neu':        ['ma-neu',        'Neu — wird bearbeitet'],
+  'Bestätigt':  ['ma-bestaetigt', 'Bestätigt'],
+  'In Arbeit':  ['ma-arbeit',     'In Arbeit'],
+  'Erledigt':   ['ma-erledigt',   'Erledigt ✓']
+};
+
+async function loadMeineAuftraege(){
+  const el = document.getElementById('ma-body');
+  if(!el) return;
+  if(!sel){
+    el.innerHTML = '<div class="ma-login-hint">Bitte wählen Sie oben Ihre Suite, um Ihre Aufträge zu sehen.</div>';
+    return;
+  }
+  el.innerHTML = '<div class="ma-login-hint">Wird geladen …</div>';
+  try{
+    const [bRes, sRes] = await Promise.all([
+      fetch(`${SB}/rest/v1/buchungen?zimmer=eq.${encodeURIComponent(sel.zimmer)}&order=created_at.desc`,
+        {headers:{apikey:KEY,Authorization:`Bearer ${KEY}`}}),
+      fetch(`${SB}/rest/v1/schaden?zimmer=eq.${encodeURIComponent(sel.zimmer)}&order=created_at.desc&select=id,datum,ort,problem,status,notiz`,
+        {headers:{apikey:KEY,Authorization:`Bearer ${KEY}`}})
+    ]);
+    const buchungen = bRes.ok ? await bRes.json() : [];
+    const schaeden  = sRes.ok ? await sRes.json() : [];
+    renderMeineAuftraege(buchungen, schaeden);
+  }catch{
+    el.innerHTML = '<div class="ma-login-hint">Konnte nicht geladen werden. Bitte Seite neu laden.</div>';
+  }
+}
+
+function renderMeineAuftraege(buchungen, schaeden){
+  const el = document.getElementById('ma-body');
+  if(!el) return;
+
+  let html = '';
+
+  // ── Buchungen (Services) ──
+  if(buchungen.length){
+    html += `<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone);margin-bottom:8px">Service-Anfragen</div>`;
+    html += `<div class="card" style="padding:0;margin-bottom:20px">`;
+    buchungen.forEach(b => {
+      const [cls, lbl] = MA_BADGE[b.status] || ['ma-neu','Neu'];
+      const icon = MA_ICON[b.service] || '📋';
+      const dt = b.created_at ? new Date(b.created_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+      html += `
+        <div class="ma-item">
+          <div class="ma-top">
+            <div class="ma-title">${icon} ${esc(b.service_label||b.service)}</div>
+            <span class="ma-badge ${cls}">${lbl}</span>
+          </div>
+          <div class="ma-meta">Gewünschter Termin: ${esc(b.wunschtermin||'—')} · eingegangen ${dt}</div>
+          ${b.beschreibung ? `<div class="ma-meta" style="font-style:italic">"${esc(b.beschreibung)}"</div>` : ''}
+          ${b.antwort ? `<div class="ma-antwort">💬 <strong>Rückmeldung:</strong> ${esc(b.antwort)}</div>` : ''}
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Schadensmeldungen ──
+  if(schaeden.length){
+    html += `<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone);margin-bottom:8px">Schadensmeldungen</div>`;
+    html += `<div class="card" style="padding:0;margin-bottom:20px">`;
+    schaeden.forEach(s => {
+      const done = s.status === 'Abgeschlossen';
+      const cls = done ? 'ma-erledigt' : s.status === 'Offen' ? 'ma-neu' : 'ma-arbeit';
+      const lbl = done ? 'Abgeschlossen ✓' : s.status;
+      html += `
+        <div class="ma-item">
+          <div class="ma-top">
+            <div class="ma-title">🔧 ${esc(s.ort||'Schaden')}</div>
+            <span class="ma-badge ${cls}">${lbl}</span>
+          </div>
+          <div class="ma-meta">${esc(s.problem||'—')} · gemeldet ${esc(s.datum||'')}</div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if(!buchungen.length && !schaeden.length){
+    html = `<div class="ma-empty">
+      <div style="font-size:32px;margin-bottom:10px">📋</div>
+      Noch keine Aufträge für Suite ${esc(String(sel.zimmer))} vorhanden.
+    </div>`;
+  }
+
+  html += `<button onclick="loadMeineAuftraege()" style="width:100%;padding:11px;background:none;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--stone);cursor:pointer;font-family:var(--sans)">↻ Aktualisieren</button>`;
+
+  el.innerHTML = html;
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── SERVICE BUCHEN ────────────────────────────────────────────────────
+async function bkSelect(el, service, icon, label) {
+  bkService = { service, icon, label, slotId: null };
+  document.querySelectorAll('#bk-step-1 .cat-tile').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('bk-step-1').style.display = 'none';
+  document.getElementById('bk-step-3').style.display = 'none';
+
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const r = await fetch(SB + '/rest/v1/zeitfenster?service=eq.' + service + '&buchung_id=is.null&datum=gte.' + today + '&order=datum.asc,von.asc', {
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY }
+    });
+    const slots = r.ok ? await r.json() : [];
+    if (slots.length > 0) {
+      document.getElementById('bk-sl-icon').textContent = icon;
+      document.getElementById('bk-sl-title').textContent = label;
+      const list = document.getElementById('bk-slot-list');
+      list.innerHTML = '';
+      slots.forEach(s => {
+        const dateStr = new Date(s.datum + 'T12:00:00').toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long' });
+        const card = document.createElement('div');
+        card.className = 'slot-card';
+        card.innerHTML = '<div class="slot-dot"></div><div><div class="slot-date">' + dateStr + '</div><div class="slot-time">' + s.von.slice(0,5) + ' – ' + s.bis.slice(0,5) + ' Uhr</div></div>';
+        card.addEventListener('click', () => {
+          document.querySelectorAll('#bk-slot-list .slot-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          bkService.slotId = s.id; bkService.slotDatum = s.datum; bkService.slotVon = s.von; bkService.slotBis = s.bis;
+          setTimeout(() => bkShowStep2(true), 200);
+        });
+        list.appendChild(card);
+      });
+      document.getElementById('bk-step-slots').style.display = 'block';
+    } else {
+      bkShowStep2(false);
+    }
+  } catch {
+    bkShowStep2(false);
+  }
+}
+
+function bkShowStep2(withSlot) {
+  document.getElementById('bk-step-slots').style.display = 'none';
+  document.getElementById('bk-icon').textContent = bkService.icon;
+  document.getElementById('bk-title').textContent = bkService.label;
+  document.getElementById('bk-suite-disp').textContent = sel ? 'Suite ' + sel.zimmer : '—';
+  document.getElementById('bk-desc').value = '';
+  document.getElementById('bk-err').style.display = 'none';
+  document.getElementById('bk-submit').disabled = false;
+  document.getElementById('bk-submit').textContent = 'Anfrage absenden →';
+
+  const slotInfo = document.getElementById('bk-slot-info');
+  const freeform = document.getElementById('bk-freeform');
+  if (withSlot && bkService.slotId) {
+    const dateStr = new Date(bkService.slotDatum + 'T12:00:00').toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    slotInfo.innerHTML = '<div style="background:var(--green-pale,#eaf3ed);border:1.5px solid var(--green);border-radius:10px;padding:12px 14px"><div style="font-size:11px;font-weight:600;color:var(--green);letter-spacing:.4px;text-transform:uppercase;margin-bottom:3px">Gewählter Termin ✓</div><div style="font-size:15px;font-weight:600;color:var(--ink)">' + dateStr + '</div><div style="font-size:14px;color:var(--stone)">' + bkService.slotVon.slice(0,5) + ' – ' + bkService.slotBis.slice(0,5) + ' Uhr</div></div>';
+    slotInfo.style.display = 'block';
+    freeform.style.display = 'none';
+  } else {
+    bkService.slotId = null;
+    document.getElementById('bk-datum').value = '';
+    document.getElementById('bk-datum').min = new Date().toISOString().slice(0, 10);
+    document.getElementById('bk-zeit').value = '';
+    slotInfo.style.display = 'none';
+    freeform.style.display = 'block';
+  }
+  document.getElementById('bk-step-2').style.display = 'block';
+}
+
+function bkReset() {
+  bkService = null;
+  document.getElementById('bk-step-1').style.display = 'block';
+  document.getElementById('bk-step-slots').style.display = 'none';
+  document.getElementById('bk-step-2').style.display = 'none';
+  document.getElementById('bk-step-3').style.display = 'none';
+  document.querySelectorAll('#bk-step-1 .cat-tile').forEach(t => t.classList.remove('active'));
+}
+
+async function saveBuchung() {
+  const errEl = document.getElementById('bk-err');
+  let wunschtermin;
+  if (bkService.slotId) {
+    const datumFormatted = new Date(bkService.slotDatum + 'T12:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    wunschtermin = datumFormatted + ' ' + bkService.slotVon.slice(0,5) + '–' + bkService.slotBis.slice(0,5);
+  } else {
+    const datum = document.getElementById('bk-datum').value;
+    if (!datum) { errEl.textContent = 'Bitte einen Wunschtermin angeben.'; errEl.style.display = 'block'; return; }
+    const zeit = document.getElementById('bk-zeit').value;
+    const datumFormatted = new Date(datum + 'T12:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    wunschtermin = datumFormatted + (zeit ? ', ' + zeit : '');
+  }
+  if (!sel) { errEl.textContent = 'Bitte zuerst Ihre Suite auswählen.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('bk-submit');
+  btn.disabled = true;
+  btn.textContent = 'Wird gesendet …';
+
+  const payload = {
+    service: bkService.service,
+    service_label: bkService.label,
+    zimmer: sel.zimmer,
+    wunschtermin,
+    beschreibung: document.getElementById('bk-desc').value.trim() || null,
+    status: 'Neu'
+  };
+
+  try {
+    const r = await fetch(SB + '/rest/v1/buchungen', {
+      method: 'POST',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw 0;
+    if (bkService.slotId) {
+      const rows = await r.json();
+      const newId = rows[0]?.id;
+      if (newId) {
+        await fetch(SB + '/rest/v1/zeitfenster?id=eq.' + bkService.slotId, {
+          method: 'PATCH',
+          headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ buchung_id: newId })
+        });
+      }
+    }
+    document.getElementById('bk-step-2').style.display = 'none';
+    document.getElementById('bk-step-3').style.display = 'block';
+  } catch {
+    errEl.textContent = 'Senden fehlgeschlagen — bitte erneut versuchen.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Anfrage absenden →';
+  }
+}
 </script>
 
 <script>
