@@ -245,6 +245,28 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .dm-teile-sw{font-size:14px;font-weight:600;color:var(--accent);padding:6px 2px;border-top:1px solid var(--border);margin-top:4px;margin-bottom:12px}
 
+/* BUCHUNGEN */
+.bk-item{padding:12px 13px;border-bottom:1px solid var(--border);cursor:pointer}
+.bk-item:last-child{border:none}
+.bk-item:active{background:var(--bg)}
+.bk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
+.bk-title{font-size:14px;font-weight:500}
+.bk-meta{font-size:11.5px;color:var(--text-muted);margin-bottom:6px}
+.bk-desc{font-size:12.5px;color:var(--text-muted);font-style:italic;margin-bottom:6px}
+.bk-badge{font-size:10.5px;padding:2px 9px;border-radius:10px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.bk-neu{background:var(--red-pale);color:var(--red)}
+.bk-bestaetigt{background:var(--yellow-pale);color:var(--yellow)}
+.bk-arbeit{background:#e0e7ff;color:#3730a3}
+.bk-erledigt{background:var(--green-pale);color:var(--green-mid)}
+.bk-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.bk-act{padding:5px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;background:var(--bg);color:var(--text);font-family:inherit}
+.bk-act.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:600}
+.bk-antwort-wrap{margin-top:8px;display:none}
+.bk-antwort-wrap.show{display:block}
+.bk-antwort-in{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;resize:none}
+.bk-antwort-in:focus{outline:none;border-color:var(--accent)}
+.bk-save{margin-top:6px;padding:7px 14px;background:var(--green-mid);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+
 /* EINKAUFSLISTE */
 .eink-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px}
 .eink-total{font-size:22px;font-weight:700;color:var(--green-mid);font-variant-numeric:tabular-nums;flex-shrink:0}
@@ -379,6 +401,15 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <div class="eink-total" id="eink-total"></div>
     </div>
     <div class="card" id="eink-list"></div>
+  </div>
+
+  <!-- BUCHUNGEN -->
+  <div class="view" id="v-buchungen">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="sec" style="margin:0">Service-Anfragen</div>
+      <button class="set-btn" onclick="loadBuchungen(true)">↻ Laden</button>
+    </div>
+    <div class="card" id="buch-list"></div>
   </div>
 
   <!-- EINSTELLUNGEN (Hendrik only) -->
@@ -624,6 +655,7 @@ const TASKS = [
 // ── STATE ────────────────────────────────────────────────────────────────────
 let role = null; // 'hm' | 'sw'
 let schaden = [];
+let buchungen = [];
 let filterMode = 'alle';
 let editItem = null;
 let bgtEntries = JSON.parse(localStorage.getItem('bgt_entries') || '[]');
@@ -699,9 +731,10 @@ function initApp(){
 
   // Build nav
   const tabs = role==='hm'
-    ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'budget',lbl:'💰 Budget'},
-       {id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
-    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'budget',lbl:'💰 Budget'}];
+    ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
+       {id:'budget',lbl:'💰 Budget'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},
+       {id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'budget',lbl:'💰 Budget'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
 
@@ -729,6 +762,7 @@ function showTab(id){
   if(id==='schaeden')renderSchaden();
   if(id==='settings')renderSettings();
   if(id==='einkauf')renderEinkauf();
+  if(id==='buchungen')renderBuchungen();
 }
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
@@ -757,10 +791,20 @@ async function loadData(){
     setSyncDot('ok');
     localStorage.setItem('db_last_sync', new Date().toISOString());
     renderAll();
+    loadBuchungen();
   }catch{
     setSyncDot('err');
     renderAll();
   }
+}
+
+async function loadBuchungen(forceRender){
+  try{
+    const r=await sbReq('buchungen?order=created_at.desc&limit=200&select=*');
+    if(!r.ok)throw 0;
+    buchungen=await r.json();
+    if(forceRender)renderBuchungen();
+  }catch{/* silent */}
 }
 
 async function syncNow(){
@@ -1104,6 +1148,81 @@ function editCap(cat){
   localStorage.setItem('bgt_caps',JSON.stringify(bgtCaps));
   document.getElementById(`set-${cat}-val`).textContent=eur(n);
   renderBudget();renderOverview();
+}
+
+// ── BUCHUNGEN ────────────────────────────────────────────────────────────────
+const BK_STATUS = ['Neu','Bestätigt','In Arbeit','Erledigt'];
+const BK_BADGE  = {Neu:'bk-neu',Bestätigt:'bk-bestaetigt','In Arbeit':'bk-arbeit',Erledigt:'bk-erledigt'};
+const BK_ICON   = {sperrmuell:'📦',paket:'📬',handwerk:'🔨'};
+
+function renderBuchungen(){
+  const el = document.getElementById('buch-list');
+  if(!el) return;
+  if(!buchungen.length){
+    el.innerHTML='<div class="empty" style="padding:20px 16px">Noch keine Anfragen eingegangen.</div>';
+    return;
+  }
+  el.innerHTML = buchungen.map((b,idx)=>{
+    const badge = BK_BADGE[b.status]||'bk-neu';
+    const icon  = BK_ICON[b.service]||'📋';
+    const dt    = b.created_at ? new Date(b.created_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+    const actBtns = BK_STATUS.map(s=>`
+      <button class="bk-act${b.status===s?' active':''}"
+        onclick="updateBuchungStatus('${b.id}',${idx},'${s}')">${s}</button>`).join('');
+    return `
+    <div class="bk-item" id="bk-row-${idx}">
+      <div class="bk-top">
+        <div class="bk-title">${icon} ${escHtml(b.service_label||b.service)}</div>
+        <span class="bk-badge ${badge}">${escHtml(b.status)}</span>
+      </div>
+      <div class="bk-meta">Suite ${escHtml(b.zimmer||'—')} · ${escHtml(b.wunschtermin||'—')} · eingegangen ${dt}</div>
+      ${b.beschreibung ? `<div class="bk-desc">"${escHtml(b.beschreibung)}"</div>` : ''}
+      <div class="bk-actions">${actBtns}</div>
+      <div class="bk-antwort-wrap${b.antwort?' show':''}" id="bk-ans-${idx}">
+        <textarea class="bk-antwort-in" id="bk-txt-${idx}" rows="2"
+          placeholder="Rückmeldung an Bewohner (optional)…">${escHtml(b.antwort||'')}</textarea>
+        <button class="bk-save" onclick="saveBuchungAntwort('${b.id}',${idx})">Speichern</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updateBuchungStatus(id, idx, status){
+  const prev = buchungen[idx]?.status;
+  buchungen[idx].status = status;
+  renderBuchungen();
+  const showAns = (status==='Bestätigt'||status==='In Arbeit'||status==='Erledigt');
+  const wrap = document.getElementById('bk-ans-'+idx);
+  if(wrap) wrap.classList.toggle('show', showAns);
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('buchungen?id=eq.'+id,{
+      method:'PATCH',
+      headers:{Prefer:'return=minimal'},
+      body:JSON.stringify({status})
+    });
+    if(!r.ok) throw 0;
+    setSyncDot('ok');
+  }catch{
+    buchungen[idx].status = prev;
+    renderBuchungen();
+    setSyncDot('err');
+  }
+}
+
+async function saveBuchungAntwort(id, idx){
+  const txt = (document.getElementById('bk-txt-'+idx)?.value||'').trim()||null;
+  buchungen[idx].antwort = txt;
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('buchungen?id=eq.'+id,{
+      method:'PATCH',
+      headers:{Prefer:'return=minimal'},
+      body:JSON.stringify({antwort:txt})
+    });
+    if(!r.ok) throw 0;
+    setSyncDot('ok');
+  }catch{ setSyncDot('err'); }
 }
 
 // ── PFLEGEPLAN ───────────────────────────────────────────────────────────────
