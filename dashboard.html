@@ -70,7 +70,7 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .view.active{display:block}
 
 /* KPI ROW */
-.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.kpi-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
 .kpi{background:var(--card);border-radius:var(--radius);padding:11px 12px;box-shadow:var(--shadow)}
 .kpi-val{font-size:24px;font-weight:700;color:var(--green-mid);line-height:1}
 .kpi-val.alert{color:var(--red)}
@@ -340,9 +340,11 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <div class="kpi"><div class="kpi-val alert" id="kpi-notfall">—</div><div class="kpi-lbl">Notfälle offen</div></div>
       <div class="kpi"><div class="kpi-val warn" id="kpi-offen">—</div><div class="kpi-lbl">Schäden offen</div></div>
       <div class="kpi"><div class="kpi-val" id="kpi-budget">—</div><div class="kpi-lbl">Budget genutzt</div></div>
+      <div class="kpi" onclick="showTab('buchungen')" style="cursor:pointer"><div class="kpi-val" id="kpi-buchungen">—</div><div class="kpi-lbl">Anfragen neu</div></div>
     </div>
 
     <div id="notfall-overview"></div>
+    <div id="buchungen-overview"></div>
 
     <div class="sec">Budget August 2026</div>
     <div id="bgt-overview-cards" class="bgt-grid"></div>
@@ -803,6 +805,7 @@ async function loadBuchungen(forceRender){
     const r=await sbReq('buchungen?order=created_at.desc&limit=200&select=*');
     if(!r.ok)throw 0;
     buchungen=await r.json();
+    renderOverview();
     if(forceRender)renderBuchungen();
   }catch{/* silent */}
 }
@@ -847,6 +850,35 @@ function renderOverview(){
         <span class="notfall-row-date">${n.datum}</span>
       </div>`).join('')}
     </div>`;
+  }
+
+  // Buchungen KPI + preview
+  const neueAnfragen = buchungen.filter(b=>b.status==='Neu');
+  const kbEl = document.getElementById('kpi-buchungen');
+  if(kbEl){
+    kbEl.textContent = neueAnfragen.length||'0';
+    kbEl.className = 'kpi-val'+(neueAnfragen.length>0?' warn':'');
+  }
+  const bOvEl = document.getElementById('buchungen-overview');
+  if(bOvEl){
+    if(neueAnfragen.length===0){
+      bOvEl.innerHTML='';
+    } else {
+      const BK_ICO={sperrmuell:'📦',paket:'📬',handwerk:'🔨'};
+      bOvEl.innerHTML=`<div class="overview-notfall" style="border-left-color:var(--yellow)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span class="notfall-pill" style="background:var(--yellow-pale);color:var(--yellow)">
+            📋 ${neueAnfragen.length} neue Anfrage${neueAnfragen.length>1?'n':''}
+          </span>
+          <button class="set-btn" onclick="showTab('buchungen')" style="font-size:12px">Alle →</button>
+        </div>
+        ${neueAnfragen.slice(0,3).map(b=>`
+          <div class="notfall-row" onclick="showTab('buchungen')">
+            <span class="notfall-row-ort">${BK_ICO[b.service]||'📋'} ${escHtml(b.service_label||b.service)} · Suite ${escHtml(b.zimmer||'—')}</span>
+            <span class="notfall-row-date">${escHtml(b.wunschtermin||'—')}</span>
+          </div>`).join('')}
+      </div>`;
+    }
   }
 
   // Budget cards (compact)
