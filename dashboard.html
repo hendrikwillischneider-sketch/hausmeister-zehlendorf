@@ -263,6 +263,23 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .zt-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .zt-add{padding:11px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
 .zt-add:disabled{opacity:.5;cursor:not-allowed}
+/* SERVICE-VERWALTUNG */
+.svc-mgmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.svc-mgmt-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;transition:opacity .2s}
+.svc-mgmt-card.inaktiv{opacity:.45}
+.svc-mgmt-icon{font-size:28px;margin-bottom:6px}
+.svc-mgmt-name{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px}
+.svc-mgmt-desc{font-size:11px;color:var(--text-muted);line-height:1.45;flex:1;margin-bottom:10px}
+.svc-mgmt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:8px 0;border-top:1px solid var(--border);margin-bottom:10px;text-align:center}
+.svc-mgmt-stat-val{font-size:16px;font-weight:700;color:var(--text);line-height:1.1}
+.svc-mgmt-stat-lbl{font-size:10px;color:var(--text-muted);margin-top:1px}
+.svc-toggle{width:100%;padding:7px 10px;font-size:11.5px;font-weight:600;border-radius:8px;border:1.5px solid;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left}
+.svc-toggle.on{background:var(--green-pale);color:var(--green-mid);border-color:var(--green-mid)}
+.svc-toggle.off{background:#f5f5f5;color:#888;border-color:#ccc}
+@media(prefers-color-scheme:dark){.svc-toggle.off{background:#2a2a2a;color:#666;border-color:#444}}
+:root[data-theme="dark"] .svc-toggle.off{background:#2a2a2a;color:#666;border-color:#444}
+.svc-setup{background:var(--yellow-pale,#fffbe6);border:1px solid var(--yellow,#e6a817);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--text);margin-bottom:12px;line-height:1.5}
+
 .zt-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .zt-sum-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
 .zt-sum-svc{font-size:11px;color:var(--text-muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -457,6 +474,16 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
         <button class="zt-add" id="zt-add-btn" onclick="addSlot()">+ Slot anlegen</button>
       </div>
     </div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="view" id="v-services">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="sec" style="margin:0">Angebotene Services</div>
+      <button class="set-btn" onclick="loadServices(true)">↻ Laden</button>
+    </div>
+    <div id="svc-setup-notice" style="display:none" class="svc-setup"></div>
+    <div id="svc-list"></div>
   </div>
 
   <!-- BUCHUNGEN -->
@@ -713,6 +740,15 @@ let role = null; // 'hm' | 'sw'
 let schaden = [];
 let buchungen = [];
 let zeitfenster = [];
+let services = [];
+let servicesFromDb = false;
+
+const DEFAULT_SERVICES = [
+  {id:'sperrmuell',     label:'Sperrmüll',       icon:'📦', beschreibung:'Sperrige Gegenstände abholen und entsorgen lassen', aktiv:true, dauer_min:120},
+  {id:'moebel',         label:'Möbel & Aufbau',  icon:'🛋️',  beschreibung:'Möbel aufbauen, abbauen oder umstellen',            aktiv:true, dauer_min:120},
+  {id:'kleiner_auftrag',label:'Kleiner Auftrag', icon:'🔧', beschreibung:'Bild aufhängen, Regal montieren, Glühbirne wechseln …', aktiv:true, dauer_min:60},
+  {id:'paket',          label:'Paketzustellung', icon:'📬', beschreibung:'Paket wird am Eingang angenommen und aufs Zimmer gebracht', aktiv:true, dauer_min:30}
+];
 let filterMode = 'alle';
 let editItem = null;
 let bgtEntries = JSON.parse(localStorage.getItem('bgt_entries') || '[]');
@@ -789,9 +825,9 @@ function initApp(){
   // Build nav
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
-       {id:'termine',lbl:'📅 Termine'},{id:'budget',lbl:'💰 Budget'},{id:'pflegeplan',lbl:'Pflegeplan'},
-       {id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
-    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'budget',lbl:'💰 Budget'}];
+       {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'budget',lbl:'💰 Budget'},
+       {id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'budget',lbl:'💰 Budget'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
 
@@ -821,6 +857,7 @@ function showTab(id){
   if(id==='einkauf')renderEinkauf();
   if(id==='buchungen')renderBuchungen();
   if(id==='termine')renderTermine();
+  if(id==='services')renderServices();
 }
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
@@ -851,6 +888,7 @@ async function loadData(){
     renderAll();
     loadBuchungen();
     loadZeitfenster();
+    loadServices();
   }catch{
     setSyncDot('err');
     renderAll();
@@ -874,6 +912,64 @@ async function loadZeitfenster(forceRender){
     zeitfenster=await r.json();
     if(forceRender)renderTermine();
   }catch{/* silent */}
+}
+
+async function loadServices(forceRender){
+  try{
+    const r=await sbReq('services?order=id');
+    if(r.ok){
+      const data=await r.json();
+      if(Array.isArray(data)&&data.length>0){services=data;servicesFromDb=true;}
+      else{services=DEFAULT_SERVICES;servicesFromDb=false;}
+    }else{services=DEFAULT_SERVICES;servicesFromDb=false;}
+  }catch{services=DEFAULT_SERVICES;servicesFromDb=false;}
+  if(forceRender)renderServices();
+}
+
+function renderServices(){
+  const el=document.getElementById('svc-list');
+  if(!el)return;
+  const notice=document.getElementById('svc-setup-notice');
+  if(notice){
+    if(servicesFromDb){notice.style.display='none';}
+    else{
+      notice.style.display='block';
+      notice.innerHTML='⚠️ Services-Tabelle noch nicht eingerichtet — Toggle deaktiviert. SQL in Supabase ausführen um Services live zu verwalten.';
+    }
+  }
+  const cards=services.map(s=>{
+    const bkCount=buchungen.filter(b=>b.service===s.id).length;
+    const freeSlots=zeitfenster.filter(z=>z.service===s.id&&!z.buchung_id).length;
+    const bookedSlots=zeitfenster.filter(z=>z.service===s.id&&z.buchung_id).length;
+    const h=Math.floor(s.dauer_min/60),m=s.dauer_min%60;
+    const dauerStr=h>0?(m>0?`${h}h ${m}m`:`${h} Std`):`${m} Min`;
+    const toggleDisabled=servicesFromDb?'':'disabled title="Tabelle nicht eingerichtet"';
+    return `<div class="svc-mgmt-card${s.aktiv?'':' inaktiv'}" id="svc-card-${s.id}">
+      <div class="svc-mgmt-icon">${s.icon}</div>
+      <div class="svc-mgmt-name">${escHtml(s.label)}</div>
+      <div class="svc-mgmt-desc">${escHtml(s.beschreibung||'')}</div>
+      <div class="svc-mgmt-stats">
+        <div><div class="svc-mgmt-stat-val">${bkCount}</div><div class="svc-mgmt-stat-lbl">Buchungen</div></div>
+        <div><div class="svc-mgmt-stat-val">${freeSlots}</div><div class="svc-mgmt-stat-lbl">Slots frei</div></div>
+        <div><div class="svc-mgmt-stat-val">${dauerStr}</div><div class="svc-mgmt-stat-lbl">Dauer</div></div>
+      </div>
+      <button class="svc-toggle ${s.aktiv?'on':'off'}" onclick="toggleService('${s.id}',${s.aktiv})" ${toggleDisabled}>
+        ${s.aktiv?'● Aktiv — im Portal sichtbar':'○ Inaktiv — im Portal ausgeblendet'}
+      </button>
+    </div>`;
+  });
+  el.innerHTML=`<div class="svc-mgmt-grid">${cards.join('')}</div>`;
+}
+
+async function toggleService(id,currentlyAktiv){
+  const newVal=!currentlyAktiv;
+  try{
+    const r=await sbReq(`services?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({aktiv:newVal})});
+    if(!r.ok)throw 0;
+    const s=services.find(x=>x.id===id);
+    if(s)s.aktiv=newVal;
+    renderServices();
+  }catch{alert('Fehler beim Aktualisieren.');}
 }
 
 const ZT_SVC_LABEL={sperrmuell:'📦 Sperrmüll',moebel:'🛋️ Möbel & Aufbau',kleiner_auftrag:'🔧 Kleiner Auftrag',paket:'📬 Paketzustellung'};
