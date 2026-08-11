@@ -301,9 +301,20 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .bk-bestaetigt{background:var(--yellow-pale);color:var(--yellow)}
 .bk-arbeit{background:#e0e7ff;color:#3730a3}
 .bk-erledigt{background:var(--green-pale);color:var(--green-mid)}
+.bk-storniert{background:var(--bg);color:var(--text-muted);border:1px solid var(--border)}
 .bk-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .bk-act{padding:5px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;background:var(--bg);color:var(--text);font-family:inherit}
 .bk-act.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:600}
+.bk-act.storno{border-color:#fca5a5;color:#dc2626;background:var(--bg)}
+.bk-act.storno:hover{background:#fee2e2}
+.bk-termin-edit{background:var(--bg-subtle,#f8f8f7);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:8px;display:none}
+.bk-termin-edit.open{display:block}
+.bk-termin-in{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;margin-bottom:6px}
+.bk-termin-in:focus{outline:none;border-color:var(--accent)}
+.bk-bestaetigt-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.bk-best-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:13px}
+.bk-best-date{font-weight:600;color:var(--green-mid);min-width:90px}
+.bk-best-meta{color:var(--text-muted);font-size:12px}
 .bk-antwort-wrap{margin-top:8px;display:none}
 .bk-antwort-wrap.show{display:block}
 .bk-antwort-in{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;resize:none}
@@ -498,6 +509,7 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <button class="chip" onclick="setBkFilterStatus(this,'Bestätigt')">Bestätigt</button>
       <button class="chip" onclick="setBkFilterStatus(this,'In Arbeit')">In Arbeit</button>
       <button class="chip" onclick="setBkFilterStatus(this,'Erledigt')">✓ Erledigt</button>
+      <button class="chip" onclick="setBkFilterStatus(this,'Storniert')">⊘ Storniert</button>
     </div>
     <div class="chips" id="bk-svc-chips" style="margin-bottom:10px">
       <button class="chip active" onclick="setBkFilterSvc(this,'alle')">Alle Services</button>
@@ -505,6 +517,10 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <button class="chip" onclick="setBkFilterSvc(this,'moebel')">🛋️</button>
       <button class="chip" onclick="setBkFilterSvc(this,'kleiner_auftrag')">🔧</button>
       <button class="chip" onclick="setBkFilterSvc(this,'paket')">📬</button>
+    </div>
+    <div id="bk-bestaetigte-wrap" style="display:none">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">📅 Bestätigte Termine</div>
+      <div class="bk-bestaetigt-list" id="bk-best-list"></div>
     </div>
     <div class="card" id="buch-list"></div>
   </div>
@@ -1546,7 +1562,8 @@ function editCap(cat){
 
 // ── BUCHUNGEN ────────────────────────────────────────────────────────────────
 const BK_STATUS = ['Neu','Bestätigt','In Arbeit','Erledigt'];
-const BK_BADGE  = {Neu:'bk-neu',Bestätigt:'bk-bestaetigt','In Arbeit':'bk-arbeit',Erledigt:'bk-erledigt'};
+const BK_BADGE  = {Neu:'bk-neu',Bestätigt:'bk-bestaetigt','In Arbeit':'bk-arbeit',Erledigt:'bk-erledigt',Storniert:'bk-storniert'};
+const CAL_HM_ID = encodeURIComponent('cecee355008d83fcad2bbeaf4a82e283f66b942c2ec39402ba16ece52bdc3992@group.calendar.google.com');
 const BK_ICON   = {sperrmuell:'📦',moebel:'🛋️',handwerk:'🔨',kleiner_auftrag:'🔧',paket:'📬'};
 
 let bkFilterStatus = 'alle';
@@ -1570,6 +1587,27 @@ function renderBuchungen(){
   const el = document.getElementById('buch-list');
   if(!el) return;
 
+  // mini-calendar: bestätigte Termine
+  const bestWrap = document.getElementById('bk-bestaetigte-wrap');
+  const bestList = document.getElementById('bk-best-list');
+  const bestAlle = buchungen.filter(b=>b.status==='Bestätigt');
+  if(bestWrap && bestList){
+    if(bestAlle.length){
+      bestList.innerHTML = bestAlle.map(b=>{
+        const icon = BK_ICON[b.service]||'📋';
+        return `<div class="bk-best-row">
+          <div class="bk-best-date">${escHtml(b.wunschtermin||'—')}</div>
+          <div style="flex:1">${icon} ${escHtml(b.service_label||b.service)}</div>
+          <div class="bk-best-meta">Suite ${escHtml(b.zimmer||'—')}</div>
+          <a class="bk-act" href="${bkCalUrl(b)}" target="_blank" rel="noopener" style="text-decoration:none;font-size:11px;padding:3px 9px">📅</a>
+        </div>`;
+      }).join('');
+      bestWrap.style.display = 'block';
+    } else {
+      bestWrap.style.display = 'none';
+    }
+  }
+
   let filtered = buchungen;
   if(bkFilterStatus !== 'alle') filtered = filtered.filter(b=>b.status===bkFilterStatus);
   if(bkFilterSvc    !== 'alle') filtered = filtered.filter(b=>b.service===bkFilterSvc);
@@ -1583,24 +1621,38 @@ function renderBuchungen(){
     const badge = BK_BADGE[b.status]||'bk-neu';
     const icon  = BK_ICON[b.service]||'📋';
     const dt    = b.created_at ? new Date(b.created_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
-    const actBtns = BK_STATUS.map(s=>`
+    const isStorniert = b.status === 'Storniert';
+    const isEditbar  = b.status === 'Neu' || b.status === 'Bestätigt';
+    const actBtns = isStorniert ? '' : BK_STATUS.map(s=>`
       <button class="bk-act${b.status===s?' active':''}"
         onclick="updateBuchungStatus('${b.id}',${ri},'${s}')">${s}</button>`).join('');
+    const calBtn  = (b.status==='Bestätigt'||b.status==='In Arbeit')
+      ? `<a class="bk-act" href="${bkCalUrl(b)}" target="_blank" rel="noopener" style="text-decoration:none">📅 Kalender</a>` : '';
+    const stornoBtn = isEditbar
+      ? `<button class="bk-act storno" onclick="storniereInDashboard('${b.id}',${ri})">✕ Stornieren</button>` : '';
+    const terminBtn = isEditbar
+      ? `<button class="bk-act" id="bk-te-btn-${ri}" onclick="toggleTerminEdit(${ri})">✏️ Termin</button>` : '';
+    const terminEditor = isEditbar ? `
+      <div class="bk-termin-edit" id="bk-te-${ri}">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px">Termin ändern</div>
+        <input class="bk-termin-in" id="bk-te-in-${ri}" type="text" placeholder="z.B. 25.08.2026, morgens" value="${escHtml(b.wunschtermin||'')}">
+        <button class="bk-save" onclick="saveTerminEdit('${b.id}',${ri})">Speichern</button>
+      </div>` : '';
     return `
-    <div class="bk-item" id="bk-row-${ri}">
+    <div class="bk-item${isStorniert?' bk-row-storniert':''}" id="bk-row-${ri}" style="${isStorniert?'opacity:.55':''}">
       <div class="bk-top">
         <div class="bk-title">${icon} ${escHtml(b.service_label||b.service)}</div>
         <span class="bk-badge ${badge}">${escHtml(b.status)}</span>
       </div>
       <div class="bk-meta">Suite ${escHtml(b.zimmer||'—')} · ${escHtml(b.wunschtermin||'—')} · eingegangen ${dt}</div>
       ${b.beschreibung ? `<div class="bk-desc">"${escHtml(b.beschreibung)}"</div>` : ''}
-      <div class="bk-actions">${actBtns}${(b.status==='Bestätigt'||b.status==='In Arbeit')?`<a class="bk-act" href="${bkCalUrl(b)}" target="_blank" rel="noopener" style="text-decoration:none">📅 Kalender</a>`:''}
-      </div>
-      <div class="bk-antwort-wrap${b.antwort?' show':''}" id="bk-ans-${ri}">
+      ${isStorniert ? '' : `<div class="bk-actions">${actBtns}${calBtn}${stornoBtn}${terminBtn}</div>`}
+      ${terminEditor}
+      ${isStorniert ? '' : `<div class="bk-antwort-wrap${b.antwort?' show':''}" id="bk-ans-${ri}">
         <textarea class="bk-antwort-in" id="bk-txt-${ri}" rows="2"
           placeholder="Rückmeldung an Bewohner (optional)…">${escHtml(b.antwort||'')}</textarea>
         <button class="bk-save" onclick="saveBuchungAntwort('${b.id}',${ri})">Speichern</button>
-      </div>
+      </div>`}
     </div>`;
   }).join('');
 }
@@ -1628,7 +1680,7 @@ function bkCalUrl(b){
   );
   const loc = encodeURIComponent('Scharfestraße 4–6, 14163 Berlin-Zehlendorf');
   const dates = start && end ? `${start}/${end}` : '';
-  return `https://calendar.google.com/calendar/r/eventedit?text=${title}${dates?'&dates='+dates:''}&details=${details}&location=${loc}`;
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}${dates?'&dates='+dates:''}&details=${details}&location=${loc}&src=${CAL_HM_ID}`;
 }
 
 async function updateBuchungStatus(id, idx, status){
@@ -1667,6 +1719,59 @@ async function saveBuchungAntwort(id, idx){
     if(!r.ok) throw 0;
     setSyncDot('ok');
   }catch{ setSyncDot('err'); }
+}
+
+async function storniereInDashboard(id, idx){
+  if(!confirm('Buchung wirklich stornieren? Dies kann nicht rückgängig gemacht werden.')) return;
+  const prev = buchungen[idx]?.status;
+  buchungen[idx].status = 'Storniert';
+  renderBuchungen();
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('buchungen?id=eq.'+id,{
+      method:'PATCH',
+      headers:{Prefer:'return=minimal'},
+      body:JSON.stringify({status:'Storniert'})
+    });
+    if(!r.ok) throw 0;
+    setSyncDot('ok');
+  }catch{
+    buchungen[idx].status = prev;
+    renderBuchungen();
+    setSyncDot('err');
+  }
+}
+
+function toggleTerminEdit(idx){
+  const el  = document.getElementById('bk-te-'+idx);
+  const btn = document.getElementById('bk-te-btn-'+idx);
+  if(!el) return;
+  const opening = !el.classList.contains('open');
+  el.classList.toggle('open', opening);
+  if(btn) btn.style.fontWeight = opening ? '700' : '';
+}
+
+async function saveTerminEdit(id, idx){
+  const val = (document.getElementById('bk-te-in-'+idx)?.value||'').trim();
+  if(!val){ alert('Bitte einen Termin eingeben.'); return; }
+  const prev = buchungen[idx]?.wunschtermin;
+  buchungen[idx].wunschtermin = val;
+  renderBuchungen();
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('buchungen?id=eq.'+id,{
+      method:'PATCH',
+      headers:{Prefer:'return=minimal'},
+      body:JSON.stringify({wunschtermin:val})
+    });
+    if(!r.ok) throw 0;
+    setSyncDot('ok');
+  }catch{
+    buchungen[idx].wunschtermin = prev;
+    renderBuchungen();
+    setSyncDot('err');
+    alert('Speichern fehlgeschlagen — bitte erneut versuchen.');
+  }
 }
 
 // ── PFLEGEPLAN ───────────────────────────────────────────────────────────────

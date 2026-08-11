@@ -167,7 +167,8 @@ textarea.f-input{resize:vertical;min-height:88px;line-height:1.6;padding-top:6px
 .slot-card.active .slot-dot{background:#fff}
 .slot-date{font-size:13px;color:var(--stone);margin-bottom:2px}
 .slot-time{font-size:15px;font-weight:600;color:var(--ink)}
-.slot-free-btn{width:100%;padding:11px;background:none;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--stone);cursor:pointer;font-family:var(--sans);margin-top:6px}
+.slot-free-btn{width:100%;padding:11px;background:none;border:1.5px dashed var(--border);border-radius:8px;font-size:12.5px;color:var(--stone);cursor:pointer;font-family:var(--sans);margin-top:10px;transition:border-color .15s,color .15s}
+.slot-free-btn:hover{border-color:var(--green);color:var(--green)}
 
 /* MEINE AUFTRÄGE */
 .ma-empty{text-align:center;padding:32px 16px;color:var(--stone);font-size:14px}
@@ -182,6 +183,15 @@ textarea.f-input{resize:vertical;min-height:88px;line-height:1.6;padding-top:6px
 .ma-bestaetigt{background:#d1e7dd;color:#0a5c36}
 .ma-arbeit{background:#d1ecf1;color:#0c5460}
 .ma-erledigt{background:#d4edda;color:#155724}
+.ma-storniert{background:#f3f4f6;color:#9ca3af}
+.ma-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ma-btn{padding:5px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;background:transparent;color:var(--stone);font-family:var(--sans)}
+.ma-btn.danger{border-color:#fca5a5;color:#dc2626}
+.ma-btn.danger:hover{background:#fee2e2}
+.ma-termin-edit{background:var(--input-bg,#f9f8f5);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:8px;display:none}
+.ma-termin-edit.open{display:block}
+.ma-termin-in{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:transparent;color:var(--ink);font-family:var(--sans);margin-bottom:6px;box-sizing:border-box}
+.ma-termin-in:focus{outline:none;border-color:var(--green)}
 .ma-slot{font-size:13px;color:var(--green);font-weight:500;margin-top:4px}
 .ma-login-hint{text-align:center;padding:36px 20px;color:var(--stone);font-size:14px;line-height:1.6}
 
@@ -713,6 +723,7 @@ html{scroll-behavior:smooth}
       <div style="font-size:11px;font-weight:600;color:var(--stone);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px">Wunschtermin</div>
       <div id="bk-slot-info" style="display:none;margin-bottom:4px"></div>
       <div id="bk-freeform">
+        <div id="bk-no-slots-msg" style="display:none;font-size:12px;color:var(--stone);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:8px">Aktuell gibt es keine freien Terminvorschläge — bitte wählen Sie einen Wunschtermin.</div>
         <input class="f-input" id="bk-datum" type="date" style="margin-bottom:8px">
         <select class="f-input" id="bk-zeit">
           <option value="">Uhrzeit egal</option>
@@ -723,9 +734,11 @@ html{scroll-behavior:smooth}
       </div>
     </div>
 
+    <div id="bk-service-hint" style="display:none;font-size:12.5px;color:var(--stone);background:var(--card);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:14px"></div>
+
     <div style="margin-bottom:20px">
-      <div style="font-size:11px;font-weight:600;color:var(--stone);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px">Details <span style="font-weight:400;text-transform:none">(optional)</span></div>
-      <textarea class="f-input" id="bk-desc" rows="3" placeholder="z. B. Schrank im Schlafzimmer, ca. 2 m breit …" style="resize:none;padding:10px 0;line-height:1.5"></textarea>
+      <div style="font-size:11px;font-weight:600;color:var(--stone);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px"><span id="bk-desc-label">Details</span> <span style="font-weight:400;text-transform:none">(optional)</span></div>
+      <textarea class="f-input" id="bk-desc" rows="3" placeholder="z. B. kurze Beschreibung …" style="resize:none;padding:10px 0;line-height:1.5"></textarea>
     </div>
 
     <div id="bk-err" style="display:none;color:#c1121f;font-size:13px;margin-bottom:10px;padding:8px 10px;background:#ffe5e5;border-radius:8px"></div>
@@ -1310,9 +1323,10 @@ let bkService = null;
 const MA_ICON = {sperrmuell:'📦',moebel:'🛋️',kleiner_auftrag:'🔧',paket:'📬',handwerk:'🔨'};
 const MA_BADGE = {
   'Neu':        ['ma-neu',        'Neu — wird bearbeitet'],
-  'Bestätigt':  ['ma-bestaetigt', 'Bestätigt'],
+  'Bestätigt':  ['ma-bestaetigt', 'Bestätigt ✓'],
   'In Arbeit':  ['ma-arbeit',     'In Arbeit'],
-  'Erledigt':   ['ma-erledigt',   'Erledigt ✓']
+  'Erledigt':   ['ma-erledigt',   'Erledigt ✓'],
+  'Storniert':  ['ma-storniert',  'Storniert']
 };
 
 async function loadMeineAuftraege(){
@@ -1352,8 +1366,20 @@ function renderMeineAuftraege(buchungen, schaeden){
       const [cls, lbl] = MA_BADGE[b.status] || ['ma-neu','Neu'];
       const icon = MA_ICON[b.service] || '📋';
       const dt = b.created_at ? new Date(b.created_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+      const isEditbar = b.status === 'Neu' || b.status === 'Bestätigt';
+      const isStorniert = b.status === 'Storniert';
+      const actionBtns = isEditbar ? `
+        <div class="ma-actions">
+          <button class="ma-btn" onclick="toggleTerminEditPortal('${b.id}')">✏️ Termin ändern</button>
+          <button class="ma-btn danger" onclick="storniereAuftrag('${b.id}')">✕ Stornieren</button>
+        </div>
+        <div class="ma-termin-edit" id="ma-te-${b.id}">
+          <div style="font-size:11px;font-weight:600;color:var(--stone);margin-bottom:5px">Neuen Wunschtermin eingeben</div>
+          <input class="ma-termin-in" id="ma-te-in-${b.id}" type="text" placeholder="z.B. 25.08.2026, morgens" value="${esc(b.wunschtermin||'')}">
+          <button class="sub-btn" style="padding:8px 16px;font-size:13px" onclick="saveTerminEditPortal('${b.id}')">Termin speichern</button>
+        </div>` : '';
       html += `
-        <div class="ma-item">
+        <div class="ma-item" style="${isStorniert?'opacity:.55':''}">
           <div class="ma-top">
             <div class="ma-title">${icon} ${esc(b.service_label||b.service)}</div>
             <span class="ma-badge ${cls}">${lbl}</span>
@@ -1361,6 +1387,7 @@ function renderMeineAuftraege(buchungen, schaeden){
           <div class="ma-meta">Gewünschter Termin: ${esc(b.wunschtermin||'—')} · eingegangen ${dt}</div>
           ${b.beschreibung ? `<div class="ma-meta" style="font-style:italic">"${esc(b.beschreibung)}"</div>` : ''}
           ${b.antwort ? `<div class="ma-antwort">💬 <strong>Rückmeldung:</strong> ${esc(b.antwort)}</div>` : ''}
+          ${actionBtns}
         </div>`;
     });
     html += `</div>`;
@@ -1400,6 +1427,42 @@ function renderMeineAuftraege(buchungen, schaeden){
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+async function storniereAuftrag(id){
+  if(!confirm('Auftrag wirklich stornieren?')) return;
+  try{
+    const r = await fetch(`${SB}/rest/v1/buchungen?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{apikey:KEY,Authorization:`Bearer ${KEY}`,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({status:'Storniert'})
+    });
+    if(!r.ok) throw 0;
+    loadMeineAuftraege();
+  }catch{
+    alert('Stornierung fehlgeschlagen — bitte Seite neu laden.');
+  }
+}
+
+function toggleTerminEditPortal(id){
+  const el = document.getElementById('ma-te-'+id);
+  if(el) el.classList.toggle('open');
+}
+
+async function saveTerminEditPortal(id){
+  const val = (document.getElementById('ma-te-in-'+id)?.value||'').trim();
+  if(!val){ alert('Bitte einen Termin eingeben.'); return; }
+  try{
+    const r = await fetch(`${SB}/rest/v1/buchungen?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{apikey:KEY,Authorization:`Bearer ${KEY}`,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({wunschtermin:val})
+    });
+    if(!r.ok) throw 0;
+    loadMeineAuftraege();
+  }catch{
+    alert('Speichern fehlgeschlagen — bitte erneut versuchen.');
+  }
+}
+
 // ── SERVICE BUCHEN ────────────────────────────────────────────────────
 async function bkSelect(el, service, icon, label) {
   bkService = { service, icon, label, slotId: null };
@@ -1415,6 +1478,7 @@ async function bkSelect(el, service, icon, label) {
     });
     const slots = r.ok ? await r.json() : [];
     if (slots.length > 0) {
+      bkService._noSlots = false;
       document.getElementById('bk-sl-icon').textContent = icon;
       document.getElementById('bk-sl-title').textContent = label;
       const list = document.getElementById('bk-slot-list');
@@ -1434,19 +1498,45 @@ async function bkSelect(el, service, icon, label) {
       });
       document.getElementById('bk-step-slots').style.display = 'block';
     } else {
+      bkService._noSlots = true;
       bkShowStep2(false);
     }
   } catch {
+    bkService._noSlots = true;
     bkShowStep2(false);
   }
 }
+
+const BK_PLACEHOLDER = {
+  sperrmuell:     'z.B. alter Sessel + Regal, ca. 50 kg · steht im Keller bereit',
+  moebel:         'z.B. Schrank im Schlafzimmer, ca. 2 m breit · 2. Etage',
+  kleiner_auftrag:'z.B. Badezimmerlampe wechseln, Schraube an Türrahmen locker',
+  paket:          'z.B. DHL-Paket, kommt Montag · ca. 3 kg · bitte an der Haustür abgeben'
+};
+const BK_HINT = {
+  sperrmuell: '🗓 Bitte stellen Sie die Gegenstände bis zum Termin im Flur oder Keller bereit.',
+  paket:      '📦 Ich nehme Ihr Paket gerne entgegen — bitte melden Sie, wann es eintrifft.'
+};
+const BK_DESC_LABEL = {
+  paket: 'Paketdetails'
+};
 
 function bkShowStep2(withSlot) {
   document.getElementById('bk-step-slots').style.display = 'none';
   document.getElementById('bk-icon').textContent = bkService.icon;
   document.getElementById('bk-title').textContent = bkService.label;
   document.getElementById('bk-suite-disp').textContent = sel ? 'Suite ' + sel.zimmer : '—';
-  document.getElementById('bk-desc').value = '';
+  const descEl = document.getElementById('bk-desc');
+  descEl.value = '';
+  descEl.placeholder = BK_PLACEHOLDER[bkService.service] || 'z.B. kurze Beschreibung des Auftrags';
+  const descLabel = document.getElementById('bk-desc-label');
+  if(descLabel) descLabel.textContent = BK_DESC_LABEL[bkService.service] || 'Details';
+  const hintEl = document.getElementById('bk-service-hint');
+  if(hintEl){
+    const hint = BK_HINT[bkService.service];
+    hintEl.textContent = hint || '';
+    hintEl.style.display = hint ? 'block' : 'none';
+  }
   document.getElementById('bk-err').style.display = 'none';
   document.getElementById('bk-submit').disabled = false;
   document.getElementById('bk-submit').textContent = 'Anfrage absenden →';
@@ -1465,6 +1555,8 @@ function bkShowStep2(withSlot) {
     document.getElementById('bk-zeit').value = '';
     slotInfo.style.display = 'none';
     freeform.style.display = 'block';
+    const noSlotsMsg = document.getElementById('bk-no-slots-msg');
+    if(noSlotsMsg) noSlotsMsg.style.display = bkService._noSlots ? 'block' : 'none';
   }
   document.getElementById('bk-step-2').style.display = 'block';
 }
@@ -1525,6 +1617,7 @@ async function saveBuchung() {
       }
     }
     document.getElementById('bk-step-2').style.display = 'none';
+    loadMeineAuftraege();
     const confCard = document.getElementById('bk-conf-card');
     if(confCard){
       const dm = portalSvcs.find(s=>s.id===bkService.service)?.dauer_min||0;
