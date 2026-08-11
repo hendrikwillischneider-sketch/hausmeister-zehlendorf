@@ -157,6 +157,22 @@ textarea.f-input{resize:vertical;min-height:88px;line-height:1.6;padding-top:6px
 .s-new{margin-top:24px;display:inline-block;padding:12px 24px;background:var(--green);
   color:#fff;border:none;border-radius:7px;font-size:15px;cursor:pointer;font-family:var(--sans)}
 
+/* MEINE AUFTRÄGE */
+.ma-empty{text-align:center;padding:32px 16px;color:var(--stone);font-size:14px}
+.ma-item{padding:14px 16px;border-bottom:1px solid var(--border)}
+.ma-item:last-child{border:none}
+.ma-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
+.ma-title{font-size:15px;font-weight:600;color:var(--ink)}
+.ma-meta{font-size:12.5px;color:var(--stone);margin-bottom:6px}
+.ma-antwort{font-size:13px;background:var(--cream);border-left:3px solid var(--green);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:8px;line-height:1.5;color:var(--ink-soft)}
+.ma-badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.ma-neu{background:#fef3cd;color:#856404}
+.ma-bestaetigt{background:#d1e7dd;color:#0a5c36}
+.ma-arbeit{background:#d1ecf1;color:#0c5460}
+.ma-erledigt{background:#d4edda;color:#155724}
+.ma-slot{font-size:13px;color:var(--green);font-weight:500;margin-top:4px}
+.ma-login-hint{text-align:center;padding:36px 20px;color:var(--stone);font-size:14px;line-height:1.6}
+
 /* FOOTER */
 footer{max-width:600px;margin:0 auto;padding:16px 16px 28px;border-top:1px solid var(--border);
   display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
@@ -342,6 +358,7 @@ html{scroll-behavior:smooth}
   <a href="#willkommen">Willkommen</a>
   <a href="#melden">Schaden melden</a>
   <a href="#service-buchen">Service buchen</a>
+  <a href="#meine-auftraege">Meine Aufträge</a>
   <!-- RELEASE 3
   <a href="#jahresplan">Jahresplan</a>
   <a href="#unser-park">Unser Park</a>
@@ -717,6 +734,17 @@ html{scroll-behavior:smooth}
 
 </div>
 
+<!-- ── MEINE AUFTRÄGE ──────────────────────────────────────── -->
+<div class="main" id="meine-auftraege" style="padding-top:28px;padding-bottom:48px;scroll-margin-top:44px">
+  <div class="form-cat-title" style="margin-bottom:4px">Meine Aufträge</div>
+  <p style="font-size:14px;color:var(--stone);margin-bottom:22px;line-height:1.55">
+    Alle Ihre Anfragen auf einen Blick — mit aktuellem Status und Rückmeldung.
+  </p>
+  <div id="ma-body">
+    <div class="ma-login-hint">Bitte wählen Sie oben Ihre Suite, um Ihre Aufträge zu sehen.</div>
+  </div>
+</div>
+
 <div class="modal-ov" id="art-ov">
   <button class="modal-close" onclick="closeArtikel()">&#x2715;</button>
   <div class="modal-box" id="art-box"></div>
@@ -769,7 +797,7 @@ function onDDChange(v){document.getElementById('bw-ok').style.display=v?'block':
 function confirmR(){
   const id=document.getElementById('bw-dd').value;
   const r=rs.find(x=>x.id===id);if(!r)return;
-  sel=r;localStorage.setItem(BK,JSON.stringify(r));showSeld(r);
+  sel=r;localStorage.setItem(BK,JSON.stringify(r));showSeld(r);loadMeineAuftraege();
 }
 function goAnon(){sel=null;document.getElementById('bw-card').style.display='none';}
 function showSeld(r){
@@ -786,7 +814,7 @@ function showSel(){
 
 (async()=>{
   const sv=localStorage.getItem(BK);
-  if(sv){try{sel=JSON.parse(sv);showSeld(sel);loadR();return;}catch{localStorage.removeItem(BK);}}
+  if(sv){try{sel=JSON.parse(sv);showSeld(sel);loadR();loadMeineAuftraege();return;}catch{localStorage.removeItem(BK);}}
   document.getElementById('bw-wrap').style.display='block';
   await loadR();
 })();
@@ -1234,6 +1262,101 @@ function closeBaumPub() { document.getElementById('baum-pub-modal').style.displa
 // ── SERVICE BUCHEN ───────────────────────────────────────────────────────────
 let bkService = null;
 
+// ── MEINE AUFTRÄGE ────────────────────────────────────────────────────
+const MA_ICON = {sperrmuell:'📦',moebel:'🛋️',kleiner_auftrag:'🔧',paket:'📬',handwerk:'🔨'};
+const MA_BADGE = {
+  'Neu':        ['ma-neu',        'Neu — wird bearbeitet'],
+  'Bestätigt':  ['ma-bestaetigt', 'Bestätigt'],
+  'In Arbeit':  ['ma-arbeit',     'In Arbeit'],
+  'Erledigt':   ['ma-erledigt',   'Erledigt ✓']
+};
+
+async function loadMeineAuftraege(){
+  const el = document.getElementById('ma-body');
+  if(!el) return;
+  if(!sel){
+    el.innerHTML = '<div class="ma-login-hint">Bitte wählen Sie oben Ihre Suite, um Ihre Aufträge zu sehen.</div>';
+    return;
+  }
+  el.innerHTML = '<div class="ma-login-hint">Wird geladen …</div>';
+  try{
+    const [bRes, sRes] = await Promise.all([
+      fetch(`${SB}/rest/v1/buchungen?zimmer=eq.${encodeURIComponent(sel.zimmer)}&order=created_at.desc`,
+        {headers:{apikey:KEY,Authorization:`Bearer ${KEY}`}}),
+      fetch(`${SB}/rest/v1/schaden?zimmer=eq.${encodeURIComponent(sel.zimmer)}&order=created_at.desc&select=id,datum,ort,problem,status,notiz`,
+        {headers:{apikey:KEY,Authorization:`Bearer ${KEY}`}})
+    ]);
+    const buchungen = bRes.ok ? await bRes.json() : [];
+    const schaeden  = sRes.ok ? await sRes.json() : [];
+    renderMeineAuftraege(buchungen, schaeden);
+  }catch{
+    el.innerHTML = '<div class="ma-login-hint">Konnte nicht geladen werden. Bitte Seite neu laden.</div>';
+  }
+}
+
+function renderMeineAuftraege(buchungen, schaeden){
+  const el = document.getElementById('ma-body');
+  if(!el) return;
+
+  let html = '';
+
+  // ── Buchungen (Services) ──
+  if(buchungen.length){
+    html += `<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone);margin-bottom:8px">Service-Anfragen</div>`;
+    html += `<div class="card" style="padding:0;margin-bottom:20px">`;
+    buchungen.forEach(b => {
+      const [cls, lbl] = MA_BADGE[b.status] || ['ma-neu','Neu'];
+      const icon = MA_ICON[b.service] || '📋';
+      const dt = b.created_at ? new Date(b.created_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+      html += `
+        <div class="ma-item">
+          <div class="ma-top">
+            <div class="ma-title">${icon} ${esc(b.service_label||b.service)}</div>
+            <span class="ma-badge ${cls}">${lbl}</span>
+          </div>
+          <div class="ma-meta">Gewünschter Termin: ${esc(b.wunschtermin||'—')} · eingegangen ${dt}</div>
+          ${b.beschreibung ? `<div class="ma-meta" style="font-style:italic">"${esc(b.beschreibung)}"</div>` : ''}
+          ${b.antwort ? `<div class="ma-antwort">💬 <strong>Rückmeldung:</strong> ${esc(b.antwort)}</div>` : ''}
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Schadensmeldungen ──
+  if(schaeden.length){
+    html += `<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--stone);margin-bottom:8px">Schadensmeldungen</div>`;
+    html += `<div class="card" style="padding:0;margin-bottom:20px">`;
+    schaeden.forEach(s => {
+      const done = s.status === 'Abgeschlossen';
+      const cls = done ? 'ma-erledigt' : s.status === 'Offen' ? 'ma-neu' : 'ma-arbeit';
+      const lbl = done ? 'Abgeschlossen ✓' : s.status;
+      html += `
+        <div class="ma-item">
+          <div class="ma-top">
+            <div class="ma-title">🔧 ${esc(s.ort||'Schaden')}</div>
+            <span class="ma-badge ${cls}">${lbl}</span>
+          </div>
+          <div class="ma-meta">${esc(s.problem||'—')} · gemeldet ${esc(s.datum||'')}</div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if(!buchungen.length && !schaeden.length){
+    html = `<div class="ma-empty">
+      <div style="font-size:32px;margin-bottom:10px">📋</div>
+      Noch keine Aufträge für Suite ${esc(String(sel.zimmer))} vorhanden.
+    </div>`;
+  }
+
+  html += `<button onclick="loadMeineAuftraege()" style="width:100%;padding:11px;background:none;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--stone);cursor:pointer;font-family:var(--sans)">↻ Aktualisieren</button>`;
+
+  el.innerHTML = html;
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── SERVICE BUCHEN ────────────────────────────────────────────────────
 function bkSelect(el, service, icon, label) {
   bkService = { service, icon, label };
   document.getElementById('bk-icon').textContent = icon;

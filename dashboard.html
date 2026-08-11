@@ -1209,7 +1209,8 @@ function renderBuchungen(){
       </div>
       <div class="bk-meta">Suite ${escHtml(b.zimmer||'—')} · ${escHtml(b.wunschtermin||'—')} · eingegangen ${dt}</div>
       ${b.beschreibung ? `<div class="bk-desc">"${escHtml(b.beschreibung)}"</div>` : ''}
-      <div class="bk-actions">${actBtns}</div>
+      <div class="bk-actions">${actBtns}${(b.status==='Bestätigt'||b.status==='In Arbeit')?`<a class="bk-act" href="${bkCalUrl(b)}" target="_blank" rel="noopener" style="text-decoration:none">📅 Kalender</a>`:''}
+      </div>
       <div class="bk-antwort-wrap${b.antwort?' show':''}" id="bk-ans-${idx}">
         <textarea class="bk-antwort-in" id="bk-txt-${idx}" rows="2"
           placeholder="Rückmeldung an Bewohner (optional)…">${escHtml(b.antwort||'')}</textarea>
@@ -1217,6 +1218,32 @@ function renderBuchungen(){
       </div>
     </div>`;
   }).join('');
+}
+
+function bkCalUrl(b){
+  // wunschtermin z.B. "20.08.2026, morgens" oder "20.08.2026, Uhrzeit egal"
+  const ZEITEN = {morgens:[9,0,11,0], mittags:[12,0,14,0], nachmittags:[14,0,17,0]};
+  let start='', end='';
+  if(b.wunschtermin){
+    const parts = b.wunschtermin.split(',');
+    const datePart = (parts[0]||'').trim(); // "20.08.2026"
+    const zeitPart = (parts[1]||'').trim().toLowerCase();
+    const m = datePart.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+    if(m){
+      const [,dd,mm,yyyy] = m;
+      const [h1,min1,h2,min2] = ZEITEN[zeitPart] || [9,0,11,0];
+      const pad = n=>String(n).padStart(2,'0');
+      start = `${yyyy}${mm}${dd}T${pad(h1)}${pad(min1)}00`;
+      end   = `${yyyy}${mm}${dd}T${pad(h2)}${pad(min2)}00`;
+    }
+  }
+  const title = encodeURIComponent(`${b.service_label||b.service} — Suite ${b.zimmer||'?'}`);
+  const details = encodeURIComponent(
+    `Service-Anfrage über Bewohnerportal\nSuite: ${b.zimmer||'—'}\nWunschtermin: ${b.wunschtermin||'—'}${b.beschreibung?'\nHinweis: '+b.beschreibung:''}`
+  );
+  const loc = encodeURIComponent('Scharfestraße 4–6, 14163 Berlin-Zehlendorf');
+  const dates = start && end ? `${start}/${end}` : '';
+  return `https://calendar.google.com/calendar/r/eventedit?text=${title}${dates?'&dates='+dates:''}&details=${details}&location=${loc}`;
 }
 
 async function updateBuchungStatus(id, idx, status){
