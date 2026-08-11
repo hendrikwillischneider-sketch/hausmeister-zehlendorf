@@ -239,6 +239,27 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .part-link-in{flex:1;min-width:120px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px}
 .part-link-go{font-size:15px;text-decoration:none;color:var(--accent);flex-shrink:0;line-height:1}
 .dm-parts-total{border-top:1px solid var(--border);padding:8px 2px 2px;text-align:right;font-size:14px;font-weight:600;color:var(--accent);margin-top:6px}
+.dm-teile-summary{cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);padding:6px 0;list-style:none;display:flex;align-items:center;gap:6px;user-select:none}
+.dm-teile-summary::-webkit-details-marker{display:none}
+.dm-teile-summary::before{content:'▶';font-size:9px;transition:transform .15s}
+details[open] .dm-teile-summary::before{transform:rotate(90deg)}
+.dm-teile-sw{font-size:14px;font-weight:600;color:var(--accent);padding:6px 2px;border-top:1px solid var(--border);margin-top:4px;margin-bottom:12px}
+
+/* EINKAUFSLISTE */
+.eink-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px}
+.eink-total{font-size:22px;font-weight:700;color:var(--green-mid);font-variant-numeric:tabular-nums;flex-shrink:0}
+.eink-cnt{font-size:12px;color:var(--text-muted);margin-top:2px}
+.eink-item{display:flex;align-items:flex-start;gap:12px;padding:12px 13px;border-bottom:1px solid var(--border);transition:opacity .3s}
+.eink-item:last-child{border:none}
+.eink-item.done{opacity:.4}
+.eink-cb{width:22px;height:22px;accent-color:var(--accent);flex-shrink:0;cursor:pointer;margin-top:1px}
+.eink-body{flex:1;min-width:0}
+.eink-name{font-size:14px;font-weight:500;margin-bottom:3px}
+.eink-item.done .eink-name{text-decoration:line-through;color:var(--text-muted)}
+.eink-ref{font-size:11.5px;color:var(--text-muted);margin-bottom:4px}
+.eink-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.eink-preis{font-size:13px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.eink-link{font-size:12px;color:var(--green-mid);text-decoration:none;background:var(--green-pale);padding:3px 9px;border-radius:6px;white-space:nowrap}
 
 /* RESPONSIVE */
 @media(min-width:480px){.bgt-grid{grid-template-columns:repeat(4,1fr)}}
@@ -346,6 +367,18 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
     <div class="sec">Wochenlog</div>
     <div id="log-list"><div class="empty"><div class="empty-icon">📋</div><div class="empty-lbl">Noch kein Eintrag diese Woche</div></div></div>
     <button onclick="addLogEntry()" class="chip active" style="font-size:14px;padding:9px 16px;margin-top:8px">+ Stunden eintragen</button>
+  </div>
+
+  <!-- EINKAUFSLISTE (Hendrik only) -->
+  <div class="view" id="v-einkauf">
+    <div class="eink-header">
+      <div>
+        <div class="sec" style="margin:0 0 2px">Materialbeschaffung</div>
+        <div class="eink-cnt" id="eink-cnt"></div>
+      </div>
+      <div class="eink-total" id="eink-total"></div>
+    </div>
+    <div class="card" id="eink-list"></div>
   </div>
 
   <!-- EINSTELLUNGEN (Hendrik only) -->
@@ -493,16 +526,17 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
       <textarea class="modal-in" id="dm-notiz" rows="3" placeholder="z.B. Handwerker beauftragt am …"></textarea>
     </div>
 
-    <!-- Teileliste (unten) -->
-    <div id="dm-teile-section" style="margin-top:4px;margin-bottom:12px">
-      <div class="modal-lbl" style="margin-bottom:6px">🔩 Benötigte Teile / Material</div>
-      <div id="dm-parts-list"></div>
+    <!-- Reparaturaufnahme (Hendrik: aufklappbar · Frau Schwade: nur Summe) -->
+    <details id="dm-teile-details" style="margin-top:4px;margin-bottom:12px">
+      <summary class="dm-teile-summary">🔧 Reparaturaufnahme</summary>
+      <div id="dm-parts-list" style="margin-top:8px"></div>
       <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
         <input class="modal-in" id="dm-part-in" placeholder="Teil hinzufügen …" onkeydown="if(event.key==='Enter'){event.preventDefault();addDmPart()}">
         <button class="modal-btn secondary" style="padding:10px 14px;flex-shrink:0;white-space:nowrap" onclick="addDmPart()">+ Add</button>
       </div>
       <div class="dm-parts-total" id="dm-teile-total" style="display:none"></div>
-    </div>
+    </details>
+    <div id="dm-teile-sw" class="dm-teile-sw" style="display:none"></div>
 
     <div class="modal-actions">
       <button class="modal-btn primary" onclick="saveDetail()">Speichern</button>
@@ -666,7 +700,7 @@ function initApp(){
   // Build nav
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'budget',lbl:'💰 Budget'},
-       {id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'settings',lbl:'⚙️'}]
+       {id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
     : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'budget',lbl:'💰 Budget'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
@@ -694,6 +728,7 @@ function showTab(id){
   if(id==='uebersicht')renderOverview();
   if(id==='schaeden')renderSchaden();
   if(id==='settings')renderSettings();
+  if(id==='einkauf')renderEinkauf();
 }
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
@@ -867,6 +902,21 @@ function openDetail(id){
   const rawNotiz = s.notiz||'';
   dmParts = parseTeile(rawNotiz);
   renderDmParts();
+
+  // Reparaturaufnahme: Hendrik = aufgeklappt, Frau Schwade = zugeklappt + Summe sichtbar
+  const detailsEl = document.getElementById('dm-teile-details');
+  const swEl = document.getElementById('dm-teile-sw');
+  if(role === 'hm'){
+    detailsEl.open = true;
+    swEl.style.display = 'none';
+  } else {
+    detailsEl.open = false;
+    const tot = teileTotal();
+    if(tot > 0){
+      swEl.style.display = 'block';
+      swEl.textContent = 'Gesamtkosten Teile: ' + tot.toFixed(2).replace('.',',') + ' €';
+    } else { swEl.style.display = 'none'; }
+  }
 
   document.getElementById('dm-kosten').value = s.kosten!=null?s.kosten:'';
   document.getElementById('dm-notiz').value = cleanNotizText(rawNotiz);
@@ -1361,6 +1411,90 @@ function nsSelKat(el, kat){
   el.classList.add('sel');
   // Set prio to Hoch automatically for Notfall
   if(kat==='Notfall') document.getElementById('ns-prio').value='Hoch';
+}
+
+// ── EINKAUFSLISTE ─────────────────────────────────────────────────────────────
+function buildEinkaufsliste(){
+  const items = [];
+  schaden.forEach(s=>{
+    if(s.status==='Abgeschlossen') return;
+    const parts = parseTeile(s.notiz||'');
+    parts.forEach((p,i)=>{
+      if(!p.l) items.push({
+        schadenId:s.id, sbId:s.sb_id, partIdx:i,
+        n:p.n, p:p.p, url:p.url,
+        ort:s.ort, prob:s.prob, zimmer:s.zimmer
+      });
+    });
+  });
+  return items;
+}
+
+function renderEinkauf(){
+  const items = buildEinkaufsliste();
+  const total = items.reduce((s,it)=>s+(it.p||0),0);
+  const cntEl = document.getElementById('eink-cnt');
+  const totEl = document.getElementById('eink-total');
+  const listEl = document.getElementById('eink-list');
+  if(!cntEl) return;
+
+  cntEl.textContent = items.length
+    ? `${items.length} ${items.length===1?'Teil':'Teile'} zu beschaffen`
+    : 'Kein Material offen';
+  totEl.textContent = total>0 ? eur(total) : '';
+
+  if(!items.length){
+    listEl.innerHTML='<div class="empty"><div class="empty-icon">✅</div><div class="empty-lbl">Alle Teile vorhanden — nichts zu beschaffen</div></div>';
+    return;
+  }
+  listEl.innerHTML = items.map((it,idx)=>`
+    <div class="eink-item" id="eink-row-${idx}">
+      <input type="checkbox" class="eink-cb" title="Als besorgt / Im Lager markieren"
+        onchange="markBesorgt('${it.schadenId}','${it.sbId}',${it.partIdx},${idx},this)">
+      <div class="eink-body">
+        <div class="eink-name">🔩 ${escHtml(it.n)}</div>
+        <div class="eink-ref">📍 ${escHtml(it.ort||'—')}${it.prob?' — '+escHtml(it.prob.slice(0,55)):''}</div>
+        <div class="eink-meta">
+          ${it.p ? `<span class="eink-preis">${eur(it.p)}</span>` : ''}
+          ${it.url ? `<a class="eink-link" href="${escHtml(it.url)}" target="_blank" rel="noopener">Kaufen ↗</a>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function markBesorgt(schadenId, sbId, partIdx, rowIdx, cb){
+  cb.disabled = true;
+  const row = document.getElementById('eink-row-'+rowIdx);
+  if(row) row.classList.add('done');
+
+  const s = schaden.find(x=>x.id===schadenId);
+  if(!s){ cb.disabled=false; return; }
+
+  const parts = parseTeile(s.notiz||'');
+  if(!parts[partIdx]){ cb.disabled=false; return; }
+  parts[partIdx].l = true;
+  parts[partIdx].p = null;
+
+  const notizText = cleanNotizText(s.notiz||'');
+  const notiz = [serializeTeile(parts), notizText].filter(Boolean).join('\n') || null;
+
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('schaden?id=eq.'+sbId, {
+      method:'PATCH',
+      headers:{Prefer:'return=minimal'},
+      body: JSON.stringify({notiz})
+    });
+    if(!r.ok) throw 0;
+    s.notiz = notiz||'';
+    setSyncDot('ok');
+    setTimeout(renderEinkauf, 500);
+  }catch{
+    setSyncDot('err');
+    if(row) row.classList.remove('done');
+    cb.checked=false;
+    cb.disabled=false;
+  }
 }
 
 async function saveNewSchaden(){
