@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3c2e">
+<title>Dashboard — Sidonie-Scharfe-Stiftung</title>
+<style>
+:root{
+  --green:#1C4A2E;--green-d:#132E1C;--green-mid:#2d6a4f;--green-light:#40916c;--green-pale:#d8f3dc;
+  --accent:#52b788;--gold:#B8892A;--burg:#7A2430;
+  --red:#c1121f;--red-pale:#ffe5e5;--red-mid:#e63946;
+  --yellow:#d97706;--yellow-pale:#fef3c7;
+  --bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;
+  --radius:12px;--shadow:0 1px 3px rgba(26,21,16,.06),0 4px 16px rgba(26,21,16,.04)
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;
+  --green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;
+  --shadow:0 1px 4px rgba(0,0,0,.4)
+}}
+:root[data-theme="dark"]{--bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--shadow:0 1px 4px rgba(0,0,0,.4)}
+:root[data-theme="light"]{--bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;--shadow:0 1px 3px rgba(26,21,16,.06),0 4px 16px rgba(26,21,16,.04)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--green);display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}
+.login-screen.gone{display:none}
+.login-box{background:var(--card);border-radius:20px;padding:28px 22px;max-width:380px;width:100%}
+.login-logo{font-size:26px;margin-bottom:4px}
+.login-title{font-size:19px;font-weight:700;color:var(--green);margin-bottom:2px}
+.login-sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.role-card{background:var(--bg);border:2px solid var(--border);border-radius:13px;padding:16px 12px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s}
+.role-card:active,.role-card.sel{border-color:var(--green-mid);background:var(--green-pale)}
+.role-icon{font-size:26px;margin-bottom:6px}
+.role-name{font-size:14px;font-weight:600}
+.role-desc{font-size:11px;color:var(--text-muted);margin-top:2px}
+.login-pw-wrap{display:none}
+.login-pw-wrap.show{display:block}
+.login-pw-lbl{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text-muted)}
+.pw-in{width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:10px;font-size:17px;background:var(--bg);color:var(--text);font-family:inherit}
+.pw-in:focus{outline:none;border-color:var(--accent)}
+.pw-btn{display:block;width:100%;padding:14px;background:var(--green-mid);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
+.pw-err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.pw-err.show{display:block}
+
+/* HEADER */
+.hdr{background:var(--green);color:#fff;padding:13px 16px 11px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-left h1{font-size:15.5px;font-weight:700;letter-spacing:-.2px}
+.hdr-left .hdr-sub{font-size:11px;opacity:.6;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.role-badge{font-size:11px;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:20px;font-weight:600}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#52b788;flex-shrink:0}
+.sync-dot.busy{background:var(--yellow);animation:pulse .8s infinite}
+.sync-dot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.logout-btn{background:none;border:none;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;padding:2px}
+
+/* NAV */
+nav{background:var(--card);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1;min-width:64px;padding:10px 4px;border:none;background:none;color:var(--text-muted);font-size:12px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;font-family:inherit}
+nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);font-weight:600}
+
+/* VIEWS */
+.view{display:none;padding:12px 12px 96px;max-width:700px;margin:0 auto}
+.view.active{display:block}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.kpi{background:var(--card);border-radius:var(--radius);padding:11px 12px;box-shadow:var(--shadow)}
+.kpi-val{font-size:24px;font-weight:700;color:var(--green-mid);line-height:1}
+.kpi-val.alert{color:var(--red)}
+.kpi-val.warn{color:var(--yellow)}
+.kpi-lbl{font-size:11px;color:var(--text-muted);margin-top:3px}
+
+/* SECTION HEADER */
+.sec{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 7px}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+
+/* FILTER CHIPS */
+.chips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);font-size:13px;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--text-muted);transition:all .15s;font-family:inherit}
+.chip.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:500}
+
+/* DAMAGE ITEM */
+.si{padding:12px 13px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.si:last-child{border:none}
+.si:active{background:var(--bg)}
+.si-prio{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.p-hoch{background:var(--red)} .p-mittel{background:var(--yellow)} .p-niedrig{background:var(--accent)} .p-done{background:var(--border)}
+.si-body{flex:1;min-width:0}
+.si-top{display:flex;align-items:flex-start;gap:6px;justify-content:space-between}
+.si-title{font-size:14px;font-weight:500;line-height:1.3;flex:1}
+.si-meta{font-size:11.5px;color:var(--text-muted);margin-top:3px}
+.si-badge{font-size:10.5px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.b-offen{background:var(--red-pale);color:var(--red)}
+.b-laufend{background:var(--yellow-pale);color:var(--yellow)}
+.b-done{background:var(--green-pale);color:var(--green-mid)}
+.b-kosten{background:#e0e7ff;color:#3730a3}
+.si-notfall{background:#fff1f0;border-left:3px solid var(--red)}
+@media(prefers-color-scheme:dark){.si-notfall{background:#2d0a0a}}
+:root[data-theme="dark"] .si-notfall{background:#2d0a0a}
+
+/* BUDGET */
+.bgt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.bgt-cat{background:var(--card);border-radius:var(--radius);padding:14px 14px 12px;box-shadow:var(--shadow);cursor:pointer;border:2px solid transparent}
+.bgt-cat.active-filter{border-color:var(--green-mid)}
+.bgt-icon{font-size:22px;margin-bottom:5px}
+.bgt-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.bgt-spent{font-size:20px;font-weight:700;color:var(--green-mid);font-variant-numeric:tabular-nums}
+.bgt-spent.warn{color:var(--yellow)}
+.bgt-spent.over{color:var(--red)}
+.bgt-cap{font-size:11px;color:var(--text-muted);margin-top:1px}
+.bgt-bar-wrap{margin-top:8px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.bgt-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s}
+.bgt-bar-fill.warn{background:var(--yellow)}
+.bgt-bar-fill.over{background:var(--red)}
+
+/* BUDGET ENTRIES */
+.bgt-entry{padding:10px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.bgt-entry:last-child{border:none}
+.bgt-e-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.bgt-e-body{flex:1;min-width:0}
+.bgt-e-desc{font-size:13.5px}
+.bgt-e-meta{font-size:11px;color:var(--text-muted);margin-top:1px}
+.bgt-e-amt{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0}
+.bgt-e-del{background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:4px}
+
+/* ADD BUTTON */
+.fab{position:fixed;bottom:20px;right:16px;background:var(--green-mid);color:#fff;border:none;border-radius:28px;padding:14px 20px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(28,74,46,.35);display:flex;align-items:center;gap:7px;z-index:50}
+.fab.hidden{display:none}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal-bg.gone{display:none}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding:20px 18px 40px}
+.modal-drag{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:14px;line-height:1.3}
+.modal-row{margin-bottom:10px}
+.modal-lbl{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.modal-val{font-size:14.5px}
+.modal-in{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:15px;background:var(--bg);color:var(--text);font-family:inherit}
+.modal-in:focus{outline:none;border-color:var(--accent)}
+.modal-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.modal-btn{padding:13px 16px;border:none;border-radius:11px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.modal-btn.primary{background:var(--green-mid);color:#fff}
+.modal-btn.secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+.modal-btn.danger{background:var(--red-pale);color:var(--red)}
+.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.status-opt{padding:9px 10px;border-radius:9px;border:1.5px solid var(--border);font-size:13px;cursor:pointer;text-align:center;font-family:inherit;background:var(--bg);color:var(--text)}
+.status-opt.sel{border-color:var(--green-mid);background:var(--green-pale);color:var(--green-mid);font-weight:600}
+
+/* PFLEGEPLAN */
+.task-group-hdr{font-size:13px;font-weight:700;color:var(--green-mid);margin:12px 0 6px;padding:0 2px;border-left:3px solid var(--green-mid);padding-left:8px}
+.task-item{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--border)}
+.task-item:last-child{border:none}
+.task-cb{width:20px;height:20px;flex-shrink:0;accent-color:var(--green-mid);cursor:pointer}
+.task-body{flex:1}
+.task-name{font-size:14px}
+.task-note{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.task-h{font-size:11.5px;color:var(--text-muted);flex-shrink:0}
+.task-done .task-name{text-decoration:line-through;color:var(--text-muted)}
+
+/* LOG */
+.log-day{margin-bottom:12px}
+.log-day-hdr{font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:5px;padding:0 2px}
+.log-item{background:var(--card);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start;box-shadow:var(--shadow)}
+.log-time{font-size:12px;color:var(--text-muted);flex-shrink:0;min-width:32px;font-variant-numeric:tabular-nums}
+.log-body{flex:1}
+.log-desc{font-size:13.5px}
+.log-h{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* SETTINGS */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border)}
+.set-row:last-child{border:none}
+.set-lbl{font-size:14px}
+.set-val{font-size:13.5px;color:var(--text-muted)}
+.set-btn{background:none;border:none;color:var(--green-mid);font-size:13.5px;cursor:pointer;font-weight:600;font-family:inherit}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:40px 20px;color:var(--text-muted)}
+.empty-icon{font-size:36px;margin-bottom:8px}
+.empty-lbl{font-size:14px}
+
+/* NOTFALL PILL */
+.notfall-pill{display:inline-flex;align-items:center;gap:4px;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.overview-notfall{background:var(--red-pale);border-radius:var(--radius);padding:13px 14px;margin-bottom:14px;border-left:3px solid var(--red)}
+@media(prefers-color-scheme:dark){.overview-notfall{background:#3a0f0f}}
+:root[data-theme="dark"] .overview-notfall{background:#3a0f0f}
+.notfall-row{display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0}
+.notfall-row+.notfall-row{border-top:1px solid rgba(193,18,31,.2)}
+.notfall-row-ort{font-size:14px;font-weight:500;flex:1}
+.notfall-row-date{font-size:11.5px;color:var(--red);opacity:.7}
+
+/* FOTO GRID */
+.foto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.foto-slot{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg);border:2px dashed var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:11px;color:var(--text-muted);transition:border-color .15s}
+.foto-slot:hover{border-color:var(--accent)}
+.foto-slot.filled{border:none}
+.foto-slot img{width:100%;height:100%;object-fit:cover}
+.foto-slot .foto-rm{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;font-size:13px;line-height:22px;text-align:center;cursor:pointer;display:none}
+.foto-slot.filled .foto-rm{display:block}
+.foto-add-slot{font-size:22px;line-height:1}
+
+/* SCHADEN THUMB */
+.si-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0}
+
+/* DETAIL FOTO GRID */
+.dm-foto-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.dm-foto-grid img{width:100%;border-radius:10px;object-fit:cover;max-height:160px;cursor:pointer}
+.dm-foto-grid img:only-child{grid-column:span 2;max-height:220px}
+
+/* TEILE */
+/* EINFACHE TEILE (new-schaden modal) */
+.parts-list{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
+.part-item{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:8px;padding:7px 10px;font-size:13.5px}
+.part-item span{flex:1}
+.part-rm{background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;line-height:1;padding:0}
+
+/* REICHE TEILE (detail modal) */
+.part-rich{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.part-rich-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.part-rich-icon{font-size:15px;flex-shrink:0}
+.part-rich-name{flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text);font-size:13.5px;font-family:inherit;outline:none;min-width:0;padding:0 2px}
+.part-rich-name:focus{border-bottom-color:var(--accent)}
+.part-rich-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.part-lager-lbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.part-lager-lbl input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer}
+.part-preis-wrap{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-muted);flex-shrink:0}
+.part-preis-in{width:72px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;text-align:right}
+.part-preis-in:disabled{opacity:.35;cursor:not-allowed}
+.part-link-in{flex:1;min-width:120px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px}
+.part-link-go{font-size:15px;text-decoration:none;color:var(--accent);flex-shrink:0;line-height:1}
+.dm-parts-total{border-top:1px solid var(--border);padding:8px 2px 2px;text-align:right;font-size:14px;font-weight:600;color:var(--accent);margin-top:6px}
+
+/* RESPONSIVE */
+@media(min-width:480px){.bgt-grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login">
+  <div class="login-box">
+    <div class="login-logo">🏠</div>
+    <div class="login-title">Hausmeister Dashboard</div>
+    <div class="login-sub">Sidonie-Scharfe-Stiftung · Zehlendorf</div>
+    <div class="role-cards">
+      <div class="role-card" onclick="selRole('hm')">
+        <div class="role-icon">🔧</div>
+        <div class="role-name">Hendrik</div>
+        <div class="role-desc">Hausmeister</div>
+      </div>
+      <div class="role-card" onclick="selRole('sw')">
+        <div class="role-icon">👤</div>
+        <div class="role-name">Frau Schwade</div>
+        <div class="role-desc">Heimleiterin</div>
+      </div>
+    </div>
+    <div class="login-pw-wrap" id="pw-wrap">
+      <div class="login-pw-lbl" id="pw-lbl">Passwort eingeben</div>
+      <input class="pw-in" id="pw-in" type="password" inputmode="none" autocomplete="current-password"
+             placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="pw-btn" onclick="doLogin()">Anmelden →</button>
+      <div class="pw-err" id="pw-err">Falsches Passwort — bitte prüfen.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+
+  <div class="hdr">
+    <div class="hdr-left">
+      <h1>Hausmeister Dashboard</h1>
+      <div class="hdr-sub" id="hdr-date"></div>
+    </div>
+    <div class="hdr-right">
+      <span class="role-badge" id="role-badge"></span>
+      <div class="sync-dot" id="sync-dot" title="Supabase-Sync"></div>
+      <button class="logout-btn" onclick="logout()">Abmelden</button>
+    </div>
+  </div>
+
+  <nav id="main-nav"></nav>
+
+  <!-- ÜBERSICHT -->
+  <div class="view" id="v-uebersicht">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val alert" id="kpi-notfall">—</div><div class="kpi-lbl">Notfälle offen</div></div>
+      <div class="kpi"><div class="kpi-val warn" id="kpi-offen">—</div><div class="kpi-lbl">Schäden offen</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpi-budget">—</div><div class="kpi-lbl">Budget genutzt</div></div>
+    </div>
+
+    <div id="notfall-overview"></div>
+
+    <div class="sec">Budget August 2026</div>
+    <div id="bgt-overview-cards" class="bgt-grid"></div>
+
+    <div class="sec">Zuletzt gemeldet</div>
+    <div class="card" id="recent-list"><div class="empty"><div class="empty-lbl">Wird geladen …</div></div></div>
+  </div>
+
+  <!-- SCHÄDEN -->
+  <div class="view" id="v-schaeden">
+    <div class="chips" id="filter-chips">
+      <button class="chip active" onclick="setFilter(this,'alle')">Alle</button>
+      <button class="chip" onclick="setFilter(this,'notfall')">🚨 Notfall</button>
+      <button class="chip" onclick="setFilter(this,'offen')">Offen</button>
+      <button class="chip" onclick="setFilter(this,'laufend')">In Arbeit</button>
+      <button class="chip" onclick="setFilter(this,'done')">Erledigt</button>
+    </div>
+    <div id="schaden-list"></div>
+  </div>
+
+  <!-- BUDGET -->
+  <div class="view" id="v-budget">
+    <div class="sec">Übersicht — August 2026</div>
+    <div class="bgt-grid" id="bgt-cat-cards"></div>
+
+    <div class="sec" id="bgt-entries-hdr">Kostenbuchungen</div>
+    <div class="card" id="bgt-entries-list"></div>
+    <div style="margin-top:8px;text-align:right">
+      <button class="chip active" onclick="openBgtModal()" style="font-size:14px;padding:8px 16px">+ Kosten buchen</button>
+    </div>
+  </div>
+
+  <!-- PFLEGEPLAN (Hendrik only) -->
+  <div class="view" id="v-pflegeplan">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <div class="sec" style="margin:0">Diese Woche · KW <span id="kw-lbl"></span></div>
+      <div style="font-size:12px;color:var(--text-muted)"><span id="task-done-cnt">0</span> / <span id="task-total-cnt">0</span> erledigt</div>
+    </div>
+    <div id="pflegeplan-list"></div>
+  </div>
+
+  <!-- LOG (Hendrik only) -->
+  <div class="view" id="v-log">
+    <div class="sec">Wochenlog</div>
+    <div id="log-list"><div class="empty"><div class="empty-icon">📋</div><div class="empty-lbl">Noch kein Eintrag diese Woche</div></div></div>
+    <button onclick="addLogEntry()" class="chip active" style="font-size:14px;padding:9px 16px;margin-top:8px">+ Stunden eintragen</button>
+  </div>
+
+  <!-- EINSTELLUNGEN (Hendrik only) -->
+  <div class="view" id="v-settings">
+    <div class="sec">Budget-Grenzen</div>
+    <div class="card">
+      <div class="set-row">
+        <div><div class="set-lbl">🏠 Allg. Wartung / Monat</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="set-val" id="set-wartung-val">€150</span>
+          <button class="set-btn" onclick="editCap('wartung')">Ändern</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-lbl">🌿 Parkanlage & Garten / Monat</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="set-val" id="set-park-val">€300</span>
+          <button class="set-btn" onclick="editCap('park')">Ändern</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-lbl">🔧 Reparaturen</div><div style="font-size:11px;color:var(--text-muted)">Aus Schadensmeldungen automatisch</div></div>
+        <span class="set-val">kein Limit</span>
+      </div>
+      <div class="set-row">
+        <div><div class="set-lbl">📦 Sonstiges</div></div>
+        <span class="set-val">kein Limit</span>
+      </div>
+    </div>
+
+    <div class="sec">System</div>
+    <div class="card">
+      <div class="set-row">
+        <div class="set-lbl">Letzte Synchronisierung</div>
+        <span class="set-val" id="last-sync-lbl">—</span>
+      </div>
+      <div class="set-row">
+        <button class="set-btn" onclick="syncNow()">Jetzt synchronisieren</button>
+        <span class="set-val" id="sync-status-txt"></span>
+      </div>
+      <div class="set-row">
+        <button class="set-btn" style="color:var(--text-muted)" onclick="logout()">Abmelden</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- FAB -->
+<button class="fab hidden" id="fab" onclick="openAddEntry()">+ Eingang erfassen</button>
+
+<!-- NEUEN SCHADEN ERFASSEN MODAL -->
+<div class="modal-bg gone" id="new-schaden-modal">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Eingang erfassen</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Telefonisch entgegengenommener Schaden oder Notfall</div>
+
+    <div class="modal-row">
+      <div class="modal-lbl">Art der Meldung</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+        <button class="status-opt sel" id="ns-kat-schaden" onclick="nsSelKat(this,'Schaden')">🔧 Schaden</button>
+        <button class="status-opt" id="ns-kat-notfall" onclick="nsSelKat(this,'Notfall')" style="border-color:var(--red)">🚨 Notfall</button>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Ort / Bereich</div>
+      <input class="modal-in" id="ns-ort" type="text" placeholder="z.B. Suite 12 · Bad, Treppenhaus Erdgeschoss …">
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Problem (kurz beschreiben)</div>
+      <textarea class="modal-in" id="ns-prob" rows="3" placeholder="z.B. Wasserhahn tropft, Heizung kalt, Glühbirne kaputt …"></textarea>
+    </div>
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Suite-Nr. (falls bekannt)</div>
+        <input class="modal-in" id="ns-zimmer" type="text" inputmode="numeric" maxlength="4" placeholder="z.B. 12">
+      </div>
+      <div>
+        <div class="modal-lbl">Priorität</div>
+        <select class="modal-in" id="ns-prio">
+          <option value="Hoch">Hoch</option>
+          <option value="Mittel" selected>Mittel</option>
+          <option value="Niedrig">Niedrig</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">🔩 Teile / Material (optional)</div>
+      <div class="parts-list" id="ns-parts-list"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="modal-in" id="ns-part-in" placeholder="z.B. Duschkopf, Dichtring 1/2" …" onkeydown="if(event.key==='Enter'){event.preventDefault();addPart()}">
+        <button class="modal-btn secondary" style="padding:10px 14px;flex-shrink:0;white-space:nowrap" onclick="addPart()">+ Add</button>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Notiz (optional)</div>
+      <input class="modal-in" id="ns-notiz" type="text" placeholder="z.B. Bewohnerin wartet auf Rückruf">
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">📷 Fotos (optional · bis zu 6)</div>
+      <div class="foto-grid" id="ns-foto-grid"></div>
+      <input type="file" id="ns-foto-in" accept="image/*" capture="environment" multiple style="display:none" onchange="addFotos(this)">
+    </div>
+
+    <div id="ns-err" style="display:none;color:var(--red);font-size:13px;margin-bottom:8px;padding:8px 10px;background:var(--red-pale);border-radius:8px"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="ns-submit-btn" onclick="saveNewSchaden()">Meldung speichern</button>
+      <button class="modal-btn secondary" onclick="closeModal('new-schaden-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCHADEN DETAIL MODAL -->
+<div class="modal-bg gone" id="detail-modal">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title" id="dm-title"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="dm-badges"></div>
+
+    <!-- Ort · Problem · Suite · Datum -->
+    <div class="modal-row"><div class="modal-lbl">Ort</div><div class="modal-val" id="dm-ort">—</div></div>
+    <div class="modal-row"><div class="modal-lbl">Problem</div><div class="modal-val" id="dm-prob">—</div></div>
+    <div class="modal-row" id="dm-zimmer-row"><div class="modal-lbl">Suite</div><div class="modal-val" id="dm-zimmer">—</div></div>
+    <div class="modal-row"><div class="modal-lbl">Datum</div><div class="modal-val" id="dm-date">—</div></div>
+
+    <!-- Fotos -->
+    <div id="dm-foto-wrap" style="display:none;margin-bottom:12px">
+      <div class="modal-lbl" style="margin-bottom:6px">📷 Schadensaufnahme</div>
+      <div id="dm-foto-grid" class="dm-foto-grid"></div>
+    </div>
+
+    <!-- Status · Kosten · Notiz -->
+    <div class="modal-row">
+      <div class="modal-lbl">Status</div>
+      <div class="status-grid" id="dm-status-grid"></div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Kosten (€)</div>
+      <input class="modal-in" id="dm-kosten" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Notiz / Maßnahme</div>
+      <textarea class="modal-in" id="dm-notiz" rows="3" placeholder="z.B. Handwerker beauftragt am …"></textarea>
+    </div>
+
+    <!-- Teileliste (unten) -->
+    <div id="dm-teile-section" style="margin-top:4px;margin-bottom:12px">
+      <div class="modal-lbl" style="margin-bottom:6px">🔩 Benötigte Teile / Material</div>
+      <div id="dm-parts-list"></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <input class="modal-in" id="dm-part-in" placeholder="Teil hinzufügen …" onkeydown="if(event.key==='Enter'){event.preventDefault();addDmPart()}">
+        <button class="modal-btn secondary" style="padding:10px 14px;flex-shrink:0;white-space:nowrap" onclick="addDmPart()">+ Add</button>
+      </div>
+      <div class="dm-parts-total" id="dm-teile-total" style="display:none"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="saveDetail()">Speichern</button>
+      <button class="modal-btn secondary" onclick="closeModal('detail-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET ENTRY MODAL -->
+<div class="modal-bg gone" id="bgt-modal">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Kosten buchen</div>
+
+    <div class="modal-row">
+      <div class="modal-lbl">Kategorie</div>
+      <select class="modal-in" id="bgt-kat">
+        <option value="wartung">🏠 Allgemeine Wartung</option>
+        <option value="park">🌿 Parkanlage &amp; Garten</option>
+        <option value="sonstiges">📦 Sonstiges</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Betrag (€)</div>
+      <input class="modal-in" id="bgt-betrag" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Beschreibung</div>
+      <input class="modal-in" id="bgt-desc" type="text" placeholder="z.B. Grassamen Herbstsorte 5 kg">
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Datum</div>
+      <input class="modal-in" id="bgt-date" type="date">
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="saveBgtEntry()">Buchen</button>
+      <button class="modal-btn secondary" onclick="closeModal('bgt-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+const SB   = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
+const KEY  = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+const LS   = 'db_v1';
+const ROLE_KEY = 'db_role';
+
+const STATUSES = ['Offen','In Umsetzung','Handwerker beauftragt','Abgeschlossen'];
+
+const MONTHS = {1:'Januar',2:'Februar',3:'März',4:'April',5:'Mai',6:'Juni',
+  7:'Juli',8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
+
+const BGT_CATS = [
+  {id:'wartung',  icon:'🏠', name:'Allg. Wartung',       cap:true,  color:'#2d6a4f'},
+  {id:'park',     icon:'🌿', name:'Parkanlage & Garten', cap:true,  color:'#40916c'},
+  {id:'reparatur',icon:'🔧', name:'Reparaturen',          cap:false, color:'#d97706', auto:true},
+  {id:'sonstiges',icon:'📦', name:'Sonstiges',            cap:false, color:'#6c757d'}
+];
+
+const TASKS = [
+  {cat:'Rasen',name:'Rasen mähen',m:[8,9,10,11],h:1.5,note:'Aug/Sep: 1–2×/Woche · Okt/Nov: 2-wöchig'},
+  {cat:'Rasen',name:'Rasenkanten trimmen',m:[8,9,10],h:1,note:'Im Anschluss ans Mähen'},
+  {cat:'Rasen',name:'Bewässerung bei Hitze',m:[8,9],h:1,note:'Morgens wässern'},
+  {cat:'Rasen',name:'Herbstdünger ausbringen',m:[9],h:1,note:'Mitte September, Kalium-NPK'},
+  {cat:'Rasen',name:'Kahle Stellen nachsäen',m:[9,10],h:2,note:'Herbstsaat · Boden lockern'},
+  {cat:'Wege & Plätze',name:'Wege fegen & reinigen',m:[8,9,10,11,12],h:1.5,note:'Wöchentlich'},
+  {cat:'Wege & Plätze',name:'Abfälle aufsammeln',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich'},
+  {cat:'Wege & Plätze',name:'Unkraut in Fugen entfernen',m:[8,9,10],h:1,note:'Gehwege und Pflaster'},
+  {cat:'Wege & Plätze',name:'Müllstandplatz kontrollieren',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich'},
+  {cat:'Hecken & Gehölze',name:'Heckenschnitt (letzter)',m:[9],h:4,note:'Bis Ende September'},
+  {cat:'Hecken & Gehölze',name:'Baumkontrolle nach Sturm',m:[10,11,12],h:1,note:'Kranke Äste melden'},
+  {cat:'Beete',name:'Unkraut jäten',m:[8,9,10],h:1,note:'Beete und Rahmenbepflanzung'},
+  {cat:'Beete',name:'Beete winterfest machen',m:[10],h:3,note:'Stauden schneiden, Mulch'},
+  {cat:'Laub',name:'Laub entfernen und entsorgen',m:[10,11,12],h:2,note:'⚠️ Nasses Laub = Rutschgefahr!'},
+  {cat:'Sitzbänke',name:'Bänke & Möbel reinigen',m:[8,9,10,11],h:0.5,note:'Alle 2 Wochen'},
+  {cat:'Sitzbänke',name:'Bänke auf Schäden prüfen',m:[8,9,10,11],h:0.5,note:'Risse, Schrauben, Splitter'},
+  {cat:'Sitzbänke',name:'Bänke & Möbel einlagern',m:[11],h:1,note:'Vor Frost schützen'},
+  {cat:'Winterdienst',name:'Winterdienst vorbereiten',m:[11],h:2,note:'Streugut und Geräte prüfen'},
+  {cat:'Kontrollen',name:'Außenbeleuchtung kontrollieren',m:[8,9,10,11,12],h:0.5,note:'Monatlich'},
+  {cat:'Kontrollen',name:'Spielgeräte Sichtkontrolle',m:[8,9,10,11,12],h:1,note:'Mängel sofort melden'},
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let role = null; // 'hm' | 'sw'
+let schaden = [];
+let filterMode = 'alle';
+let editItem = null;
+let bgtEntries = JSON.parse(localStorage.getItem('bgt_entries') || '[]');
+let bgtCaps = JSON.parse(localStorage.getItem('bgt_caps') || '{"wartung":150,"park":300}');
+let taskState = JSON.parse(localStorage.getItem('task_state_' + wkKey()) || '{}');
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+const td = () => new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+function wkKey(){const d=new Date(),dw=d.getDay()||7,m=new Date(d);m.setDate(d.getDate()-(dw-1));return m.toISOString().slice(0,10);}
+function kw(){const d=new Date(),j4=new Date(d.getFullYear(),0,4),sw=new Date(j4);sw.setDate(j4.getDate()-(j4.getDay()||7)+1);return Math.ceil((d-sw)/(7*864e5))+1;}
+const cm = () => new Date().getMonth() + 1;
+const cy = () => new Date().getFullYear();
+const eur = v => (v||0).toLocaleString('de-DE',{style:'currency',currency:'EUR',minimumFractionDigits:2});
+
+async function sbReq(path, opts={}){
+  const {headers:extraHdrs={}, ...rest} = opts;
+  return fetch(`${SB}/rest/v1/${path}`,{
+    headers:{apikey:KEY,Authorization:`Bearer ${KEY}`,'Content-Type':'application/json',...extraHdrs},
+    ...rest
+  });
+}
+
+function setSyncDot(state){
+  const d=document.getElementById('sync-dot');
+  if(!d)return;
+  d.className='sync-dot'+(state==='busy'?' busy':state==='err'?' err':'');
+}
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+const PW_HM = () => localStorage.getItem('hm_pw') || 'Zehlendorf26';
+const PW_SW = () => localStorage.getItem('sw_pw') || 'Schwade26';
+
+let pendingRole = null;
+
+function selRole(r){
+  pendingRole = r;
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.role-card')[r==='hm'?0:1].classList.add('sel');
+  const wrap=document.getElementById('pw-wrap');
+  wrap.classList.add('show');
+  document.getElementById('pw-lbl').textContent = r==='hm' ? 'Passwort — Hendrik' : 'Passwort — Frau Schwade';
+  document.getElementById('pw-in').value='';
+  document.getElementById('pw-err').classList.remove('show');
+  document.getElementById('pw-in').focus();
+}
+
+function doLogin(){
+  const val=document.getElementById('pw-in').value;
+  const ok = pendingRole==='hm' ? val===PW_HM() : val===PW_SW();
+  if(!ok){
+    document.getElementById('pw-err').classList.add('show');
+    document.getElementById('pw-in').value='';
+    document.getElementById('pw-in').focus();
+    return;
+  }
+  role=pendingRole;
+  sessionStorage.setItem(ROLE_KEY,role);
+  document.getElementById('login').classList.add('gone');
+  document.getElementById('app').style.display='block';
+  initApp();
+}
+
+function logout(){
+  sessionStorage.removeItem(ROLE_KEY);
+  location.reload();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+function initApp(){
+  // Header
+  document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('role-badge').textContent = role==='hm' ? '🔧 Hendrik' : '👤 Frau Schwade';
+
+  // Build nav
+  const tabs = role==='hm'
+    ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'budget',lbl:'💰 Budget'},
+       {id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'settings',lbl:'⚙️'}]
+    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'budget',lbl:'💰 Budget'}];
+  const nav=document.getElementById('main-nav');
+  nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
+
+  document.getElementById('kw-lbl').textContent = kw();
+  loadData();
+  showTab('uebersicht');
+}
+
+function showTab(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  const v=document.getElementById('v-'+id);
+  const b=document.getElementById('tab-'+id);
+  if(v)v.classList.add('active');
+  if(b)b.classList.add('active');
+
+  // Show FAB on schaden view for both roles
+  const fab=document.getElementById('fab');
+  fab.classList.toggle('hidden', id!=='schaeden');
+
+  if(id==='pflegeplan')renderPflegeplan();
+  if(id==='log')renderLog();
+  if(id==='budget')renderBudget();
+  if(id==='uebersicht')renderOverview();
+  if(id==='schaeden')renderSchaden();
+  if(id==='settings')renderSettings();
+}
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+async function loadData(){
+  setSyncDot('busy');
+  try{
+    const r=await sbReq('schaden?order=created_at.desc&limit=500&select=*');
+    if(!r.ok)throw 0;
+    const raw=await r.json();
+    schaden=raw.map(x=>({
+      id:x.id, sb_id:x.id,
+      datum:x.datum||'',
+      ort:x.ort||'',
+      prob:x.problem||'',
+      prio:x.prio||'Mittel',
+      von:x.von||'Bewohner',
+      zimmer:x.zimmer||null,
+      status:x.status||'Offen',
+      notiz:x.notiz||'',
+      foto:x.foto||null,
+      kosten:x.kosten!=null?x.kosten:null,
+      kategorie:x.kategorie||null,
+      termin:x.termin||'',
+      created_at:x.created_at
+    }));
+    setSyncDot('ok');
+    localStorage.setItem('db_last_sync', new Date().toISOString());
+    renderAll();
+  }catch{
+    setSyncDot('err');
+    renderAll();
+  }
+}
+
+async function syncNow(){
+  document.getElementById('sync-status-txt').textContent='Synchronisiere …';
+  await loadData();
+  document.getElementById('sync-status-txt').textContent='Fertig · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr';
+  renderSettings();
+}
+
+function renderAll(){
+  renderOverview();
+  renderSchaden();
+  renderBudget();
+}
+
+// ── OVERVIEW ─────────────────────────────────────────────────────────────────
+function renderOverview(){
+  const notfaelle = schaden.filter(s=>s.kategorie==='Notfall'&&s.status!=='Abgeschlossen');
+  const offen = schaden.filter(s=>s.status==='Offen');
+  const {total,spent} = budgetSummary();
+  const pct = total>0?Math.round(spent/total*100):0;
+
+  document.getElementById('kpi-notfall').textContent = notfaelle.length||'0';
+  document.getElementById('kpi-offen').textContent = offen.length||'0';
+  document.getElementById('kpi-budget').textContent = pct+'%';
+  const kb = document.getElementById('kpi-budget');
+  kb.className='kpi-val'+(pct>=80?' warn':'');
+
+  // Notfall section
+  const nEl = document.getElementById('notfall-overview');
+  if(notfaelle.length===0){
+    nEl.innerHTML='';
+  } else {
+    nEl.innerHTML=`<div class="overview-notfall">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span class="notfall-pill">🚨 ${notfaelle.length} Notfall${notfaelle.length>1?'älle':''} offen</span>
+      </div>
+      ${notfaelle.map(n=>`<div class="notfall-row" onclick="openDetail('${n.id}')">
+        <span class="notfall-row-ort">${n.ort||'Unbekannt'}</span>
+        <span class="notfall-row-date">${n.datum}</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  // Budget cards (compact)
+  const bCards = document.getElementById('bgt-overview-cards');
+  if(bCards) bCards.innerHTML = renderBgtCards();
+
+  // Recent
+  const recent = [...schaden].slice(0,5);
+  const rEl = document.getElementById('recent-list');
+  if(!schaden.length){
+    rEl.innerHTML='<div class="empty"><div class="empty-icon">✅</div><div class="empty-lbl">Keine Meldungen</div></div>';
+    return;
+  }
+  rEl.innerHTML = recent.map(s=>siHTML(s)).join('');
+}
+
+// ── SCHÄDEN ──────────────────────────────────────────────────────────────────
+function setFilter(el, mode){
+  filterMode=mode;
+  document.querySelectorAll('#filter-chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderSchaden();
+}
+
+function renderSchaden(){
+  let items = [...schaden];
+  if(filterMode==='notfall') items=items.filter(s=>s.kategorie==='Notfall');
+  else if(filterMode==='offen') items=items.filter(s=>s.status==='Offen');
+  else if(filterMode==='laufend') items=items.filter(s=>['In Umsetzung','Handwerker beauftragt','In Prüfung'].includes(s.status));
+  else if(filterMode==='done') items=items.filter(s=>s.status==='Abgeschlossen');
+
+  const el=document.getElementById('schaden-list');
+  if(!items.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-lbl">Keine Einträge</div></div>';
+    return;
+  }
+  el.innerHTML='<div class="card">'+items.map(s=>siHTML(s)).join('')+'</div>';
+}
+
+function parseFotos(raw){
+  if(!raw) return [];
+  if(typeof raw==='string' && raw.startsWith('[')){
+    try{ return JSON.parse(raw); }catch{ return [raw]; }
+  }
+  return [raw];
+}
+
+function siHTML(s){
+  const isNotfall = s.kategorie==='Notfall';
+  const done = s.status==='Abgeschlossen';
+  const pc = isNotfall?'p-hoch': s.prio==='Hoch'?'p-hoch': done?'p-done':'p-mittel';
+  const bc = done?'b-done': isNotfall?'b-offen': ['In Umsetzung','Handwerker beauftragt'].includes(s.status)?'b-laufend':'b-offen';
+  const fotos = parseFotos(s.foto);
+  const thumb = fotos[0] ? `<img class="si-thumb" src="${fotos[0]}" alt="Foto">` : '';
+  return `<div class="si${isNotfall?' si-notfall':''}" onclick="openDetail('${s.id}')">
+    <div class="si-prio ${pc}"></div>
+    <div class="si-body">
+      <div class="si-top">
+        <div class="si-title">${isNotfall?'🚨 ':''}${s.ort||'Ort unbekannt'}</div>
+        <span class="si-badge ${bc}">${s.status}</span>
+      </div>
+      <div class="si-meta">${s.prob||'—'}${s.zimmer?' · Suite '+s.zimmer:''} · ${s.datum}</div>
+    </div>
+    ${thumb}
+  </div>`;
+}
+
+// ── DETAIL MODAL ─────────────────────────────────────────────────────────────
+function openDetail(id){
+  editItem = schaden.find(s=>s.id===id);
+  if(!editItem)return;
+  const s=editItem;
+  const isNotfall = s.kategorie==='Notfall';
+
+  document.getElementById('dm-title').textContent = (isNotfall?'🚨 Notfall — ':'🔧 Schaden — ') + (s.ort||'');
+  document.getElementById('dm-badges').innerHTML =
+    `<span class="si-badge b-${s.status==='Abgeschlossen'?'done':'offen'}">${s.status}</span>`+
+    (s.prio?`<span class="si-badge" style="background:var(--bg);border:1px solid var(--border)">${s.prio}</span>`:'')+
+    (isNotfall?`<span class="si-badge" style="background:var(--red-pale);color:var(--red)">Notfall</span>`:'');
+  document.getElementById('dm-ort').textContent = s.ort||'—';
+  document.getElementById('dm-prob').textContent = s.prob||'—';
+  document.getElementById('dm-date').textContent = s.datum||'—';
+  const zr=document.getElementById('dm-zimmer-row');
+  zr.style.display = s.zimmer?'block':'none';
+  if(s.zimmer)document.getElementById('dm-zimmer').textContent = 'Suite '+s.zimmer;
+
+  // Fotos
+  const fotoArr = parseFotos(s.foto);
+  const dmFotoWrap = document.getElementById('dm-foto-wrap');
+  const dmFotoGrid = document.getElementById('dm-foto-grid');
+  if(fotoArr.length){
+    dmFotoWrap.style.display='block';
+    dmFotoGrid.innerHTML = fotoArr.map(src=>`<img src="${src}" alt="Foto" onclick="this.requestFullscreen&&this.requestFullscreen()">`).join('');
+  } else { dmFotoWrap.style.display='none'; dmFotoGrid.innerHTML=''; }
+
+  // Teile parsen + rendern
+  const rawNotiz = s.notiz||'';
+  dmParts = parseTeile(rawNotiz);
+  renderDmParts();
+
+  document.getElementById('dm-kosten').value = s.kosten!=null?s.kosten:'';
+  document.getElementById('dm-notiz').value = cleanNotizText(rawNotiz);
+
+  const sg=document.getElementById('dm-status-grid');
+  sg.innerHTML=STATUSES.map(st=>
+    `<button class="status-opt${s.status===st?' sel':''}" onclick="selStatus(this,'${st}')">${st}</button>`
+  ).join('');
+
+  document.getElementById('detail-modal').classList.remove('gone');
+}
+
+function selStatus(el, st){
+  document.querySelectorAll('#dm-status-grid .status-opt').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  if(editItem) editItem._newStatus=st;
+}
+
+async function saveDetail(){
+  if(!editItem)return;
+  const newStatus = editItem._newStatus || editItem.status;
+  const kosten = document.getElementById('dm-kosten').value;
+  const notizRaw = document.getElementById('dm-notiz').value.trim();
+  const notiz = [serializeTeile(dmParts), notizRaw].filter(Boolean).join('\n') || null;
+
+  const patch = {
+    status: newStatus,
+    notiz: notiz||null,
+    kosten: kosten!==''?parseFloat(kosten):null,
+    erledigt_am: newStatus==='Abgeschlossen'&&editItem.status!=='Abgeschlossen'?td():editItem.erledigt||null
+  };
+
+  setSyncDot('busy');
+  try{
+    const r=await sbReq('schaden?id=eq.'+editItem.sb_id,{
+      method:'PATCH',
+      headers:{Prefer:'return=minimal'},
+      body:JSON.stringify(patch)
+    });
+    if(!r.ok)throw 0;
+    Object.assign(editItem, patch);
+    delete editItem._newStatus;
+    setSyncDot('ok');
+    closeModal('detail-modal');
+    renderAll();
+  }catch{
+    setSyncDot('err');
+    alert('Speichern fehlgeschlagen. Bitte prüfen.');
+  }
+}
+
+// ── BUDGET ───────────────────────────────────────────────────────────────────
+function thisMonthEntries(){
+  const mm=cm(), yyyy=cy();
+  return bgtEntries.filter(e=>{
+    const d=new Date(e.date);
+    return d.getMonth()+1===mm && d.getFullYear()===yyyy;
+  });
+}
+
+function reparaturCosts(){
+  const mm=cm(), yyyy=cy();
+  return schaden.filter(s=>{
+    if(s.kosten==null||s.kosten===0)return false;
+    const p=(s.datum||'').split('.');
+    if(p.length<3)return false;
+    return parseInt(p[1])===mm && parseInt(p[2])===yyyy;
+  }).reduce((sum,s)=>sum+(s.kosten||0),0);
+}
+
+function budgetSummary(){
+  const ent = thisMonthEntries();
+  const wartung = ent.filter(e=>e.kat==='wartung').reduce((s,e)=>s+e.betrag,0);
+  const park = ent.filter(e=>e.kat==='park').reduce((s,e)=>s+e.betrag,0);
+  const sonst = ent.filter(e=>e.kat==='sonstiges').reduce((s,e)=>s+e.betrag,0);
+  const rep = reparaturCosts();
+  const spent = wartung+park+sonst+rep;
+  const total = bgtCaps.wartung+bgtCaps.park;
+  return {wartung,park,sonst,rep,spent,total};
+}
+
+function renderBgtCards(){
+  const {wartung,park,rep,sonst} = budgetSummary();
+  const vals = {wartung, park, reparatur:rep, sonstiges:sonst};
+  return BGT_CATS.map(c=>{
+    const v = vals[c.id]||0;
+    const cap = c.cap ? bgtCaps[c.id] : null;
+    const pct = cap&&cap>0 ? Math.min(100,Math.round(v/cap*100)) : null;
+    const warn = pct!=null&&pct>=80;
+    const over = pct!=null&&pct>=100;
+    const cls = over?'over':warn?'warn':'';
+    return `<div class="bgt-cat">
+      <div class="bgt-icon">${c.icon}</div>
+      <div class="bgt-name">${c.name}</div>
+      <div class="bgt-spent ${cls}">${eur(v)}</div>
+      <div class="bgt-cap">${cap!=null?`von ${eur(cap)}`:'kein Limit'}</div>
+      ${pct!=null?`<div class="bgt-bar-wrap"><div class="bgt-bar-fill ${cls}" style="width:${pct}%"></div></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderBudget(){
+  const bCards=document.getElementById('bgt-cat-cards');
+  if(bCards)bCards.innerHTML=renderBgtCards();
+
+  // Entries list
+  const ent=thisMonthEntries();
+  const repItems = schaden.filter(s=>{
+    if(s.kosten==null)return false;
+    const p=(s.datum||'').split('.');
+    return p.length>=3&&parseInt(p[1])===cm()&&parseInt(p[2])===cy();
+  });
+  const el=document.getElementById('bgt-entries-list');
+  if(!ent.length&&!repItems.length){
+    el.innerHTML='<div class="empty"><div class="empty-lbl">Noch keine Buchungen diesen Monat</div></div>';
+    return;
+  }
+  const now = `${MONTHS[cm()]} ${cy()}`;
+  document.getElementById('bgt-entries-hdr').textContent = `Buchungen — ${now}`;
+
+  let html='';
+  // Manual entries
+  [...ent].sort((a,b)=>b.date.localeCompare(a.date)).forEach(e=>{
+    const c=BGT_CATS.find(x=>x.id===e.kat)||BGT_CATS[3];
+    html+=`<div class="bgt-entry">
+      <div class="bgt-e-dot" style="background:${c.color}"></div>
+      <div class="bgt-e-body">
+        <div class="bgt-e-desc">${e.desc||'—'}</div>
+        <div class="bgt-e-meta">${c.icon} ${c.name} · ${new Date(e.date).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}</div>
+      </div>
+      <span class="bgt-e-amt">−${eur(e.betrag)}</span>
+      ${role==='hm'?`<button class="bgt-e-del" onclick="delBgtEntry('${e.id}')">✕</button>`:''}
+    </div>`;
+  });
+  // Auto repair costs
+  repItems.forEach(s=>{
+    html+=`<div class="bgt-entry">
+      <div class="bgt-e-dot" style="background:#d97706"></div>
+      <div class="bgt-e-body">
+        <div class="bgt-e-desc">${s.ort}: ${s.prob}</div>
+        <div class="bgt-e-meta">🔧 Reparatur · ${s.datum}</div>
+      </div>
+      <span class="bgt-e-amt">−${eur(s.kosten)}</span>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function openBgtModal(){
+  document.getElementById('bgt-betrag').value='';
+  document.getElementById('bgt-desc').value='';
+  document.getElementById('bgt-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('bgt-kat').value='park';
+  document.getElementById('bgt-modal').classList.remove('gone');
+}
+
+function saveBgtEntry(){
+  const kat=document.getElementById('bgt-kat').value;
+  const betrag=parseFloat(document.getElementById('bgt-betrag').value);
+  const desc=document.getElementById('bgt-desc').value.trim();
+  const date=document.getElementById('bgt-date').value;
+  if(isNaN(betrag)||betrag<=0){alert('Bitte gültigen Betrag eingeben.');return;}
+  if(!desc){alert('Bitte Beschreibung eingeben.');return;}
+  bgtEntries.push({id:Date.now()+'',kat,betrag,desc,date});
+  localStorage.setItem('bgt_entries',JSON.stringify(bgtEntries));
+  closeModal('bgt-modal');
+  renderBudget();
+  renderOverview();
+}
+
+function delBgtEntry(id){
+  bgtEntries=bgtEntries.filter(e=>e.id!==id);
+  localStorage.setItem('bgt_entries',JSON.stringify(bgtEntries));
+  renderBudget();
+  renderOverview();
+}
+
+function editCap(cat){
+  const cur=bgtCaps[cat]||0;
+  const v=prompt(`Budget ${cat==='wartung'?'Allgemeine Wartung':'Parkanlage & Garten'} / Monat (€):`,cur);
+  if(!v)return;
+  const n=parseFloat(v.replace(',','.'));
+  if(isNaN(n)||n<0){alert('Ungültig');return;}
+  bgtCaps[cat]=n;
+  localStorage.setItem('bgt_caps',JSON.stringify(bgtCaps));
+  document.getElementById(`set-${cat}-val`).textContent=eur(n);
+  renderBudget();renderOverview();
+}
+
+// ── PFLEGEPLAN ───────────────────────────────────────────────────────────────
+function renderPflegeplan(){
+  const month=cm();
+  const tasks=TASKS.filter(t=>t.m.includes(month));
+  const groups={};
+  tasks.forEach(t=>{
+    if(!groups[t.cat])groups[t.cat]=[];
+    groups[t.cat].push(t);
+  });
+  const key=wkKey();
+  taskState=JSON.parse(localStorage.getItem('task_state_'+key)||'{}');
+
+  let html='',done=0,total=0;
+  Object.entries(groups).forEach(([cat,items])=>{
+    html+=`<div class="task-group-hdr">${cat}</div><div class="card">`;
+    items.forEach((t,i)=>{
+      const tid=`${key}_${cat}_${i}`;
+      const checked=taskState[tid]||false;
+      if(checked)done++;total++;
+      html+=`<div class="task-item${checked?' task-done':''}">
+        <input type="checkbox" class="task-cb" ${checked?'checked':''} onchange="toggleTask('${tid}',this)">
+        <div class="task-body">
+          <div class="task-name">${t.name}</div>
+          ${t.note?`<div class="task-note">${t.note}</div>`:''}
+        </div>
+        <div class="task-h">${t.h}h</div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+
+  document.getElementById('pflegeplan-list').innerHTML=html||'<div class="empty"><div class="empty-lbl">Keine Aufgaben für diesen Monat</div></div>';
+  document.getElementById('task-done-cnt').textContent=done;
+  document.getElementById('task-total-cnt').textContent=total;
+}
+
+function toggleTask(tid,cb){
+  taskState[tid]=cb.checked;
+  localStorage.setItem('task_state_'+wkKey(),JSON.stringify(taskState));
+  renderPflegeplan();
+}
+
+// ── LOG ───────────────────────────────────────────────────────────────────────
+let logEntries=JSON.parse(localStorage.getItem('log_'+wkKey())||'[]');
+
+function renderLog(){
+  const el=document.getElementById('log-list');
+  if(!logEntries.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-lbl">Noch kein Eintrag diese Woche</div></div>';
+    return;
+  }
+  const totalH=logEntries.reduce((s,e)=>s+e.h,0);
+  const grouped={};
+  logEntries.forEach(e=>{if(!grouped[e.date])grouped[e.date]=[];grouped[e.date].push(e);});
+  let html=`<div style="margin-bottom:10px;font-size:14px;color:var(--text-muted)">Gesamt: <strong style="color:var(--text)">${totalH.toFixed(1)}h</strong> diese Woche</div>`;
+  Object.entries(grouped).sort((a,b)=>b[0].localeCompare(a[0])).forEach(([date,items])=>{
+    const d=new Date(date);
+    html+=`<div class="log-day"><div class="log-day-hdr">${d.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'2-digit'})}</div>`;
+    items.forEach(e=>{
+      html+=`<div class="log-item">
+        <div class="log-time">${e.h}h</div>
+        <div class="log-body"><div class="log-desc">${e.desc}</div></div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function addLogEntry(){
+  const desc=prompt('Was gemacht? (kurze Beschreibung)');
+  if(!desc)return;
+  const hStr=prompt('Wieviele Stunden?','1');
+  const h=parseFloat(hStr);
+  if(isNaN(h)||h<=0){alert('Ungültige Stundenzahl');return;}
+  logEntries.push({id:Date.now()+'',date:new Date().toISOString().slice(0,10),desc,h});
+  localStorage.setItem('log_'+wkKey(),JSON.stringify(logEntries));
+  renderLog();
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────────────────────
+function renderSettings(){
+  document.getElementById('set-wartung-val').textContent=eur(bgtCaps.wartung||150);
+  document.getElementById('set-park-val').textContent=eur(bgtCaps.park||300);
+  const ls=localStorage.getItem('db_last_sync');
+  document.getElementById('last-sync-lbl').textContent=ls?new Date(ls).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+' Uhr':'—';
+}
+
+// ── MODAL HELPERS ─────────────────────────────────────────────────────────────
+function closeModal(id){
+  document.getElementById(id).classList.add('gone');
+  editItem=null;
+}
+
+// Close modal on bg click
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click',e=>{if(e.target===bg)closeModal(bg.id);});
+});
+
+// ── STARTUP ──────────────────────────────────────────────────────────────────
+(function(){
+  const r=sessionStorage.getItem(ROLE_KEY);
+  if(r){
+    role=r;
+    document.getElementById('login').classList.add('gone');
+    document.getElementById('app').style.display='block';
+    initApp();
+  }
+})();
+
+// ── NEUER SCHADEN ────────────────────────────────────────────────────────────
+let nsKat = 'Schaden';
+
+// ── DETAIL MODAL TEILE ───────────────────────────────────────────────────────
+let dmParts = []; // [{n,p,l,url}]
+
+function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function parseTeile(raw){
+  const m = (raw||'').match(/\[TEILE\]([\s\S]*?)\[\/TEILE\]/);
+  if(m){ try{ return JSON.parse(m[1]); }catch{ return []; } }
+  const teileNew = (raw||'').match(/^Benötigte Teile:\n((?:- .+\n?)+)/m);
+  const teileOld = (raw||'').match(/^Benötigte Teile: (.+)/m);
+  if(teileNew) return teileNew[1].trim().split('\n').map(l=>({n:l.replace(/^- /,''),p:null,l:false,url:null}));
+  if(teileOld) return teileOld[1].split(',').map(t=>({n:t.trim(),p:null,l:false,url:null})).filter(x=>x.n);
+  return [];
+}
+
+function cleanNotizText(raw){
+  return (raw||'')
+    .replace(/\[TEILE\][\s\S]*?\[\/TEILE\]\n?/g,'')
+    .replace(/^Benötigte Teile:\n(?:- .+\n?)+/m,'')
+    .replace(/^Benötigte Teile: .+\n?/m,'')
+    .trim();
+}
+
+function serializeTeile(parts){
+  if(!parts.length) return '';
+  return '[TEILE]'+JSON.stringify(parts)+'[/TEILE]';
+}
+
+function teileTotal(){ return dmParts.reduce((s,p)=>s+(p.l?0:(p.p||0)),0); }
+
+function updateTeileTotal(){
+  const el = document.getElementById('dm-teile-total');
+  if(!el) return;
+  const hasCost = dmParts.some(p=>!p.l && p.p);
+  if(hasCost){
+    const t = teileTotal();
+    el.style.display='block';
+    el.textContent = 'Gesamtkosten Teile: ' + t.toFixed(2).replace('.',',') + ' €';
+  } else { el.style.display='none'; }
+}
+
+function renderDmParts(){
+  const list = document.getElementById('dm-parts-list');
+  if(!dmParts.length){ list.innerHTML=''; updateTeileTotal(); return; }
+  list.innerHTML = dmParts.map((p,i)=>`
+    <div class="part-rich">
+      <div class="part-rich-top">
+        <span class="part-rich-icon">🔩</span>
+        <input class="part-rich-name" value="${escHtml(p.n)}" placeholder="Teilbezeichnung"
+          onchange="dmParts[${i}].n=this.value">
+        <button class="part-rm" onclick="removeDmPart(${i})">×</button>
+      </div>
+      <div class="part-rich-meta">
+        <label class="part-lager-lbl">
+          <input type="checkbox" ${p.l?'checked':''} onchange="toggleDmLager(${i},this.checked)">
+          <span>Im Lager</span>
+        </label>
+        <div class="part-preis-wrap">
+          <span>€</span>
+          <input class="part-preis-in" type="number" min="0" step="0.01"
+            value="${p.p!=null?p.p:''}" placeholder="0,00"
+            ${p.l?'disabled':''}
+            oninput="dmParts[${i}].p=this.value?parseFloat(this.value):null;updateTeileTotal()">
+        </div>
+        <input class="part-link-in" type="url" value="${escHtml(p.url||'')}"
+          placeholder="🔗 Link zum Kaufen"
+          onchange="dmParts[${i}].url=this.value.trim()||null;renderDmParts()">
+        ${p.url?`<a class="part-link-go" href="${escHtml(p.url)}" target="_blank" rel="noopener" title="Öffnen">↗</a>`:''}
+      </div>
+    </div>`).join('');
+  updateTeileTotal();
+}
+
+function toggleDmLager(i, checked){
+  dmParts[i].l = checked;
+  if(checked) dmParts[i].p = null;
+  renderDmParts();
+}
+
+function addDmPart(){
+  const inp = document.getElementById('dm-part-in');
+  const v = inp.value.trim();
+  if(!v) return;
+  dmParts.push({n:v, p:null, l:false, url:null});
+  inp.value = '';
+  renderDmParts();
+  inp.focus();
+}
+
+function removeDmPart(i){ dmParts.splice(i,1); renderDmParts(); }
+
+// ── NEW SCHADEN ──────────────────────────────────────────────────────────────
+let nsFotos = [];
+let nsParts = [];
+const MAX_FOTOS = 6;
+const MAX_PX = 900;
+
+function renderFotoGrid(){
+  const grid = document.getElementById('ns-foto-grid');
+  let html = nsFotos.map((src,i)=>
+    `<div class="foto-slot filled">
+      <img src="${src}" alt="Foto ${i+1}">
+      <button class="foto-rm" onclick="removeFoto(${i})">×</button>
+    </div>`
+  ).join('');
+  if(nsFotos.length < MAX_FOTOS){
+    html += `<div class="foto-slot foto-add-slot" onclick="document.getElementById('ns-foto-in').click()">
+      <span class="foto-add-slot">📷</span><span style="font-size:11px;color:var(--text-muted)">Hinzufügen</span>
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function addFotos(input){
+  const files = Array.from(input.files).slice(0, MAX_FOTOS - nsFotos.length);
+  if(!files.length){ input.value=''; return; }
+  let done = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if(w > MAX_PX || h > MAX_PX){
+          if(w > h){ h = Math.round(h*MAX_PX/w); w = MAX_PX; }
+          else { w = Math.round(w*MAX_PX/h); h = MAX_PX; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        nsFotos.push(canvas.toDataURL('image/jpeg', 0.72));
+        if(++done === files.length) renderFotoGrid();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function removeFoto(i){ nsFotos.splice(i,1); renderFotoGrid(); }
+
+function renderParts(){
+  const list = document.getElementById('ns-parts-list');
+  list.innerHTML = nsParts.map((p,i)=>
+    `<div class="part-item">
+      <span>🔩 ${p}</span>
+      <button class="part-rm" onclick="removePart(${i})">×</button>
+    </div>`
+  ).join('');
+}
+
+function addPart(){
+  const inp = document.getElementById('ns-part-in');
+  const v = inp.value.trim();
+  if(!v) return;
+  nsParts.push(v);
+  inp.value = '';
+  renderParts();
+  inp.focus();
+}
+
+function removePart(i){ nsParts.splice(i,1); renderParts(); }
+
+function openAddEntry(){
+  nsKat = 'Schaden';
+  nsFotos = []; nsParts = [];
+  document.getElementById('ns-kat-schaden').classList.add('sel');
+  document.getElementById('ns-kat-notfall').classList.remove('sel');
+  document.getElementById('ns-ort').value = '';
+  document.getElementById('ns-prob').value = '';
+  document.getElementById('ns-zimmer').value = '';
+  document.getElementById('ns-prio').value = 'Mittel';
+  document.getElementById('ns-notiz').value = '';
+  document.getElementById('ns-part-in').value = '';
+  document.getElementById('ns-foto-in').value = '';
+  document.getElementById('ns-err').style.display = 'none';
+  document.getElementById('ns-submit-btn').disabled = false;
+  document.getElementById('ns-submit-btn').textContent = 'Meldung speichern';
+  renderParts();
+  renderFotoGrid();
+  document.getElementById('new-schaden-modal').classList.remove('gone');
+  setTimeout(()=>document.getElementById('ns-ort').focus(),100);
+}
+
+function nsSelKat(el, kat){
+  nsKat = kat;
+  document.getElementById('ns-kat-schaden').classList.remove('sel');
+  document.getElementById('ns-kat-notfall').classList.remove('sel');
+  el.classList.add('sel');
+  // Set prio to Hoch automatically for Notfall
+  if(kat==='Notfall') document.getElementById('ns-prio').value='Hoch';
+}
+
+async function saveNewSchaden(){
+  const ort = document.getElementById('ns-ort').value.trim();
+  const prob = document.getElementById('ns-prob').value.trim();
+  const errEl = document.getElementById('ns-err');
+  if(!ort || !prob){
+    errEl.textContent = 'Bitte Ort und Problem ausfüllen.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const btn = document.getElementById('ns-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="opacity:.6">Wird gespeichert …</span>';
+
+  const zimmer = document.getElementById('ns-zimmer').value.trim() || null;
+  const prio = document.getElementById('ns-prio').value;
+  const notizRaw = document.getElementById('ns-notiz').value.trim();
+  const notiz = [serializeTeile(nsParts.map(n=>({n,p:null,l:false,url:null}))), notizRaw].filter(Boolean).join('\n') || null;
+  const von = role === 'sw' ? 'Frau Schwade' : 'Hendrik';
+  const fotoVal = nsFotos.length ? JSON.stringify(nsFotos) : null;
+
+  const payload = {
+    datum: td(),
+    zimmer, ort, problem: prob,
+    kategorie: nsKat,
+    prio, von,
+    status: 'Offen',
+    notiz,
+    foto: fotoVal
+  };
+
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('schaden', {
+      method:'POST',
+      headers:{Prefer:'return=representation'},
+      body: JSON.stringify(payload)
+    });
+    if(!r.ok) throw 0;
+    const [created] = await r.json();
+    schaden.unshift({
+      id: created.id, sb_id: created.id,
+      datum: payload.datum, ort, prob, prio, von,
+      zimmer, status:'Offen', notiz: notiz||'',
+      kosten: null, kategorie: nsKat,
+      foto: fotoVal,
+      created_at: created.created_at
+    });
+    setSyncDot('ok');
+    nsFotos = []; nsParts = [];
+    closeModal('new-schaden-modal');
+    renderAll();
+  }catch{
+    setSyncDot('err');
+    btn.disabled = false;
+    btn.textContent = 'Meldung speichern';
+    errEl.textContent = 'Fehler beim Speichern — bitte Verbindung prüfen.';
+    errEl.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
