@@ -263,6 +263,13 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .zt-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .zt-add{padding:11px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
 .zt-add:disabled{opacity:.5;cursor:not-allowed}
+.zt-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.zt-sum-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
+.zt-sum-svc{font-size:11px;color:var(--text-muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zt-sum-h{font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.zt-sum-sub{font-size:11px;margin-top:4px}
+.zt-sum-frei{color:var(--green-mid)}
+.zt-sum-gebucht{color:var(--yellow)}
 
 /* BUCHUNGEN */
 .bk-item{padding:12px 13px;border-bottom:1px solid var(--border);cursor:pointer}
@@ -430,6 +437,7 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <div class="sec" style="margin:0">Verfügbare Termine</div>
       <button class="set-btn" onclick="loadZeitfenster(true)">↻ Laden</button>
     </div>
+    <div id="zt-summary"></div>
     <div class="card" id="zt-list"></div>
     <div class="sec" style="margin-top:16px">Neuen Slot anlegen</div>
     <div class="card" style="padding:0">
@@ -870,9 +878,38 @@ async function loadZeitfenster(forceRender){
 
 const ZT_SVC_LABEL={sperrmuell:'📦 Sperrmüll',moebel:'🛋️ Möbel & Aufbau',kleiner_auftrag:'🔧 Kleiner Auftrag',paket:'📬 Paketzustellung'};
 
+function renderZtSummary(){
+  const el=document.getElementById('zt-summary');
+  if(!el) return;
+  const svcs=['sperrmuell','moebel','kleiner_auftrag','paket'];
+  const cards=svcs.map(svc=>{
+    const slots=zeitfenster.filter(z=>z.service===svc);
+    const frei=slots.filter(z=>!z.buchung_id).length;
+    const gebucht=slots.filter(z=>z.buchung_id).length;
+    const totalMin=slots.reduce((acc,z)=>{
+      const [vh,vm]=z.von.slice(0,5).split(':').map(Number);
+      const [bh,bm]=z.bis.slice(0,5).split(':').map(Number);
+      return acc+(bh*60+bm)-(vh*60+vm);
+    },0);
+    const h=Math.floor(totalMin/60), m=totalMin%60;
+    const dauer=totalMin===0?'—':(h>0?(m>0?`${h}h ${m}m`:`${h}h`):`${m}m`);
+    const sub=slots.length===0
+      ? '<span style="color:var(--text-muted)">Keine Slots</span>'
+      : `<span class="zt-sum-frei">${frei} frei</span>${gebucht?` · <span class="zt-sum-gebucht">${gebucht} gebucht</span>`:''}`;
+    return `<div class="zt-sum-card">
+      <div class="zt-sum-svc">${ZT_SVC_LABEL[svc]||svc}</div>
+      <div class="zt-sum-h">${dauer}</div>
+      <div class="zt-sum-sub">${sub}</div>
+    </div>`;
+  });
+  el.innerHTML=`<div class="zt-sum-grid">${cards.join('')}</div>`;
+}
+
 function renderTermine(){
   const el=document.getElementById('zt-list');
   if(!el) return;
+
+  renderZtSummary();
 
   // Setze Mindestdatum im Formular
   const today=new Date().toISOString().slice(0,10);
