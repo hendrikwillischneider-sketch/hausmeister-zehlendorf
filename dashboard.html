@@ -919,10 +919,13 @@ async function loadServices(forceRender){
     const r=await sbReq('services?order=id');
     if(r.ok){
       const data=await r.json();
-      if(Array.isArray(data)&&data.length>0){services=data;servicesFromDb=true;}
-      else{services=DEFAULT_SERVICES;servicesFromDb=false;}
-    }else{services=DEFAULT_SERVICES;servicesFromDb=false;}
-  }catch{services=DEFAULT_SERVICES;servicesFromDb=false;}
+      if(Array.isArray(data)&&data.length>0){
+        services=data; servicesFromDb=true;
+        renderServices(); return;
+      }
+    }
+    services=DEFAULT_SERVICES; servicesFromDb=false;
+  }catch{services=DEFAULT_SERVICES; servicesFromDb=false;}
   if(forceRender)renderServices();
 }
 
