@@ -1371,7 +1371,7 @@ function renderMeineAuftraege(buchungen, schaeden){
       const actionBtns = isEditbar ? `
         <div class="ma-actions">
           <button class="ma-btn" onclick="toggleTerminEditPortal('${b.id}')">✏️ Termin ändern</button>
-          <button class="ma-btn danger" onclick="storniereAuftrag('${b.id}')">✕ Stornieren</button>
+          <button class="ma-btn danger" onclick="storniereAuftragConfirm('${b.id}',this)">✕ Stornieren</button>
         </div>
         <div class="ma-termin-edit" id="ma-te-${b.id}">
           <div style="font-size:11px;font-weight:600;color:var(--stone);margin-bottom:5px">Neuen Wunschtermin eingeben</div>
@@ -1427,8 +1427,16 @@ function renderMeineAuftraege(buchungen, schaeden){
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+function storniereAuftragConfirm(id, btn){
+  // Replace button with inline confirm to avoid native dialog
+  const wrap = btn.closest('.ma-actions');
+  if(!wrap) return;
+  wrap.innerHTML = `<span style="font-size:12.5px;color:var(--stone)">Wirklich stornieren?</span>
+    <button class="ma-btn danger" onclick="storniereAuftrag('${id}')">Ja, stornieren</button>
+    <button class="ma-btn" onclick="loadMeineAuftraege()">Abbrechen</button>`;
+}
+
 async function storniereAuftrag(id){
-  if(!confirm('Auftrag wirklich stornieren?')) return;
   try{
     const r = await fetch(`${SB}/rest/v1/buchungen?id=eq.${id}`,{
       method:'PATCH',

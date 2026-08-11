@@ -1629,7 +1629,7 @@ function renderBuchungen(){
     const calBtn  = (b.status==='Bestätigt'||b.status==='In Arbeit')
       ? `<a class="bk-act" href="${bkCalUrl(b)}" target="_blank" rel="noopener" style="text-decoration:none">📅 Kalender</a>` : '';
     const stornoBtn = isEditbar
-      ? `<button class="bk-act storno" onclick="storniereInDashboard('${b.id}',${ri})">✕ Stornieren</button>` : '';
+      ? `<button class="bk-act storno" onclick="storniereInDashboardConfirm('${b.id}',${ri},this)">✕ Stornieren</button>` : '';
     const terminBtn = isEditbar
       ? `<button class="bk-act" id="bk-te-btn-${ri}" onclick="toggleTerminEdit(${ri})">✏️ Termin</button>` : '';
     const terminEditor = isEditbar ? `
@@ -1721,8 +1721,16 @@ async function saveBuchungAntwort(id, idx){
   }catch{ setSyncDot('err'); }
 }
 
+function storniereInDashboardConfirm(id, idx, btn){
+  const wrap = btn.closest('.bk-actions');
+  if(!wrap) return;
+  wrap.innerHTML += `<span style="font-size:12px;color:var(--text-muted);margin-left:4px">Wirklich stornieren?</span>
+    <button class="bk-act storno" onclick="storniereInDashboard('${id}',${idx})">Ja</button>
+    <button class="bk-act" onclick="renderBuchungen()">Nein</button>`;
+  wrap.querySelectorAll('button:not(.storno):not([onclick*="storniere"]):not([onclick*="renderB"])').forEach(b=>b.style.display='none');
+}
+
 async function storniereInDashboard(id, idx){
-  if(!confirm('Buchung wirklich stornieren? Dies kann nicht rückgängig gemacht werden.')) return;
   const prev = buchungen[idx]?.status;
   buchungen[idx].status = 'Storniert';
   renderBuchungen();
