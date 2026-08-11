@@ -675,27 +675,8 @@ html{scroll-behavior:smooth}
 
   <!-- Schritt 1: Service wählen -->
   <div id="bk-step-1">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="cat-tile" onclick="bkSelect(this,'sperrmuell','📦','Sperrmüll')">
-        <div style="font-size:26px;margin-bottom:7px">📦</div>
-        <div class="cat-title">Sperrmüll</div>
-        <div class="cat-desc" style="margin-top:4px">Sperrige Gegenstände abholen und entsorgen lassen</div>
-      </div>
-      <div class="cat-tile" onclick="bkSelect(this,'moebel','🛋️','Möbel & Aufbau')">
-        <div style="font-size:26px;margin-bottom:7px">🛋️</div>
-        <div class="cat-title">Möbel & Aufbau</div>
-        <div class="cat-desc" style="margin-top:4px">Möbel aufbauen, abbauen oder umstellen</div>
-      </div>
-      <div class="cat-tile" onclick="bkSelect(this,'kleiner_auftrag','🔧','Kleiner Auftrag')">
-        <div style="font-size:26px;margin-bottom:7px">🔧</div>
-        <div class="cat-title">Kleiner Auftrag</div>
-        <div class="cat-desc" style="margin-top:4px">Bild aufhängen, Regal montieren, Glühbirne wechseln …</div>
-      </div>
-      <div class="cat-tile" onclick="bkSelect(this,'paket','📬','Paketzustellung')">
-        <div style="font-size:26px;margin-bottom:7px">📬</div>
-        <div class="cat-title">Paketzustellung</div>
-        <div class="cat-desc" style="margin-top:4px">Paket wird am Eingang angenommen und auf Ihr Zimmer gebracht</div>
-      </div>
+    <div id="bk-svc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <!-- wird dynamisch befüllt -->
     </div>
   </div>
 
@@ -841,8 +822,33 @@ function showSel(){
   document.getElementById('bw-ok').style.display='none';
 }
 
+const PORTAL_SVC_DEFAULT=[
+  {id:'sperrmuell',    label:'Sperrmüll',       icon:'📦', beschreibung:'Sperrige Gegenstände abholen und entsorgen lassen'},
+  {id:'moebel',        label:'Möbel & Aufbau',  icon:'🛋️',  beschreibung:'Möbel aufbauen, abbauen oder umstellen'},
+  {id:'kleiner_auftrag',label:'Kleiner Auftrag',icon:'🔧', beschreibung:'Bild aufhängen, Regal montieren, Glühbirne wechseln …'},
+  {id:'paket',         label:'Paketzustellung', icon:'📬', beschreibung:'Paket wird am Eingang angenommen und auf Ihr Zimmer gebracht'}
+];
+
+async function loadPortalServices(){
+  let svcs=PORTAL_SVC_DEFAULT;
+  try{
+    const r=await fetch(SB+'/rest/v1/services?aktiv=eq.true&order=id',{
+      headers:{apikey:KEY,Authorization:'Bearer '+KEY}
+    });
+    if(r.ok){const d=await r.json();if(d.length>0)svcs=d;}
+  }catch{/* Fallback */}
+  const grid=document.getElementById('bk-svc-grid');
+  if(!grid)return;
+  grid.innerHTML=svcs.map(s=>`<div class="cat-tile" onclick="bkSelect(this,'${s.id}','${s.icon}','${s.label.replace(/'/g,"\\'")}')">
+    <div style="font-size:26px;margin-bottom:7px">${s.icon}</div>
+    <div class="cat-title">${esc(s.label)}</div>
+    <div class="cat-desc" style="margin-top:4px">${esc(s.beschreibung||'')}</div>
+  </div>`).join('');
+}
+
 (async()=>{
   const sv=localStorage.getItem(BK);
+  loadPortalServices();
   if(sv){try{sel=JSON.parse(sv);showSeld(sel);loadR();loadMeineAuftraege();return;}catch{localStorage.removeItem(BK);}}
   document.getElementById('bw-wrap').style.display='block';
   await loadR();
