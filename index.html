@@ -733,13 +733,16 @@ html{scroll-behavior:smooth}
   </div>
 
   <!-- Schritt 3: Bestätigung -->
-  <div id="bk-step-3" style="display:none;text-align:center;padding:32px 0">
-    <div style="font-size:44px;margin-bottom:12px">✅</div>
-    <div class="form-cat-title" style="margin-bottom:8px">Anfrage eingegangen</div>
-    <p style="font-size:14px;color:var(--stone);line-height:1.6;max-width:300px;margin:0 auto 24px">
-      Wir melden uns in Kürze mit einem Terminvorschlag bei Ihnen.
-    </p>
-    <button class="s-new" onclick="bkReset()">Weiteren Service buchen</button>
+  <div id="bk-step-3" style="display:none;padding:28px 0">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:44px;margin-bottom:10px">✅</div>
+      <div class="form-cat-title" style="margin-bottom:6px">Anfrage eingegangen</div>
+      <p style="font-size:14px;color:var(--stone);line-height:1.6;margin:0">Wir melden uns in Kürze bei Ihnen.</p>
+    </div>
+    <div id="bk-conf-card" style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin:16px 0 22px"></div>
+    <div style="text-align:center">
+      <button class="s-new" onclick="bkReset()">Weiteren Service buchen</button>
+    </div>
   </div>
 
 </div>
@@ -829,6 +832,7 @@ const PORTAL_SVC_DEFAULT=[
   {id:'paket',         label:'Paketzustellung', icon:'📬', beschreibung:'Paket wird am Eingang angenommen und auf Ihr Zimmer gebracht'}
 ];
 
+let portalSvcs=PORTAL_SVC_DEFAULT;
 async function loadPortalServices(){
   let svcs=PORTAL_SVC_DEFAULT;
   try{
@@ -837,13 +841,18 @@ async function loadPortalServices(){
     });
     if(r.ok){const d=await r.json();if(d.length>0)svcs=d;}
   }catch{/* Fallback */}
+  portalSvcs=svcs;
   const grid=document.getElementById('bk-svc-grid');
   if(!grid)return;
-  grid.innerHTML=svcs.map(s=>`<div class="cat-tile" onclick="bkSelect(this,'${s.id}','${s.icon}','${s.label.replace(/'/g,"\\'")}')">
+  grid.innerHTML=svcs.map(s=>{
+    const dm=s.dauer_min||0;
+    const dauerStr=dm>=60?(dm%60?`${Math.floor(dm/60)} Std ${dm%60} Min`:`${Math.floor(dm/60)} Std`):dm?`${dm} Min`:'';
+    return `<div class="cat-tile" onclick="bkSelect(this,'${s.id}','${s.icon}','${s.label.replace(/'/g,"\\'")}')">
     <div style="font-size:26px;margin-bottom:7px">${s.icon}</div>
     <div class="cat-title">${esc(s.label)}</div>
     <div class="cat-desc" style="margin-top:4px">${esc(s.beschreibung||'')}</div>
-  </div>`).join('');
+    ${dauerStr?`<div style="font-size:11px;color:var(--stone);margin-top:8px;display:flex;align-items:center;gap:4px"><span>⏱</span><span>ca. ${dauerStr}</span></div>`:''}
+  </div>`;}).join('');
 }
 
 (async()=>{
@@ -1516,6 +1525,24 @@ async function saveBuchung() {
       }
     }
     document.getElementById('bk-step-2').style.display = 'none';
+    const confCard = document.getElementById('bk-conf-card');
+    if(confCard){
+      const dm = portalSvcs.find(s=>s.id===bkService.service)?.dauer_min||0;
+      const dauerStr = dm>=60?(dm%60?`${Math.floor(dm/60)} Std ${dm%60} Min`:`${Math.floor(dm/60)} Std`):dm?`${dm} Min`:'';
+      confCard.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px">
+          <span style="font-size:32px">${bkService.icon}</span>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--green)">${esc(bkService.label)}</div>
+            <div style="font-size:12px;color:var(--stone)">Suite ${esc(sel?.zimmer||'—')}</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:13px;color:var(--ink-soft)">📅 <strong>${esc(wunschtermin)}</strong></div>
+          ${dauerStr?`<div style="font-size:12px;color:var(--stone)">⏱ Geplante Dauer: ca. ${dauerStr}</div>`:''}
+          <div style="font-size:12px;color:var(--stone);margin-top:2px">Wir bestätigen Ihren Termin so bald wie möglich.</div>
+        </div>`;
+    }
     document.getElementById('bk-step-3').style.display = 'block';
   } catch {
     errEl.textContent = 'Senden fehlgeschlagen — bitte erneut versuchen.';

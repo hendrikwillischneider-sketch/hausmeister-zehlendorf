@@ -459,7 +459,7 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div class="sec" style="margin-top:16px">Neuen Slot anlegen</div>
     <div class="card" style="padding:0">
       <div class="zt-form">
-        <select class="zt-inp" id="zt-svc">
+        <select class="zt-inp" id="zt-svc" onchange="autoFillSlotTime()">
           <option value="">Service wählen …</option>
           <option value="sperrmuell">📦 Sperrmüll</option>
           <option value="moebel">🛋️ Möbel & Aufbau</option>
@@ -488,9 +488,23 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 
   <!-- BUCHUNGEN -->
   <div class="view" id="v-buchungen">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div class="sec" style="margin:0">Service-Anfragen</div>
       <button class="set-btn" onclick="loadBuchungen(true)">↻ Laden</button>
+    </div>
+    <div class="chips" id="bk-status-chips">
+      <button class="chip active" onclick="setBkFilterStatus(this,'alle')">Alle</button>
+      <button class="chip" onclick="setBkFilterStatus(this,'Neu')">🔴 Neu</button>
+      <button class="chip" onclick="setBkFilterStatus(this,'Bestätigt')">Bestätigt</button>
+      <button class="chip" onclick="setBkFilterStatus(this,'In Arbeit')">In Arbeit</button>
+      <button class="chip" onclick="setBkFilterStatus(this,'Erledigt')">✓ Erledigt</button>
+    </div>
+    <div class="chips" id="bk-svc-chips" style="margin-bottom:10px">
+      <button class="chip active" onclick="setBkFilterSvc(this,'alle')">Alle Services</button>
+      <button class="chip" onclick="setBkFilterSvc(this,'sperrmuell')">📦</button>
+      <button class="chip" onclick="setBkFilterSvc(this,'moebel')">🛋️</button>
+      <button class="chip" onclick="setBkFilterSvc(this,'kleiner_auftrag')">🔧</button>
+      <button class="chip" onclick="setBkFilterSvc(this,'paket')">📬</button>
     </div>
     <div class="card" id="buch-list"></div>
   </div>
@@ -1045,6 +1059,37 @@ function renderTermine(){
   }).join('');
 }
 
+function autoFillSlotTime(){
+  const svcId = document.getElementById('zt-svc').value;
+  if(!svcId) return;
+  const svc = services.find(s=>s.id===svcId);
+  const dauer = svc?.dauer_min || 60;
+
+  const datInp = document.getElementById('zt-datum');
+  if(!datInp.value){
+    const d = new Date();
+    d.setDate(d.getDate()+1);
+    while([0,6].includes(d.getDay())) d.setDate(d.getDate()+1);
+    datInp.value = d.toISOString().slice(0,10);
+  }
+
+  const vonInp = document.getElementById('zt-von');
+  const bisInp = document.getElementById('zt-bis');
+  const dat = datInp.value;
+  const existing = zeitfenster.filter(z=>z.service===svcId&&z.datum===dat);
+  let vonH=9, vonM=0;
+  if(existing.length){
+    const last = existing.reduce((a,b)=>a.bis>b.bis?a:b);
+    const [lh,lm]=last.bis.slice(0,5).split(':').map(Number);
+    vonM = lh*60+lm+15;
+    vonH = Math.floor(vonM/60); vonM = vonM%60;
+  }
+  const bisMin = vonH*60+vonM+dauer;
+  const pad = n=>String(n).padStart(2,'0');
+  vonInp.value = `${pad(vonH)}:${pad(vonM)}`;
+  bisInp.value = `${pad(Math.floor(bisMin/60))}:${pad(bisMin%60)}`;
+}
+
 async function addSlot(){
   const svc  = document.getElementById('zt-svc').value;
   const dat  = document.getElementById('zt-datum').value;
@@ -1469,22 +1514,45 @@ const BK_STATUS = ['Neu','Bestätigt','In Arbeit','Erledigt'];
 const BK_BADGE  = {Neu:'bk-neu',Bestätigt:'bk-bestaetigt','In Arbeit':'bk-arbeit',Erledigt:'bk-erledigt'};
 const BK_ICON   = {sperrmuell:'📦',moebel:'🛋️',handwerk:'🔨',kleiner_auftrag:'🔧',paket:'📬'};
 
+let bkFilterStatus = 'alle';
+let bkFilterSvc    = 'alle';
+
+function setBkFilterStatus(el, val){
+  bkFilterStatus = val;
+  document.querySelectorAll('#bk-status-chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderBuchungen();
+}
+
+function setBkFilterSvc(el, val){
+  bkFilterSvc = val;
+  document.querySelectorAll('#bk-svc-chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderBuchungen();
+}
+
 function renderBuchungen(){
   const el = document.getElementById('buch-list');
   if(!el) return;
-  if(!buchungen.length){
-    el.innerHTML='<div class="empty" style="padding:20px 16px">Noch keine Anfragen eingegangen.</div>';
+
+  let filtered = buchungen;
+  if(bkFilterStatus !== 'alle') filtered = filtered.filter(b=>b.status===bkFilterStatus);
+  if(bkFilterSvc    !== 'alle') filtered = filtered.filter(b=>b.service===bkFilterSvc);
+
+  if(!filtered.length){
+    el.innerHTML='<div class="empty" style="padding:20px 16px">'+(buchungen.length?'Keine Anfragen für diesen Filter.':'Noch keine Anfragen eingegangen.')+'</div>';
     return;
   }
-  el.innerHTML = buchungen.map((b,idx)=>{
+  el.innerHTML = filtered.map((b)=>{
+    const ri = buchungen.indexOf(b);
     const badge = BK_BADGE[b.status]||'bk-neu';
     const icon  = BK_ICON[b.service]||'📋';
     const dt    = b.created_at ? new Date(b.created_at).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
     const actBtns = BK_STATUS.map(s=>`
       <button class="bk-act${b.status===s?' active':''}"
-        onclick="updateBuchungStatus('${b.id}',${idx},'${s}')">${s}</button>`).join('');
+        onclick="updateBuchungStatus('${b.id}',${ri},'${s}')">${s}</button>`).join('');
     return `
-    <div class="bk-item" id="bk-row-${idx}">
+    <div class="bk-item" id="bk-row-${ri}">
       <div class="bk-top">
         <div class="bk-title">${icon} ${escHtml(b.service_label||b.service)}</div>
         <span class="bk-badge ${badge}">${escHtml(b.status)}</span>
@@ -1493,10 +1561,10 @@ function renderBuchungen(){
       ${b.beschreibung ? `<div class="bk-desc">"${escHtml(b.beschreibung)}"</div>` : ''}
       <div class="bk-actions">${actBtns}${(b.status==='Bestätigt'||b.status==='In Arbeit')?`<a class="bk-act" href="${bkCalUrl(b)}" target="_blank" rel="noopener" style="text-decoration:none">📅 Kalender</a>`:''}
       </div>
-      <div class="bk-antwort-wrap${b.antwort?' show':''}" id="bk-ans-${idx}">
-        <textarea class="bk-antwort-in" id="bk-txt-${idx}" rows="2"
+      <div class="bk-antwort-wrap${b.antwort?' show':''}" id="bk-ans-${ri}">
+        <textarea class="bk-antwort-in" id="bk-txt-${ri}" rows="2"
           placeholder="Rückmeldung an Bewohner (optional)…">${escHtml(b.antwort||'')}</textarea>
-        <button class="bk-save" onclick="saveBuchungAntwort('${b.id}',${idx})">Speichern</button>
+        <button class="bk-save" onclick="saveBuchungAntwort('${b.id}',${ri})">Speichern</button>
       </div>
     </div>`;
   }).join('');
