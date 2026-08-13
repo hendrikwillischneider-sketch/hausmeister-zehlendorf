@@ -645,7 +645,7 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div class="sec" style="margin:0">Bewohner</div>
     <div style="display:flex;gap:8px">
       <button class="set-btn" onclick="exportVCard()" title="Als vCard exportieren (Google Kontakte)">📇 vCard</button>
-      <button class="set-btn" onclick="printKlingelschilder()" title="Klingelschilder drucken">🔔 Klingelschilder</button>
+      <button class="set-btn" onclick="openKlingelschilderModal()" title="Klingelschilder drucken">🔔 Klingelschilder</button>
       <button class="modal-btn primary" style="padding:8px 14px;font-size:13px" onclick="openEinzug()">+ Einzug</button>
     </div>
   </div>
@@ -771,6 +771,59 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div class="modal-actions">
       <button class="modal-btn primary" style="background:var(--red);border-color:var(--red)" onclick="confirmAuszug()">Auszug speichern</button>
       <button class="modal-btn secondary" onclick="closeModal('auszug-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- KLINGELSCHILDER MODAL -->
+<div class="modal-bg gone" id="ks-modal">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">🔔 Klingelschilder</div>
+
+    <div class="modal-row">
+      <div class="modal-lbl">Inhalt der Schilder</div>
+      <select class="modal-in" id="ks-inhalt">
+        <option value="nachname">Nur Nachname</option>
+        <option value="vornachname">Vorname + Nachname</option>
+        <option value="suite_nachname">Suite-Nr. + Nachname</option>
+        <option value="suite_vornachname">Suite-Nr. + Vor- + Nachname</option>
+      </select>
+    </div>
+
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Breite (mm)</div>
+        <input class="modal-in" id="ks-breite" type="number" value="80" min="20" max="200">
+      </div>
+      <div>
+        <div class="modal-lbl">Höhe (mm)</div>
+        <input class="modal-in" id="ks-hoehe" type="number" value="28" min="10" max="100">
+      </div>
+      <div>
+        <div class="modal-lbl">Spalten</div>
+        <input class="modal-in" id="ks-spalten" type="number" value="2" min="1" max="5">
+      </div>
+    </div>
+
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Schriftgröße (pt)</div>
+        <input class="modal-in" id="ks-fontsize" type="number" value="14" min="6" max="36">
+      </div>
+      <div>
+        <div class="modal-lbl">Abstand zwischen Labels (mm)</div>
+        <input class="modal-in" id="ks-gap" type="number" value="3" min="0" max="20">
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;padding:8px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+      Nur aktive Bewohner ohne Gästewohnungen · Gemeinschaftsräume werden nicht gedruckt
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="generateKlingelschilder()">🖨️ Vorschau &amp; Drucken</button>
+      <button class="modal-btn secondary" onclick="closeModal('ks-modal')">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -1670,42 +1723,74 @@ function exportVCard(){
   a.click();
 }
 
-function printKlingelschilder(){
-  const aktive = bewohner.filter(b=>b.aktiv && (b.vorname||b.nachname) && !String(b.zimmer).startsWith('G'));
-  if(!aktive.length){alert('Keine Bewohnerdaten vorhanden.');return;}
-  const sortnr=b=>{const n=parseInt(b.zimmer||'');return isNaN(n)?9999:n;};
-  aktive.sort((a,b)=>sortnr(a)-sortnr(b));
-  const labels = aktive.map(b=>{
-    const name=[b.vorname,b.nachname].filter(Boolean).join(' ');
-    return `<div class="label">
-      <div class="label-suite">Suite ${b.zimmer}</div>
-      <div class="label-name">${name}</div>
-    </div>`;
+function openKlingelschilderModal(){
+  document.getElementById('ks-modal').classList.remove('gone');
+}
+
+function generateKlingelschilder(){
+  const inhalt   = document.getElementById('ks-inhalt').value;
+  const breite   = parseFloat(document.getElementById('ks-breite').value)||80;
+  const hoehe    = parseFloat(document.getElementById('ks-hoehe').value)||28;
+  const spalten  = parseInt(document.getElementById('ks-spalten').value)||2;
+  const fontsize = parseFloat(document.getElementById('ks-fontsize').value)||14;
+  const gap      = parseFloat(document.getElementById('ks-gap').value)||3;
+
+  const GR_CODES = ['WA','WB','GS','HR','BIB'];
+  const sortnr = b=>{const n=parseInt(b.zimmer||'');return isNaN(n)?9999:n;};
+  const liste = bewohner
+    .filter(b=>b.aktiv && (b.vorname||b.nachname) && !GR_CODES.includes((b.zimmer||'').toUpperCase()))
+    .sort((a,b)=>sortnr(a)-sortnr(b));
+
+  if(!liste.length){alert('Keine Bewohnerdaten vorhanden.');return;}
+
+  function labelText(b){
+    const vn = b.vorname||'', nn = b.nachname||'';
+    switch(inhalt){
+      case 'nachname':          return {zeile1: nn};
+      case 'vornachname':       return {zeile1: [vn,nn].filter(Boolean).join(' ')};
+      case 'suite_nachname':    return {zeile1: nn, zeile0: `Suite ${b.zimmer}`};
+      case 'suite_vornachname': return {zeile1: [vn,nn].filter(Boolean).join(' '), zeile0: `Suite ${b.zimmer}`};
+      default:                  return {zeile1: nn};
+    }
+  }
+
+  const labels = liste.map(b=>{
+    const t = labelText(b);
+    const sub = t.zeile0 ? `<div class="lbl-sub">${t.zeile0}</div>` : '';
+    return `<div class="lbl">${sub}<div class="lbl-main">${t.zeile1}</div></div>`;
   }).join('');
-  const win = window.open('','_blank','width=900,height=700');
+
+  const colWidth = `${breite}mm`;
+  const rowHeight = `${hoehe}mm`;
+
+  const win = window.open('','_blank','width=960,height=740');
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>Klingelschilder – Sidonie-Scharfe-Stiftung Zehlendorf</title>
+  <title>Klingelschilder – Sidonie-Scharfe-Stiftung</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Arial,sans-serif;background:#fff;padding:16px}
-    h1{font-size:13px;color:#555;margin-bottom:14px;font-weight:normal}
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-    .label{border:1.5px solid #333;border-radius:6px;padding:10px 12px;height:64px;
-           display:flex;flex-direction:column;justify-content:center;page-break-inside:avoid}
-    .label-suite{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:#777;margin-bottom:3px}
-    .label-name{font-size:15px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    body{font-family:Arial,Helvetica,sans-serif;background:#f0f0f0;padding:12px}
+    .toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;background:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+    .toolbar button{padding:8px 20px;font-size:14px;cursor:pointer;border:1.5px solid #333;border-radius:6px;background:#1a3a2a;color:#fff;font-weight:600}
+    .toolbar span{font-size:13px;color:#555}
+    .page{background:#fff;width:210mm;min-height:297mm;margin:0 auto;padding:12mm;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+    .grid{display:grid;grid-template-columns:repeat(${spalten},${colWidth});gap:${gap}mm}
+    .lbl{width:${breite}mm;height:${hoehe}mm;border:1px solid #444;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2mm 3mm;overflow:hidden;page-break-inside:avoid}
+    .lbl-sub{font-size:${Math.max(6,fontsize*0.6)}pt;color:#777;text-transform:uppercase;letter-spacing:.5px;line-height:1.2;text-align:center}
+    .lbl-main{font-size:${fontsize}pt;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center;line-height:1.3}
     @media print{
-      body{padding:8mm}
-      h1{display:none}
-      .no-print{display:none}
-      .grid{gap:5px}
+      body{background:#fff;padding:0}
+      .toolbar{display:none}
+      .page{box-shadow:none;padding:10mm;width:100%;min-height:auto}
     }
   </style></head><body>
-  <h1>Klingelschilder · Sidonie-Scharfe-Stiftung Zehlendorf · ${aktive.length} Bewohner</h1>
-  <button class="no-print" onclick="window.print()" style="margin-bottom:14px;padding:8px 18px;font-size:14px;cursor:pointer;border:1.5px solid #333;border-radius:6px;background:#f5f5f5">🖨️ Drucken</button>
-  <div class="grid">${labels}</div>
+  <div class="toolbar">
+    <button onclick="window.print()">🖨️ Drucken</button>
+    <span>${liste.length} Schilder · ${breite}×${hoehe} mm · ${spalten} Spalten · ${fontsize} pt</span>
+  </div>
+  <div class="page"><div class="grid">${labels}</div></div>
   </body></html>`);
   win.document.close();
+  closeModal('ks-modal');
 }
 
 // ── OVERVIEW ─────────────────────────────────────────────────────────────────
