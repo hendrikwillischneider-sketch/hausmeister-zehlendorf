@@ -414,6 +414,41 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .zeit-status-ok{background:var(--green-pale);color:var(--green-mid)}
 .zeit-status-warn{background:var(--yellow-pale);color:var(--yellow)}
 .zeit-status-low{background:var(--red-pale);color:var(--red)}
+
+/* ── PARK ──────────────────────────────────────────────────────────────────── */
+.park-proj-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+.park-proj-hdr{padding:13px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.park-proj-hdr:active{background:var(--bg)}
+.park-proj-left{display:flex;align-items:center;gap:10px}
+.park-proj-icon{font-size:20px;width:34px;height:34px;border-radius:9px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.park-proj-name{font-size:14px;font-weight:600}
+.park-proj-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+.park-proj-badge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+.badge-planung{background:var(--yellow-pale);color:var(--yellow)}
+.badge-aktiv{background:var(--green-pale);color:var(--green-mid)}
+.badge-abgeschlossen{background:var(--border);color:var(--text-muted)}
+.park-proj-body{border-top:1px solid var(--border);display:none}
+.park-proj-body.open{display:block}
+.park-task{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.park-task:last-child{border-bottom:none}
+.park-task-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.park-task-check.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.park-task-body{flex:1;min-width:0}
+.park-task-titel{font-size:13px;font-weight:500;line-height:1.3}
+.park-task-titel.done{text-decoration:line-through;color:var(--text-muted)}
+.park-task-sub{font-size:11px;color:var(--text-muted);margin-top:1px}
+.park-task-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.park-h-badge{font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums;background:var(--bg);padding:2px 8px;border-radius:8px;border:1px solid var(--border)}
+.park-done-row{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--green-pale);border-bottom:1px solid var(--border)}
+.park-done-label{font-size:13px;flex:1;color:var(--green-mid);font-weight:500}
+.park-done-h{width:64px;padding:6px 8px;border:1px solid var(--accent);border-radius:8px;font-size:14px;background:var(--card);color:var(--text);font-variant-numeric:tabular-nums;font-family:inherit}
+.park-add-row{padding:10px 14px;display:flex;gap:8px;align-items:center}
+.park-add-in{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.park-add-in:focus{outline:none;border-color:var(--accent)}
+.park-add-h{width:60px;padding:8px 8px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;font-variant-numeric:tabular-nums}
+.park-add-h:focus{outline:none;border-color:var(--accent)}
+.park-fab{position:fixed;bottom:82px;right:16px;width:50px;height:50px;border-radius:50%;background:var(--green-mid);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;z-index:50}
+.park-empty{padding:40px 20px;text-align:center;color:var(--text-muted);font-size:14px}
 </style>
 </head>
 <body>
@@ -709,6 +744,12 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div id="zeit-cat-cards"></div>
 
     <button class="zeit-bericht-btn" onclick="exportWochenbericht()">📋 Wochenbericht exportieren</button>
+  </div>
+
+
+  <!-- PARK-PROJEKTE -->
+  <div class="view" id="v-park">
+    <div id="park-content"><div class="park-empty">Lädt …</div></div>
   </div>
 
 </div><!-- /app -->
@@ -1212,7 +1253,7 @@ function initApp(){
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
        {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},
-       {id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'zeit',lbl:'⏱️ Zeit'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+       {id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'park',lbl:'🌿 Park'},{id:'zeit',lbl:'⏱️ Zeit'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
     : role==='sw'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'}]
     : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'📋 Schäden'},{id:'kasse',lbl:'💶 Kasse'}];
@@ -1238,6 +1279,7 @@ function showTab(id){
 
   if(id==='pflegeplan')renderPflegeplan();
   if(id==='zeit')renderZeit();
+  if(id==='park')loadPark();
   if(id==='log')renderLog();
   if(id==='budget')renderBudget();
   if(id==='uebersicht')renderOverview();
@@ -1885,7 +1927,35 @@ function generateKlingelschilder(){
     <span>${liste.length} Schilder · ${breite}×${hoehe} mm · ${spalten} Spalten · ${fontsize} pt</span>
   </div>
   <div class="page"><div class="grid">${labels}</div></div>
-  </body></html>`);
+  
+<!-- PARK PROJEKT MODAL -->
+<div class="modal-bg gone" id="park-proj-modal">
+  <div class="modal-box">
+    <div class="modal-title">Neues Projekt</div>
+    <div class="modal-field">
+      <div class="modal-lbl">Projektname</div>
+      <input id="ppmod-titel" class="modal-in" type="text" placeholder="z.B. Parkwege sanieren …">
+    </div>
+    <div class="modal-field">
+      <div class="modal-lbl">Beschreibung (optional)</div>
+      <textarea id="ppmod-desc" class="modal-in" style="height:70px;resize:vertical" placeholder="Ziel, Methode, Kontext …"></textarea>
+    </div>
+    <div class="modal-field">
+      <div class="modal-lbl">Status</div>
+      <select id="ppmod-status" class="modal-in">
+        <option value="Planung">📋 Planung</option>
+        <option value="Aktiv">🔨 Aktiv</option>
+        <option value="Abgeschlossen">✅ Abgeschlossen</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="saveParkProjekt()">Projekt anlegen</button>
+      <button class="modal-btn secondary" onclick="closeModal('park-proj-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+</body></html>`);
   win.document.close();
   closeModal('ks-modal');
 }
@@ -3483,6 +3553,260 @@ function exportWochenbericht(){
     <button onclick="window.print()">🖨️ Drucken / Speichern</button>\n${txt.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
     </body></html>`);
   win.document.close();
+}
+
+
+// ── PARK-PROJEKTE ─────────────────────────────────────────────────────────────
+let parkProjekte = [];
+let parkAufgaben = [];
+
+async function loadPark(){
+  try {
+    const [pr, pa] = await Promise.all([
+      sbReq('park_projekte?order=erstellt_am.asc').then(r=>r.json()),
+      sbReq('park_aufgaben?order=erstellt_am.asc').then(r=>r.json()),
+    ]);
+    parkProjekte = Array.isArray(pr) ? pr : [];
+    parkAufgaben = Array.isArray(pa) ? pa : [];
+    renderPark();
+  } catch(e) {
+    document.getElementById('park-content').innerHTML =
+      '<div class="park-empty">⚠️ Tabellen noch nicht angelegt — SQL unten ausführen.</div>';
+  }
+}
+
+function renderPark(){
+  const el = document.getElementById('park-content');
+  if(!el) return;
+
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sec" style="margin:0">Projekte & Tätigkeiten</div>
+    <button class="set-btn" onclick="openParkProjModal()">+ Neues Projekt</button>
+  </div>`;
+
+  if(!parkProjekte.length){
+    html += `<div class="park-empty">Noch keine Projekte.<br>Mit „+ Neues Projekt" starten.</div>`;
+  }
+
+  // Render each project
+  parkProjekte.forEach(p => {
+    const aufgaben = parkAufgaben.filter(a=>a.projekt_id===p.id);
+    const done = aufgaben.filter(a=>a.status==='Erledigt').length;
+    const total = aufgaben.length;
+    const openState = localStorage.getItem('park_open_'+p.id)==='1';
+
+    const badgeClass = p.status==='Aktiv' ? 'badge-aktiv' : p.status==='Abgeschlossen' ? 'badge-abgeschlossen' : 'badge-planung';
+
+    html += `<div class="park-proj-card">
+      <div class="park-proj-hdr" onclick="parkToggle('${p.id}')">
+        <div class="park-proj-left">
+          <div class="park-proj-icon">${p.status==='Aktiv'?'🔨':p.status==='Abgeschlossen'?'✅':'📋'}</div>
+          <div>
+            <div class="park-proj-name">${esc(p.titel)}</div>
+            <div class="park-proj-meta">${total ? done+'/'+total+' Aufgaben erledigt' : 'Keine Aufgaben'}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="park-proj-badge ${badgeClass}">${p.status||'Planung'}</span>
+          <span style="color:var(--text-muted);font-size:14px">${openState?'▲':'▼'}</span>
+        </div>
+      </div>
+      <div class="park-proj-body${openState?' open':''}" id="park-body-${p.id}">
+        ${aufgaben.map(a=>parkTaskRow(a)).join('')}
+        <div class="park-add-row">
+          <input class="park-add-in" id="pa-in-${p.id}" type="text" placeholder="Aufgabe hinzufügen …">
+          <input class="park-add-h" id="pa-h-${p.id}" type="number" placeholder="h" min="0.5" max="20" step="0.5" value="1">
+          <button class="set-btn" onclick="parkSaveAufgabe('${p.id}')">+ Add</button>
+        </div>
+        ${p.beschreibung ? `<div style="padding:8px 14px 12px;font-size:12px;color:var(--text-muted)">${esc(p.beschreibung)}</div>` : ''}
+        <div style="display:flex;gap:8px;padding:8px 14px 12px;border-top:1px solid var(--border)">
+          <button class="set-btn" onclick="parkStatusToggle('${p.id}')">Status ändern</button>
+          <button class="set-btn" style="color:var(--red);margin-left:auto" onclick="parkDeleteProjekt('${p.id}')">Löschen</button>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // Standalone tasks (no projekt_id)
+  const solo = parkAufgaben.filter(a=>!a.projekt_id);
+  if(solo.length || parkProjekte.length){
+    html += `<div class="sec">Einzeltätigkeiten</div>`;
+    html += `<div class="park-proj-card">
+      ${solo.length ? solo.map(a=>parkTaskRow(a)).join('') : '<div style="padding:12px 14px;font-size:13px;color:var(--text-muted)">Noch keine Einzeleinträge.</div>'}
+      <div class="park-add-row">
+        <input class="park-add-in" id="pa-in-solo" type="text" placeholder="Tätigkeit eintragen …">
+        <input class="park-add-h" id="pa-h-solo" type="number" placeholder="h" min="0.5" max="20" step="0.5" value="1">
+        <button class="set-btn" onclick="parkSaveAufgabe(null)">+ Add</button>
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function parkTaskRow(a){
+  const done = a.status==='Erledigt';
+  const waitConfirm = !done && a._confirm;
+  const doneDate = a.datum_erledigt ? new Date(a.datum_erledigt).toLocaleDateString('de-DE',{day:'numeric',month:'short'}) : '';
+
+  return `<div class="park-task" id="ptask-${a.id}">
+    <div class="park-task-check${done?' done':''}" onclick="parkToggleDone('${a.id}')">
+      ${done ? '✓' : ''}
+    </div>
+    <div class="park-task-body">
+      <div class="park-task-titel${done?' done':''}">${esc(a.titel)}</div>
+      ${a.notiz ? `<div class="park-task-sub">${esc(a.notiz)}</div>` : ''}
+      ${done && doneDate ? `<div class="park-task-sub">Erledigt ${doneDate} · ${a.erledigte_h||a.geplante_h||1} h</div>` : ''}
+    </div>
+    <div class="park-task-right">
+      <span class="park-h-badge">${done ? (a.erledigte_h||a.geplante_h||1) : (a.geplante_h||1)} h</span>
+      ${!done ? `<button class="set-btn" style="font-size:11px" onclick="parkShowErledigen('${a.id}')">Erledigen</button>` : ''}
+      <button class="set-btn" style="font-size:11px;color:var(--text-muted)" onclick="parkDeleteAufgabe('${a.id}')">×</button>
+    </div>
+  </div>
+  ${!done ? `<div id="pconf-${a.id}" style="display:none" class="park-done-row">
+    <span class="park-done-label">✓ Wie viele Stunden?</span>
+    <input class="park-done-h" id="pdone-h-${a.id}" type="number" value="${a.geplante_h||1}" min="0.5" max="20" step="0.5">
+    <button class="set-btn" onclick="parkConfirmDone('${a.id}')">Speichern</button>
+    <button class="set-btn" style="color:var(--text-muted)" onclick="parkHideErledigen('${a.id}')">×</button>
+  </div>` : ''}`;
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function parkToggle(pid){
+  const body = document.getElementById('park-body-'+pid);
+  if(!body) return;
+  const open = body.classList.toggle('open');
+  localStorage.setItem('park_open_'+pid, open?'1':'0');
+  renderPark();
+}
+
+function parkShowErledigen(id){
+  document.querySelectorAll('[id^="pconf-"]').forEach(el=>el.style.display='none');
+  const el = document.getElementById('pconf-'+id);
+  if(el){ el.style.display='flex'; el.querySelector('input')?.focus(); }
+}
+function parkHideErledigen(id){
+  const el = document.getElementById('pconf-'+id);
+  if(el) el.style.display='none';
+}
+
+async function parkConfirmDone(id){
+  const h = parseFloat(document.getElementById('pdone-h-'+id)?.value||'1');
+  const today = new Date().toISOString().slice(0,10);
+  try {
+    await sbReq('park_aufgaben?id=eq.'+id, {
+      method:'PATCH',
+      headers:{Prefer:'return=representation','Content-Type':'application/json'},
+      body:JSON.stringify({status:'Erledigt', erledigte_h:h, datum_erledigt:today})
+    });
+    const idx = parkAufgaben.findIndex(a=>a.id===id);
+    if(idx>=0){ parkAufgaben[idx].status='Erledigt'; parkAufgaben[idx].erledigte_h=h; parkAufgaben[idx].datum_erledigt=today; }
+    renderPark();
+  } catch{ alert('Fehler beim Speichern'); }
+}
+
+async function parkToggleDone(id){
+  const a = parkAufgaben.find(x=>x.id===id);
+  if(!a) return;
+  if(a.status==='Erledigt'){
+    // reopen
+    await sbReq('park_aufgaben?id=eq.'+id,{method:'PATCH',headers:{Prefer:'return=representation','Content-Type':'application/json'},body:JSON.stringify({status:'Offen',erledigte_h:null,datum_erledigt:null})});
+    a.status='Offen'; a.erledigte_h=null; a.datum_erledigt=null;
+    renderPark();
+  } else {
+    parkShowErledigen(id);
+  }
+}
+
+async function parkSaveAufgabe(projektId){
+  const sfx = projektId||'solo';
+  const titel = document.getElementById('pa-in-'+sfx)?.value?.trim();
+  const h = parseFloat(document.getElementById('pa-h-'+sfx)?.value||'1');
+  if(!titel) return;
+  try {
+    const payload = {titel, geplante_h:h, status:'Offen'};
+    if(projektId) payload.projekt_id = projektId;
+    const r = await sbReq('park_aufgaben',{method:'POST',headers:{Prefer:'return=representation','Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const neu = await r.json();
+    parkAufgaben.push(Array.isArray(neu)?neu[0]:neu);
+    if(projektId) localStorage.setItem('park_open_'+projektId,'1');
+    renderPark();
+  } catch{ alert('Fehler beim Speichern'); }
+}
+
+async function parkDeleteAufgabe(id){
+  if(!confirm('Aufgabe löschen?')) return;
+  await sbReq('park_aufgaben?id=eq.'+id,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+  parkAufgaben = parkAufgaben.filter(a=>a.id!==id);
+  renderPark();
+}
+
+async function parkDeleteProjekt(id){
+  if(!confirm('Projekt und alle Aufgaben löschen?')) return;
+  await sbReq('park_projekte?id=eq.'+id,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+  parkProjekte = parkProjekte.filter(p=>p.id!==id);
+  parkAufgaben = parkAufgaben.filter(a=>a.projekt_id!==id);
+  renderPark();
+}
+
+async function parkStatusToggle(id){
+  const p = parkProjekte.find(x=>x.id===id);
+  if(!p) return;
+  const order = ['Planung','Aktiv','Abgeschlossen'];
+  const next = order[(order.indexOf(p.status)+1) % order.length];
+  await sbReq('park_projekte?id=eq.'+id,{method:'PATCH',headers:{Prefer:'return=representation','Content-Type':'application/json'},body:JSON.stringify({status:next})});
+  p.status = next;
+  renderPark();
+}
+
+// ── PARK-PROJEKT MODAL ────────────────────────────────────────────────────────
+function openParkProjModal(){
+  document.getElementById('ppmod-titel').value='';
+  document.getElementById('ppmod-desc').value='';
+  document.getElementById('ppmod-status').value='Planung';
+  document.getElementById('park-proj-modal').classList.remove('gone');
+  document.getElementById('ppmod-titel').focus();
+}
+
+async function saveParkProjekt(){
+  const titel = document.getElementById('ppmod-titel').value.trim();
+  if(!titel){ document.getElementById('ppmod-titel').focus(); return; }
+  const beschreibung = document.getElementById('ppmod-desc').value.trim();
+  const status = document.getElementById('ppmod-status').value;
+  try {
+    const r = await sbReq('park_projekte',{method:'POST',headers:{Prefer:'return=representation','Content-Type':'application/json'},body:JSON.stringify({titel,beschreibung,status})});
+    const neu = await r.json();
+    const proj = Array.isArray(neu)?neu[0]:neu;
+    parkProjekte.push(proj);
+    localStorage.setItem('park_open_'+proj.id,'1');
+    closeModal('park-proj-modal');
+    renderPark();
+  } catch{ alert('Fehler beim Speichern'); }
+}
+
+// Update zeitGetProjekte to include park tasks completed this week
+function zeitGetProjekte(){
+  const {mon, sun} = weekBounds(zeitOffset);
+  // park tasks erledigt diese Woche
+  const dbItems = parkAufgaben.filter(a => {
+    if(a.status !== 'Erledigt' || !a.datum_erledigt) return false;
+    const d = new Date(a.datum_erledigt + 'T12:00:00');
+    return d >= mon && d <= sun;
+  }).map(a => {
+    const proj = parkProjekte.find(p=>p.id===a.projekt_id);
+    return {
+      label: (proj ? proj.titel+' · ' : '') + a.titel,
+      h: parseFloat(a.erledigte_h) || parseFloat(a.geplante_h) || 1,
+    };
+  });
+  // manual localStorage entries
+  const wkey = 'zeit_proj_'+zeitOffset;
+  let stored = [];
+  try { stored = JSON.parse(localStorage.getItem(wkey)||'[]'); } catch{}
+  const allItems = [...dbItems, ...stored];
+  return {h: Math.round(allItems.reduce((a,i)=>a+(i.h||0),0)*10)/10, items: allItems};
 }
 
 </script>
