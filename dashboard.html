@@ -351,6 +351,17 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .kasse-entry-del:hover{color:#dc2626}
 .kasse-total-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:2px solid var(--border);font-weight:700}
 .kasse-note{margin-top:14px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:12.5px;color:var(--text-muted);line-height:1.6;text-align:center}
+/* QUITTUNG */
+.quit-wrap{margin:10px 0 12px;padding:12px 14px;background:var(--bg);border:1.5px dashed var(--border);border-radius:10px}
+.quit-lbl{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
+.quit-preview{width:100%;max-height:220px;object-fit:contain;border-radius:8px;margin-bottom:8px;cursor:zoom-in}
+.quit-actions{display:flex;gap:8px}
+.quit-btn{flex:1;padding:9px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;text-align:center}
+.quit-btn:hover{border-color:var(--accent)}
+.quit-btn.danger{border-color:#fca5a5;color:#dc2626}
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;cursor:zoom-out}
+.lightbox img{max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px}
 
 /* RESPONSIVE */
 @media(min-width:480px){.bgt-grid{grid-template-columns:repeat(4,1fr)}}
@@ -735,6 +746,14 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     </details>
     <div id="dm-teile-sw" class="dm-teile-sw" style="display:none"></div>
 
+    <!-- Quittung -->
+    <div class="quit-wrap" id="dm-quit-wrap">
+      <div class="quit-lbl">🧾 Quittung</div>
+      <img id="dm-quit-img" class="quit-preview" style="display:none" onclick="showLightbox(this.src)">
+      <div class="quit-actions" id="dm-quit-actions"></div>
+    </div>
+    <input type="file" id="dm-quit-in" accept="image/*" capture="environment" style="display:none" onchange="onQuitChange(this)">
+
     <div class="modal-actions">
       <button class="modal-btn primary" onclick="saveDetail()">Speichern</button>
       <button class="modal-btn secondary" onclick="closeModal('detail-modal')">Abbrechen</button>
@@ -967,6 +986,7 @@ async function loadData(){
       status:x.status||'Offen',
       notiz:x.notiz||'',
       foto:x.foto||null,
+      quittung:x.quittung||null,
       kosten:x.kosten!=null?x.kosten:null,
       kategorie:x.kategorie||null,
       termin:x.termin||'',
@@ -1473,6 +1493,10 @@ function openDetail(id){
     `<button class="status-opt${s.status===st?' sel':''}" onclick="selStatus(this,'${st}')">${st}</button>`
   ).join('');
 
+  // Quittung
+  dmQuittung = s.quittung || null;
+  renderQuitWrap();
+
   // rep: read-only — disable inputs and hide save
   const isRep = role==='rep';
   document.getElementById('dm-kosten').disabled = isRep;
@@ -1500,7 +1524,8 @@ async function saveDetail(){
     status: newStatus,
     notiz: notiz||null,
     kosten: kosten!==''?parseFloat(kosten):null,
-    erledigt_am: newStatus==='Abgeschlossen'&&editItem.status!=='Abgeschlossen'?td():editItem.erledigt||null
+    erledigt_am: newStatus==='Abgeschlossen'&&editItem.status!=='Abgeschlossen'?td():editItem.erledigt||null,
+    quittung: dmQuittung||null
   };
 
   setSyncDot('busy');
@@ -2164,6 +2189,62 @@ function renderDmParts(){
       </div>
     </div>`).join('');
   updateTeileTotal();
+}
+
+// ── QUITTUNG ──────────────────────────────────────────────────────────────────
+let dmQuittung = null; // null = keine, '' = gelöscht, 'data:...' = neu
+
+function renderQuitWrap(){
+  const img = document.getElementById('dm-quit-img');
+  const acts = document.getElementById('dm-quit-actions');
+  const isRep = role === 'rep';
+  if(dmQuittung){
+    img.src = dmQuittung;
+    img.style.display = 'block';
+    acts.innerHTML = isRep
+      ? `<button class="quit-btn" onclick="showLightbox('${dmQuittung.slice(0,30)}...')">🔍 Vergrößern</button>`
+      : `<button class="quit-btn" onclick="document.getElementById('dm-quit-in').click()">↩ Ersetzen</button>
+         <button class="quit-btn danger" onclick="dmQuittung=null;renderQuitWrap()">✕ Löschen</button>`;
+  } else {
+    img.src = '';
+    img.style.display = 'none';
+    acts.innerHTML = isRep
+      ? '<span style="font-size:13px;color:var(--text-muted)">Keine Quittung vorhanden</span>'
+      : `<button class="quit-btn" onclick="document.getElementById('dm-quit-in').click()">📷 Quittung aufnehmen</button>`;
+  }
+}
+
+function onQuitChange(input){
+  const file = input.files[0];
+  if(!file){ input.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1400;
+      let w = img.width, h = img.height;
+      if(w > MAX || h > MAX){
+        if(w > h){ h = Math.round(h*MAX/w); w = MAX; }
+        else { w = Math.round(w*MAX/h); h = MAX; }
+      }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      dmQuittung = c.toDataURL('image/jpeg', 0.78);
+      renderQuitWrap();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function showLightbox(src){
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.innerHTML = `<img src="${src}" alt="Quittung">`;
+  lb.onclick = () => lb.remove();
+  document.body.appendChild(lb);
 }
 
 function toggleDmLager(i, checked){
