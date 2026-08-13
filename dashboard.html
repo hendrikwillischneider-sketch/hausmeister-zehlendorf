@@ -645,6 +645,7 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div class="sec" style="margin:0">Bewohner</div>
     <div style="display:flex;gap:8px">
       <button class="set-btn" onclick="exportVCard()" title="Als vCard exportieren (Google Kontakte)">📇 vCard</button>
+      <button class="set-btn" onclick="printKlingelschilder()" title="Klingelschilder drucken">🔔 Klingelschilder</button>
       <button class="modal-btn primary" style="padding:8px 14px;font-size:13px" onclick="openEinzug()">+ Einzug</button>
     </div>
   </div>
@@ -1638,6 +1639,44 @@ function exportVCard(){
   a.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcf);
   a.download = 'bewohner_zehlendorf.vcf';
   a.click();
+}
+
+function printKlingelschilder(){
+  const aktive = bewohner.filter(b=>b.aktiv && (b.vorname||b.nachname) && !String(b.zimmer).startsWith('G'));
+  if(!aktive.length){alert('Keine Bewohnerdaten vorhanden.');return;}
+  const sortnr=b=>{const n=parseInt(b.zimmer||'');return isNaN(n)?9999:n;};
+  aktive.sort((a,b)=>sortnr(a)-sortnr(b));
+  const labels = aktive.map(b=>{
+    const name=[b.vorname,b.nachname].filter(Boolean).join(' ');
+    return `<div class="label">
+      <div class="label-suite">Suite ${b.zimmer}</div>
+      <div class="label-name">${name}</div>
+    </div>`;
+  }).join('');
+  const win = window.open('','_blank','width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>Klingelschilder – Sidonie-Scharfe-Stiftung Zehlendorf</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;background:#fff;padding:16px}
+    h1{font-size:13px;color:#555;margin-bottom:14px;font-weight:normal}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .label{border:1.5px solid #333;border-radius:6px;padding:10px 12px;height:64px;
+           display:flex;flex-direction:column;justify-content:center;page-break-inside:avoid}
+    .label-suite{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:#777;margin-bottom:3px}
+    .label-name{font-size:15px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    @media print{
+      body{padding:8mm}
+      h1{display:none}
+      .no-print{display:none}
+      .grid{gap:5px}
+    }
+  </style></head><body>
+  <h1>Klingelschilder · Sidonie-Scharfe-Stiftung Zehlendorf · ${aktive.length} Bewohner</h1>
+  <button class="no-print" onclick="window.print()" style="margin-bottom:14px;padding:8px 18px;font-size:14px;cursor:pointer;border:1.5px solid #333;border-radius:6px;background:#f5f5f5">🖨️ Drucken</button>
+  <div class="grid">${labels}</div>
+  </body></html>`);
+  win.document.close();
 }
 
 // ── OVERVIEW ─────────────────────────────────────────────────────────────────
