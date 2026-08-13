@@ -782,6 +782,18 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div class="modal-title">🔔 Klingelschilder</div>
 
     <div class="modal-row">
+      <div class="modal-lbl">Vorlage (Standardmaße)</div>
+      <select class="modal-in" id="ks-vorlage" onchange="ksApplyVorlage(this.value)">
+        <option value="">— Benutzerdefiniert —</option>
+        <option value="60,15,3">Klein · 60×15 mm (Unterputz, MFH)</option>
+        <option value="60,18,3">Klein · 60×18 mm (Unterputz, MFH)</option>
+        <option value="70,20,2">Mittel · 70×20 mm</option>
+        <option value="80,25,2">Mittel · 80×25 mm</option>
+        <option value="100,25,2">Mittel · 100×25 mm</option>
+      </select>
+    </div>
+
+    <div class="modal-row">
       <div class="modal-lbl">Inhalt der Schilder</div>
       <select class="modal-in" id="ks-inhalt">
         <option value="nachname">Nur Nachname</option>
@@ -1725,6 +1737,14 @@ function exportVCard(){
 
 function openKlingelschilderModal(){
   document.getElementById('ks-modal').classList.remove('gone');
+}
+
+function ksApplyVorlage(val){
+  if(!val)return;
+  const [b,h,sp]=val.split(',');
+  document.getElementById('ks-breite').value=b;
+  document.getElementById('ks-hoehe').value=h;
+  document.getElementById('ks-spalten').value=sp;
 }
 
 function generateKlingelschilder(){
