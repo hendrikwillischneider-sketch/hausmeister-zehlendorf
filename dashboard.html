@@ -971,27 +971,49 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
         <button class="status-opt" id="ns-kat-gebaeude" onclick="nsSelKat(this,'Gebäudeschaden')" style="border-color:#8b5cf6">🏢 Gebäudeschaden</button>
       </div>
     </div>
-    <div class="modal-row">
+    <!-- Bewohnerschaden: Bewohnerin + Raum -->
+    <div id="ns-bew-row" class="modal-row">
+      <div class="modal-lbl">Bewohnerin <span style="color:var(--text-muted);font-weight:400">(optional)</span></div>
+      <select class="modal-in" id="ns-bewohnerin" onchange="nsBewohnerin(this)">
+        <option value="">— auswählen …</option>
+      </select>
+    </div>
+    <div id="ns-raum-row" class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Raum</div>
+        <select class="modal-in" id="ns-raum">
+          <option value="Küche">🍳 Küche</option>
+          <option value="Bad / Dusche">🚿 Bad / Dusche</option>
+          <option value="WC">🚽 WC / Toilette</option>
+          <option value="Wohnzimmer">🛋️ Wohnzimmer</option>
+          <option value="Schlafzimmer">🛏️ Schlafzimmer</option>
+          <option value="Flur / Eingang">🚪 Flur / Eingang</option>
+          <option value="Balkon">🌿 Balkon / Terrasse</option>
+          <option value="Keller">🔑 Keller</option>
+          <option value="Sonstiges">📍 Sonstiges</option>
+        </select>
+      </div>
+      <div>
+        <div class="modal-lbl">Suite-Nr.</div>
+        <input class="modal-in" id="ns-zimmer" type="text" inputmode="numeric" maxlength="4" placeholder="z.B. 12">
+      </div>
+    </div>
+    <!-- Notfall / Gebäude: freier Ort -->
+    <div id="ns-ort-row" class="modal-row" style="display:none">
       <div class="modal-lbl">Ort / Bereich</div>
-      <input class="modal-in" id="ns-ort" type="text" placeholder="z.B. Suite 12 · Bad, Treppenhaus Erdgeschoss …">
+      <input class="modal-in" id="ns-ort" type="text" placeholder="z.B. Treppenhaus EG, Außenanlage West …">
     </div>
     <div class="modal-row">
       <div class="modal-lbl">Problem (kurz beschreiben)</div>
-      <textarea class="modal-in" id="ns-prob" rows="3" placeholder="z.B. Wasserhahn tropft, Heizung kalt, Glühbirne kaputt …"></textarea>
+      <textarea class="modal-in" id="ns-prob" rows="3" placeholder="z.B. Wasserhahn tropft, Heizung kalt, Türschloss klemmt …"></textarea>
     </div>
-    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div>
-        <div class="modal-lbl">Suite-Nr. (falls bekannt)</div>
-        <input class="modal-in" id="ns-zimmer" type="text" inputmode="numeric" maxlength="4" placeholder="z.B. 12">
-      </div>
-      <div>
-        <div class="modal-lbl">Priorität</div>
-        <select class="modal-in" id="ns-prio">
-          <option value="Hoch">Hoch</option>
-          <option value="Mittel" selected>Mittel</option>
-          <option value="Niedrig">Niedrig</option>
-        </select>
-      </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Priorität</div>
+      <select class="modal-in" id="ns-prio">
+        <option value="Hoch">Hoch</option>
+        <option value="Mittel" selected>Mittel</option>
+        <option value="Niedrig">Niedrig</option>
+      </select>
     </div>
     <div class="modal-row">
       <div class="modal-lbl">🔩 Teile / Material (optional)</div>
@@ -1006,7 +1028,7 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <input class="modal-in" id="ns-notiz" type="text" placeholder="z.B. Bewohnerin wartet auf Rückruf">
     </div>
     <div class="modal-row">
-      <div class="modal-lbl">📷 Fotos (optional · bis zu 6)</div>
+      <div class="modal-lbl" style="font-size:14px;font-weight:600">📷 Fotos — direkt mit der Kamera oder aus der Galerie</div>
       <div class="foto-grid" id="ns-foto-grid"></div>
       <input type="file" id="ns-foto-in" accept="image/*" capture="environment" multiple style="display:none" onchange="addFotos(this)">
     </div>
@@ -3077,9 +3099,23 @@ function openAddEntry(){
   document.getElementById('ns-kat-schaden').classList.add('sel');
   document.getElementById('ns-kat-notfall').classList.remove('sel');
   document.getElementById('ns-kat-gebaeude').classList.remove('sel');
+  // Bewohnerin dropdown befüllen
+  const bwSel = document.getElementById('ns-bewohnerin');
+  bwSel.innerHTML = '<option value="">— auswählen …</option>';
+  const aktiv = bewohner.filter(b=>b.aktiv && (b.vorname||b.nachname) && !GR_CODES.includes(b.zimmer));
+  aktiv.sort((a,b)=>(a.nachname||a.name||'').localeCompare(b.nachname||b.name||''));
+  aktiv.forEach(b=>{
+    const opt=document.createElement('option');
+    opt.value=b.id;
+    opt.dataset.zimmer=b.zimmer||'';
+    opt.textContent=(b.vorname||'')+' '+(b.nachname||b.name||'')+' (Suite '+(b.zimmer||'?')+')';
+    bwSel.appendChild(opt);
+  });
+  bwSel.value = '';
   document.getElementById('ns-ort').value = '';
   document.getElementById('ns-prob').value = '';
   document.getElementById('ns-zimmer').value = '';
+  document.getElementById('ns-raum').value = 'Küche';
   document.getElementById('ns-prio').value = 'Mittel';
   document.getElementById('ns-notiz').value = '';
   document.getElementById('ns-part-in').value = '';
@@ -3087,10 +3123,19 @@ function openAddEntry(){
   document.getElementById('ns-err').style.display = 'none';
   document.getElementById('ns-submit-btn').disabled = false;
   document.getElementById('ns-submit-btn').textContent = 'Meldung speichern';
+  // Schaden-Modus: Bewohnerin+Raum zeigen, Ort ausblenden
+  document.getElementById('ns-bew-row').style.display = '';
+  document.getElementById('ns-raum-row').style.display = '';
+  document.getElementById('ns-ort-row').style.display = 'none';
   renderParts();
   renderFotoGrid();
   document.getElementById('new-schaden-modal').classList.remove('gone');
-  setTimeout(()=>document.getElementById('ns-ort').focus(),100);
+  setTimeout(()=>document.getElementById('ns-bewohnerin').focus(),100);
+}
+
+function nsBewohnerin(sel){
+  const zm = sel.options[sel.selectedIndex]?.dataset?.zimmer || '';
+  if(zm) document.getElementById('ns-zimmer').value = zm;
 }
 
 function nsSelKat(el, kat){
@@ -3100,6 +3145,10 @@ function nsSelKat(el, kat){
   document.getElementById('ns-kat-gebaeude').classList.remove('sel');
   el.classList.add('sel');
   if(kat==='Notfall') document.getElementById('ns-prio').value='Hoch';
+  const isSchaden = kat==='Schaden';
+  document.getElementById('ns-bew-row').style.display = isSchaden ? '' : 'none';
+  document.getElementById('ns-raum-row').style.display = isSchaden ? '' : 'none';
+  document.getElementById('ns-ort-row').style.display = isSchaden ? 'none' : '';
 }
 
 // ── EINKAUFSLISTE ─────────────────────────────────────────────────────────────
@@ -3187,11 +3236,19 @@ async function markBesorgt(schadenId, sbId, partIdx, rowIdx, cb){
 }
 
 async function saveNewSchaden(){
-  const ort = document.getElementById('ns-ort').value.trim();
   const prob = document.getElementById('ns-prob').value.trim();
   const errEl = document.getElementById('ns-err');
+  // ort aus Raum (Schaden) oder Freitext (Notfall/Gebäude) zusammenbauen
+  let ort;
+  if(nsKat==='Schaden'){
+    const raum = document.getElementById('ns-raum').value;
+    const zm = document.getElementById('ns-zimmer').value.trim();
+    ort = raum + (zm ? ' · Suite '+zm : '');
+  } else {
+    ort = document.getElementById('ns-ort').value.trim();
+  }
   if(!ort || !prob){
-    errEl.textContent = 'Bitte Ort und Problem ausfüllen.';
+    errEl.textContent = 'Bitte ' + (nsKat==='Schaden' ? 'Raum' : 'Ort') + ' und Problem ausfüllen.';
     errEl.style.display = 'block';
     return;
   }
