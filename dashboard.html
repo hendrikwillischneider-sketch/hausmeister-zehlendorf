@@ -1388,11 +1388,17 @@ function renderBewohner(){
       b.telefon ? `☎️ ${escHtml(b.telefon)}` : '',
       b.email   ? `✉️ ${escHtml(b.email)}`   : ''
     ].filter(Boolean).join('  ·  ');
-    const loc = [b.haus?'Haus '+b.haus:'', b.stockwerk||''].filter(Boolean).join(' · ');
-    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)">
-      <div style="min-width:44px;height:44px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;padding:0 6px">
-        <div style="font-size:13px;font-weight:700;color:var(--accent);line-height:1">${b.zimmer}</div>
-        ${loc?`<div style="font-size:9px;color:var(--text-muted);line-height:1.2;text-align:center;margin-top:2px;white-space:nowrap">${escHtml(loc)}</div>`:''}
+    function chip(lbl,val){
+      if(!val) return `<div style="width:48px;height:44px;border-radius:9px;background:var(--bg);border:1.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;opacity:.35">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);line-height:1">${lbl}</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);line-height:1.4">—</div></div>`;
+      return `<div style="width:48px;height:44px;border-radius:9px;background:var(--bg);border:1.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);line-height:1">${lbl}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--accent);line-height:1.4;white-space:nowrap">${escHtml(val)}</div></div>`;
+    }
+    return `<div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        ${chip('Suite',b.zimmer)}${chip('Haus',b.haus||'')}${chip('Etage',b.stockwerk||'')}
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(name)}</div>
