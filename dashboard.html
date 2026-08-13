@@ -635,8 +635,88 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 
 </div><!-- /app -->
 
+<!-- BEWOHNER VIEW -->
+<div class="view gone" id="v-bewohner">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sec" style="margin:0">Bewohner</div>
+    <div style="display:flex;gap:8px">
+      <button class="set-btn" onclick="exportVCard()" title="Als vCard exportieren (Google Kontakte)">📇 vCard</button>
+      <button class="modal-btn primary" style="padding:8px 14px;font-size:13px" onclick="openEinzug()">+ Einzug</button>
+    </div>
+  </div>
+  <div id="bewohner-list"></div>
+</div>
+
 <!-- FAB -->
 <button class="fab hidden" id="fab" onclick="openAddEntry()">+ Eingang erfassen</button>
+
+<!-- EINZUG MODAL -->
+<div class="modal-bg gone" id="einzug-modal">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title" id="einzug-modal-title">Einzug erfassen</div>
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Vorname</div>
+        <input class="modal-in" id="ez-vorname" type="text" placeholder="z.B. Maria">
+      </div>
+      <div>
+        <div class="modal-lbl">Nachname</div>
+        <input class="modal-in" id="ez-nachname" type="text" placeholder="z.B. Müller">
+      </div>
+    </div>
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Suite-Nr.</div>
+        <input class="modal-in" id="ez-zimmer" type="text" inputmode="numeric" maxlength="4" placeholder="z.B. 18">
+      </div>
+      <div>
+        <div class="modal-lbl">Eingezogen am</div>
+        <input class="modal-in" id="ez-datum" type="date">
+      </div>
+    </div>
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Telefon (Festnetz)</div>
+        <input class="modal-in" id="ez-telefon" type="tel" placeholder="z.B. 030 12345678">
+      </div>
+      <div>
+        <div class="modal-lbl">Handy</div>
+        <input class="modal-in" id="ez-handy" type="tel" placeholder="z.B. 0171 1234567">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">E-Mail</div>
+      <input class="modal-in" id="ez-email" type="email" placeholder="z.B. m.mueller@email.de">
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Anmerkung (optional)</div>
+      <input class="modal-in" id="ez-anmerkung" type="text" placeholder="z.B. Pflegegrad 2, Rollstuhlfahrer …">
+    </div>
+    <div id="ez-err" style="display:none;color:var(--red);font-size:13px;margin-bottom:8px;padding:8px 10px;background:var(--red-pale);border-radius:8px"></div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="ez-submit-btn" onclick="saveEinzug()">Speichern</button>
+      <button class="modal-btn secondary" onclick="closeModal('einzug-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUSZUG BESTÄTIGUNG MODAL -->
+<div class="modal-bg gone" id="auszug-modal">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Auszug bestätigen</div>
+    <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px" id="auszug-modal-info"></div>
+    <div class="modal-row">
+      <div class="modal-lbl">Ausgezogen am</div>
+      <input class="modal-in" id="auszug-datum" type="date">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" style="background:var(--red);border-color:var(--red)" onclick="confirmAuszug()">Auszug speichern</button>
+      <button class="modal-btn secondary" onclick="closeModal('auszug-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
 
 <!-- NEUEN SCHADEN ERFASSEN MODAL -->
 <div class="modal-bg gone" id="new-schaden-modal">
@@ -842,6 +922,9 @@ const TASKS = [
 let role = null; // 'hm' | 'sw'
 let schaden = [];
 let buchungen = [];
+let bewohner = [];
+let ezEditId = null;
+let auszugTargetId = null;
 let zeitfenster = [];
 let services = [];
 let servicesFromDb = false;
@@ -932,9 +1015,9 @@ function initApp(){
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
        {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},
-       {id:'kasse',lbl:'💶 Kasse'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+       {id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
     : role==='sw'
-    ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'kasse',lbl:'💶 Kasse'}]
+    ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'}]
     : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'📋 Schäden'},{id:'kasse',lbl:'💶 Kasse'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
@@ -967,6 +1050,7 @@ function showTab(id){
   if(id==='termine')renderTermine();
   if(id==='kasse')loadKasse();
   if(id==='services')renderServices();
+  if(id==='bewohner')renderBewohner();
 }
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
@@ -1000,6 +1084,7 @@ async function loadData(){
     loadZeitfenster();
     loadServices();
     loadBgtEntries();
+    if(role!=='rep') loadBewohner();
   }catch{
     setSyncDot('err');
     renderAll();
@@ -1256,6 +1341,173 @@ function renderAll(){
   renderOverview();
   renderSchaden();
   renderBudget();
+}
+
+// ── BEWOHNER ─────────────────────────────────────────────────────────────────
+async function loadBewohner(){
+  try{
+    const r=await sbReq('bewohner?order=zimmer.asc&select=*');
+    if(!r.ok)throw 0;
+    bewohner=await r.json();
+    renderBewohner();
+  }catch{/* silent */}
+}
+
+function renderBewohner(){
+  const el=document.getElementById('bewohner-list');
+  if(!el)return;
+  const sortnr=b=>parseInt(b.zimmer||0);
+  const aktive=bewohner.filter(b=>b.aktiv).sort((a,b)=>sortnr(a)-sortnr(b));
+  const ehemalige=bewohner.filter(b=>!b.aktiv).sort((a,b)=>sortnr(a)-sortnr(b));
+
+  function bewohnerRow(b){
+    const name = [b.vorname,b.nachname].filter(Boolean).join(' ') || b.name||'—';
+    const seit = b.eingezogen_am ? new Date(b.eingezogen_am).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+    const isAktiv = b.aktiv;
+    const kontakt = [
+      b.handy   ? `📱 ${escHtml(b.handy)}`   : '',
+      b.telefon ? `☎️ ${escHtml(b.telefon)}` : '',
+      b.email   ? `✉️ ${escHtml(b.email)}`   : ''
+    ].filter(Boolean).join('  ·  ');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent);flex-shrink:0">${b.zimmer}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(name)}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${isAktiv?'seit '+seit:'ausgezogen '+(b.ausgezogen_am?new Date(b.ausgezogen_am).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}):'')}${b.anmerkung?' · '+escHtml(b.anmerkung):''}</div>
+        ${kontakt?`<div style="font-size:11px;color:var(--text-muted);margin-top:3px">${kontakt}</div>`:''}
+      </div>
+      ${isAktiv?`
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="set-btn" onclick="openEinzug('${b.id}')" title="Bearbeiten">✏️</button>
+        <button class="set-btn" onclick="openAuszug('${b.id}')" title="Auszug">📤</button>
+        <button class="set-btn" onclick="resetPw('${b.id}','${b.zimmer}')" title="Portal-Passwort zurücksetzen">🔑</button>
+      </div>`:'<span style="font-size:11px;color:var(--text-muted);flex-shrink:0">Archiv</span>'}
+    </div>`;
+  }
+
+  let html='';
+  if(aktive.length){
+    html+=`<div class="card" style="padding:0;margin-bottom:14px">`+aktive.map(bewohnerRow).join('')+`</div>`;
+  } else {
+    html+='<div class="empty"><div class="empty-icon">👥</div><div class="empty-lbl">Keine aktiven Bewohner</div></div>';
+  }
+  if(ehemalige.length){
+    html+=`<div class="sec">Ehemalige Bewohner</div><div class="card" style="padding:0">`+ehemalige.map(bewohnerRow).join('')+`</div>`;
+  }
+  el.innerHTML=html;
+}
+
+function openEinzug(id){
+  ezEditId = id||null;
+  const b = id ? bewohner.find(x=>x.id===id) : null;
+  document.getElementById('einzug-modal-title').textContent = b ? 'Bewohner bearbeiten' : 'Einzug erfassen';
+  document.getElementById('ez-vorname').value = b?.vorname||'';
+  document.getElementById('ez-nachname').value = b?.nachname||'';
+  document.getElementById('ez-zimmer').value = b?.zimmer||'';
+  document.getElementById('ez-datum').value = b?.eingezogen_am||new Date().toISOString().slice(0,10);
+  document.getElementById('ez-telefon').value = b?.telefon||'';
+  document.getElementById('ez-handy').value = b?.handy||'';
+  document.getElementById('ez-email').value = b?.email||'';
+  document.getElementById('ez-anmerkung').value = b?.anmerkung||'';
+  document.getElementById('ez-err').style.display='none';
+  document.getElementById('ez-submit-btn').disabled=false;
+  document.getElementById('ez-submit-btn').textContent='Speichern';
+  document.getElementById('einzug-modal').classList.remove('gone');
+  setTimeout(()=>document.getElementById('ez-vorname').focus(),100);
+}
+
+async function saveEinzug(){
+  const vn=document.getElementById('ez-vorname').value.trim();
+  const nn=document.getElementById('ez-nachname').value.trim();
+  const zm=document.getElementById('ez-zimmer').value.trim();
+  const dt=document.getElementById('ez-datum').value;
+  const an=document.getElementById('ez-anmerkung').value.trim()||null;
+  const tel=document.getElementById('ez-telefon').value.trim()||null;
+  const handy=document.getElementById('ez-handy').value.trim()||null;
+  const email=document.getElementById('ez-email').value.trim()||null;
+  const errEl=document.getElementById('ez-err');
+  if(!vn||!nn||!zm){errEl.textContent='Bitte Vor-/Nachname und Suite-Nr. ausfüllen.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  const btn=document.getElementById('ez-submit-btn');
+  btn.disabled=true; btn.textContent='Wird gespeichert …';
+  const payload={vorname:vn,nachname:nn,name:vn+' '+nn,zimmer:zm,eingezogen_am:dt||null,anmerkung:an,telefon:tel,handy,email,aktiv:true};
+  try{
+    if(ezEditId){
+      const r=await sbReq('bewohner?id=eq.'+ezEditId,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(payload)});
+      if(!r.ok)throw 0;
+      const b=bewohner.find(x=>x.id===ezEditId);
+      if(b)Object.assign(b,payload);
+    } else {
+      const r=await sbReq('bewohner',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({...payload,pw_gesetzt:false})});
+      if(!r.ok)throw 0;
+      const [created]=await r.json();
+      bewohner.push(created);
+      bewohner.sort((a,b)=>parseInt(a.zimmer||0)-parseInt(b.zimmer||0));
+    }
+    closeModal('einzug-modal');
+    renderBewohner();
+  }catch{errEl.textContent='Speichern fehlgeschlagen.';errEl.style.display='block';btn.disabled=false;btn.textContent='Speichern';}
+}
+
+function openAuszug(id){
+  auszugTargetId=id;
+  const b=bewohner.find(x=>x.id===id);
+  const name=[b?.vorname,b?.nachname].filter(Boolean).join(' ')||b?.name||'Bewohner';
+  document.getElementById('auszug-modal-info').textContent=`${name} — Suite ${b?.zimmer}`;
+  document.getElementById('auszug-datum').value=new Date().toISOString().slice(0,10);
+  document.getElementById('auszug-modal').classList.remove('gone');
+}
+
+async function confirmAuszug(){
+  if(!auszugTargetId)return;
+  const dt=document.getElementById('auszug-datum').value;
+  try{
+    const r=await sbReq('bewohner?id=eq.'+auszugTargetId,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({aktiv:false,ausgezogen_am:dt||new Date().toISOString().slice(0,10)})});
+    if(!r.ok)throw 0;
+    const b=bewohner.find(x=>x.id===auszugTargetId);
+    if(b){b.aktiv=false;b.ausgezogen_am=dt;}
+    closeModal('auszug-modal');
+    renderBewohner();
+  }catch{alert('Fehler beim Speichern.');}
+}
+
+async function resetPw(id, zimmer){
+  try{
+    const r=await sbReq('bewohner?id=eq.'+id,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({portal_pw:null,pw_gesetzt:false})});
+    if(!r.ok)throw 0;
+    const b=bewohner.find(x=>x.id===id);
+    if(b){b.portal_pw=null;b.pw_gesetzt=false;}
+    alert(`Passwort zurückgesetzt. Nächstes Login: Suite-Nr. "${zimmer}"`);
+  }catch{alert('Fehler beim Zurücksetzen.');}
+}
+
+function exportVCard(){
+  const aktive = bewohner.filter(b=>b.aktiv);
+  if(!aktive.length){alert('Keine aktiven Bewohner vorhanden.');return;}
+  const lines = aktive.map(b=>{
+    const vn = b.vorname||'';
+    const nn = b.nachname||'';
+    const note = ['Suite '+b.zimmer, b.anmerkung].filter(Boolean).join(', ');
+    const parts = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      `N:${nn};${vn};;;`,
+      `FN:${vn} ${nn}`.trim(),
+      `ORG:Sidonie-Scharfe-Stiftung Zehlendorf`,
+      `TITLE:Suite ${b.zimmer}`,
+      b.telefon ? `TEL;TYPE=HOME:${b.telefon}` : '',
+      b.handy   ? `TEL;TYPE=CELL:${b.handy}`   : '',
+      b.email   ? `EMAIL:${b.email}`             : '',
+      note      ? `NOTE:${note}`                 : '',
+      'END:VCARD'
+    ].filter(Boolean);
+    return parts.join('\r\n');
+  });
+  const vcf = lines.join('\r\n\r\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcf);
+  a.download = 'bewohner_zehlendorf.vcf';
+  a.click();
 }
 
 // ── OVERVIEW ─────────────────────────────────────────────────────────────────
