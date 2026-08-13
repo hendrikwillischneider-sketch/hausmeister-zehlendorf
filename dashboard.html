@@ -796,6 +796,7 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div class="modal-row">
       <div class="modal-lbl">Inhalt der Schilder</div>
       <select class="modal-in" id="ks-inhalt">
+        <option value="nr">Nur Nr.</option>
         <option value="nachname">Nur Nachname</option>
         <option value="vornachname">Vorname + Nachname</option>
         <option value="suite_nachname">Suite-Nr. + Nachname</option>
@@ -1766,6 +1767,7 @@ function generateKlingelschilder(){
   function labelText(b){
     const vn = b.vorname||'', nn = b.nachname||'';
     switch(inhalt){
+      case 'nr':                return {zeile1: b.zimmer};
       case 'nachname':          return {zeile1: nn};
       case 'vornachname':       return {zeile1: [vn,nn].filter(Boolean).join(' ')};
       case 'suite_nachname':    return {zeile1: nn, zeile0: `Suite ${b.zimmer}`};
