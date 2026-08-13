@@ -665,10 +665,29 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
         <input class="modal-in" id="ez-nachname" type="text" placeholder="z.B. Müller">
       </div>
     </div>
-    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
       <div>
         <div class="modal-lbl">Suite-Nr.</div>
-        <input class="modal-in" id="ez-zimmer" type="text" inputmode="numeric" maxlength="4" placeholder="z.B. 18">
+        <input class="modal-in" id="ez-zimmer" type="text" inputmode="numeric" maxlength="4" placeholder="18">
+      </div>
+      <div>
+        <div class="modal-lbl">Haus</div>
+        <select class="modal-in" id="ez-haus">
+          <option value="">—</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+        </select>
+      </div>
+      <div>
+        <div class="modal-lbl">Stockwerk</div>
+        <select class="modal-in" id="ez-stockwerk">
+          <option value="">—</option>
+          <option value="EG">EG</option>
+          <option value="1. OG">1. OG</option>
+          <option value="2. OG">2. OG</option>
+          <option value="3. OG">3. OG</option>
+          <option value="4. OG">4. OG</option>
+        </select>
       </div>
       <div>
         <div class="modal-lbl">Eingezogen am</div>
@@ -1369,8 +1388,12 @@ function renderBewohner(){
       b.telefon ? `☎️ ${escHtml(b.telefon)}` : '',
       b.email   ? `✉️ ${escHtml(b.email)}`   : ''
     ].filter(Boolean).join('  ·  ');
+    const loc = [b.haus?'Haus '+b.haus:'', b.stockwerk||''].filter(Boolean).join(' · ');
     return `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)">
-      <div style="width:40px;height:40px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent);flex-shrink:0">${b.zimmer}</div>
+      <div style="min-width:44px;height:44px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;padding:0 6px">
+        <div style="font-size:13px;font-weight:700;color:var(--accent);line-height:1">${b.zimmer}</div>
+        ${loc?`<div style="font-size:9px;color:var(--text-muted);line-height:1.2;text-align:center;margin-top:2px;white-space:nowrap">${escHtml(loc)}</div>`:''}
+      </div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(name)}</div>
         <div style="font-size:12px;color:var(--text-muted)">${isAktiv?'seit '+seit:'ausgezogen '+(b.ausgezogen_am?new Date(b.ausgezogen_am).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}):'')}${b.anmerkung?' · '+escHtml(b.anmerkung):''}</div>
@@ -1404,6 +1427,8 @@ function openEinzug(id){
   document.getElementById('ez-vorname').value = b?.vorname||'';
   document.getElementById('ez-nachname').value = b?.nachname||'';
   document.getElementById('ez-zimmer').value = b?.zimmer||'';
+  document.getElementById('ez-haus').value = b?.haus||'';
+  document.getElementById('ez-stockwerk').value = b?.stockwerk||'';
   document.getElementById('ez-datum').value = b?.eingezogen_am||new Date().toISOString().slice(0,10);
   document.getElementById('ez-telefon').value = b?.telefon||'';
   document.getElementById('ez-handy').value = b?.handy||'';
@@ -1430,7 +1455,9 @@ async function saveEinzug(){
   errEl.style.display='none';
   const btn=document.getElementById('ez-submit-btn');
   btn.disabled=true; btn.textContent='Wird gespeichert …';
-  const payload={vorname:vn,nachname:nn,name:vn+' '+nn,zimmer:zm,eingezogen_am:dt||null,anmerkung:an,telefon:tel,handy,email,aktiv:true};
+  const haus=document.getElementById('ez-haus').value||null;
+  const stockwerk=document.getElementById('ez-stockwerk').value||null;
+  const payload={vorname:vn,nachname:nn,name:vn+' '+nn,zimmer:zm,haus,stockwerk,eingezogen_am:dt||null,anmerkung:an,telefon:tel,handy,email,aktiv:true};
   try{
     if(ezEditId){
       const r=await sbReq('bewohner?id=eq.'+ezEditId,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(payload)});
