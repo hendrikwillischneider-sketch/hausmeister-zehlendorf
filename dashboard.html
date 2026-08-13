@@ -408,15 +408,12 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
     <div class="kpi-row">
       <div class="kpi"><div class="kpi-val alert" id="kpi-notfall">—</div><div class="kpi-lbl">Notfälle offen</div></div>
       <div class="kpi"><div class="kpi-val warn" id="kpi-offen">—</div><div class="kpi-lbl">Schäden offen</div></div>
-      <div class="kpi"><div class="kpi-val" id="kpi-budget">—</div><div class="kpi-lbl">Budget genutzt</div></div>
+      <div class="kpi" onclick="showTab('kasse')" style="cursor:pointer"><div class="kpi-val" id="kpi-budget">—</div><div class="kpi-lbl">Kasse (Monat)</div></div>
       <div class="kpi" onclick="showTab('buchungen')" style="cursor:pointer"><div class="kpi-val" id="kpi-buchungen">—</div><div class="kpi-lbl">Anfragen neu</div></div>
     </div>
 
     <div id="notfall-overview"></div>
     <div id="buchungen-overview"></div>
-
-    <div class="sec">Budget August 2026</div>
-    <div id="bgt-overview-cards" class="bgt-grid"></div>
 
     <div class="sec">Zuletzt gemeldet</div>
     <div class="card" id="recent-list"><div class="empty"><div class="empty-lbl">Wird geladen …</div></div></div>
@@ -563,30 +560,14 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       </div>
     </div>
 
-    <!-- Schnell-Eintrag (nur HM, nur aktueller Monat) -->
-    <div id="kasse-form-wrap" style="display:none;margin-bottom:14px">
-      <div class="card" style="padding:14px 16px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Eintrag hinzufügen</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-          <input type="date" id="kasse-datum" class="kasse-in" style="flex:0 0 138px">
-          <input type="text" id="kasse-desc" class="kasse-in" placeholder="Beschreibung (z.B. Dübel + Schrauben)" style="flex:1;min-width:180px">
-          <div style="display:flex;gap:6px;align-items:center">
-            <input type="number" id="kasse-betrag" class="kasse-in" placeholder="0,00" step="0.01" min="0.01" style="width:80px">
-            <span style="font-size:13px;color:var(--text-muted);flex-shrink:0">€</span>
-          </div>
-          <button class="bk-save" onclick="saveKasseEntry()" style="white-space:nowrap">+ Hinzufügen</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Eintrags-Liste -->
     <div id="kasse-list"></div>
 
     <!-- Hinweis Frau Schwade -->
     <div id="kasse-sw-note" class="kasse-note" style="display:none">
-      Dieser Monatsbericht wird automatisch aktualisiert.<br>
+      Einträge entstehen automatisch aus den Schadensmeldungen.<br>
       Kleinstmaterial bis 150 € / Monat benötigt keine Einzelfreigabe.<br>
-      Anfragen bei Überschreitung direkt an Hendrik.
+      Bei Überschreitung bitte direkt an Hendrik wenden.
     </div>
   </div>
 
@@ -920,9 +901,9 @@ function initApp(){
   // Build nav
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
-       {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'budget',lbl:'💰 Budget'},
+       {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},
        {id:'kasse',lbl:'💶 Kasse'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
-    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'budget',lbl:'💰 Budget'},{id:'kasse',lbl:'💶 Kasse'}];
+    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'kasse',lbl:'💶 Kasse'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
 
@@ -1248,14 +1229,14 @@ function renderAll(){
 function renderOverview(){
   const notfaelle = schaden.filter(s=>s.kategorie==='Notfall'&&s.status!=='Abgeschlossen');
   const offen = schaden.filter(s=>s.status==='Offen');
-  const {total,spent} = budgetSummary();
-  const pct = total>0?Math.round(spent/total*100):0;
+  const _km=new Date(); _km.setDate(1);
+  const kassePct=Math.min(100,Math.round(kasseSchadenForMonth(_km).reduce((s,e)=>s+(e.kosten||0),0)/KASSE_BUDGET*100));
 
   document.getElementById('kpi-notfall').textContent = notfaelle.length||'0';
   document.getElementById('kpi-offen').textContent = offen.length||'0';
-  document.getElementById('kpi-budget').textContent = pct+'%';
+  document.getElementById('kpi-budget').textContent = kassePct+'%';
   const kb = document.getElementById('kpi-budget');
-  kb.className='kpi-val'+(pct>=80?' warn':'');
+  kb.className='kpi-val'+(kassePct>=100?' alert':kassePct>=80?' warn':'');
 
   // Notfall section
   const nEl = document.getElementById('notfall-overview');
@@ -1853,16 +1834,18 @@ const KASSE_BUDGET = 150;
 let kasseEntries = [];
 let kasseMonat = new Date(); kasseMonat.setDate(1);
 
-async function loadKasse(){
-  const y = kasseMonat.getFullYear();
-  const m = String(kasseMonat.getMonth()+1).padStart(2,'0');
-  const from = `${y}-${m}-01`;
-  const to   = `${y}-${m}-31`;
-  try{
-    const r = await sbReq(`budget_eintraege?kat=eq.kleinst&datum=gte.${from}&datum=lte.${to}&order=datum.desc,created_at.desc`);
-    kasseEntries = r.ok ? await r.json() : [];
-  }catch{ kasseEntries=[]; }
+function loadKasse(){
+  // entries come from in-memory schaden array — no separate fetch needed
   renderKasse();
+}
+
+function kasseSchadenForMonth(monat){
+  const m = monat.getMonth()+1, y = monat.getFullYear();
+  return schaden.filter(s=>{
+    if(s.kosten==null||s.kosten<=0) return false;
+    const p=(s.datum||'').split('.');
+    return p.length>=3 && parseInt(p[1])===m && parseInt(p[2])===y;
+  }).sort((a,b)=>(b.datum||'').localeCompare(a.datum||''));
 }
 
 function kasseNavMonth(dir){
@@ -1882,42 +1865,35 @@ function renderKasse(){
   const nextBtn = el('kasse-nav-next');
   if(nextBtn) nextBtn.disabled = isCurrent;
 
-  const total = kasseEntries.reduce((s,e)=>s+parseFloat(e.betrag||0),0);
+  const entries = kasseSchadenForMonth(kasseMonat);
+  const total = entries.reduce((s,e)=>s+(e.kosten||0),0);
   const pct   = Math.min(100,(total/KASSE_BUDGET)*100);
   const rest  = KASSE_BUDGET - total;
   const over  = total > KASSE_BUDGET;
 
   const bar = el('kasse-bar');
-  if(bar){ bar.style.width=pct+'%'; bar.style.background = over?'#dc2626':pct>80?'#d97706':'var(--green-mid)'; }
+  if(bar){ bar.style.width=pct+'%'; bar.style.background=over?'#dc2626':pct>=80?'#d97706':'var(--accent)'; }
   el('kasse-spent-lbl').textContent = eur(total)+' verbraucht';
   el('kasse-rest-lbl').textContent  = over ? `⚠️ ${eur(total-KASSE_BUDGET)} über Budget` : `${eur(rest)} verbleibend`;
   el('kasse-pct-lbl').textContent   = Math.round(pct)+' %';
 
-  const formWrap = el('kasse-form-wrap');
-  if(formWrap){
-    formWrap.style.display = (role==='hm'&&isCurrent) ? 'block' : 'none';
-    if(role==='hm'&&isCurrent){
-      const datumIn = el('kasse-datum');
-      if(datumIn&&!datumIn.value) datumIn.value = now.toISOString().slice(0,10);
-    }
-  }
   const swNote = el('kasse-sw-note');
   if(swNote) swNote.style.display = role==='sw' ? 'block' : 'none';
 
   const listEl = el('kasse-list');
-  if(!kasseEntries.length){
-    listEl.innerHTML='<div class="empty" style="padding:20px 16px">Keine Einträge in diesem Monat.</div>';
+  if(!entries.length){
+    listEl.innerHTML='<div class="empty" style="padding:20px 16px">Keine Reparaturkosten in diesem Monat.</div>';
     return;
   }
   let html = '<div class="card" style="padding:0">';
-  kasseEntries.forEach(e=>{
-    const d = e.datum ? new Date(e.datum+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : '—';
-    const canDel = role==='hm' && isCurrent;
-    html += `<div class="kasse-entry">
+  entries.forEach(e=>{
+    const parts=(e.datum||'').split('.');
+    const d=parts.length>=2?`${parts[0]}.${parts[1]}.`:'—';
+    const desc=[e.ort,e.prob].filter(Boolean).join(' — ');
+    html += `<div class="kasse-entry" onclick="openDetail('${e.id}')" style="cursor:pointer">
       <span class="kasse-entry-date">${d}</span>
-      <span class="kasse-entry-desc">${escHtml(e.beschreibung||'—')}</span>
-      <span class="kasse-entry-amt">−${eur(parseFloat(e.betrag||0))}</span>
-      ${canDel?`<button class="kasse-entry-del" onclick="delKasseEntry('${e.id}')" title="Löschen">✕</button>`:''}
+      <span class="kasse-entry-desc">${escHtml(desc||'Reparatur')}</span>
+      <span class="kasse-entry-amt">−${eur(e.kosten||0)}</span>
     </div>`;
   });
   html += `<div class="kasse-total-row">
@@ -1926,39 +1902,6 @@ function renderKasse(){
     <span class="kasse-entry-amt" style="color:${over?'#dc2626':'var(--green-mid)'}">${eur(total)}</span>
   </div></div>`;
   listEl.innerHTML = html;
-}
-
-async function saveKasseEntry(){
-  const desc   = document.getElementById('kasse-desc').value.trim();
-  const betrag = parseFloat(document.getElementById('kasse-betrag').value);
-  const datum  = document.getElementById('kasse-datum').value;
-  if(!desc)            { alert('Bitte Beschreibung eingeben.'); return; }
-  if(isNaN(betrag)||betrag<=0){ alert('Bitte gültigen Betrag eingeben.'); return; }
-  if(!datum)           { alert('Bitte Datum auswählen.'); return; }
-  setSyncDot('busy');
-  try{
-    const r = await sbReq('budget_eintraege',{
-      method:'POST',
-      headers:{Prefer:'return=minimal'},
-      body:JSON.stringify({kat:'kleinst',betrag,beschreibung:desc,datum})
-    });
-    if(!r.ok) throw 0;
-    setSyncDot('ok');
-    document.getElementById('kasse-desc').value='';
-    document.getElementById('kasse-betrag').value='';
-    loadKasse();
-  }catch{ setSyncDot('err'); alert('Fehler beim Speichern.'); }
-}
-
-async function delKasseEntry(id){
-  setSyncDot('busy');
-  try{
-    const r = await sbReq('budget_eintraege?id=eq.'+id,{method:'DELETE',headers:{Prefer:'return=minimal'}});
-    if(!r.ok) throw 0;
-    kasseEntries = kasseEntries.filter(e=>e.id!==id);
-    setSyncDot('ok');
-    renderKasse();
-  }catch{ setSyncDot('err'); }
 }
 
 // ── PFLEGEPLAN ───────────────────────────────────────────────────────────────
