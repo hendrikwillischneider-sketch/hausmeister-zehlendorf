@@ -1320,7 +1320,7 @@ function closeBaumPub() { document.getElementById('baum-pub-modal').style.displa
 let bkService = null;
 
 // ── MEINE AUFTRÄGE ────────────────────────────────────────────────────
-const MA_ICON = {sperrmuell:'📦',moebel:'🛋️',kleiner_auftrag:'🔧',paket:'📬',handwerk:'🔨'};
+const MA_ICON = {sperrmuell:'📦',moebel:'🛋️',kleiner_auftrag:'🔧',paket:'📬',handwerk:'🔨',tech_hilfe:'📱',besorgungen:'🛒',fenster:'🪟',urlaubsdienst:'🌴',balkon:'🌿'};
 const MA_BADGE = {
   'Neu':        ['ma-neu',        'Neu — wird bearbeitet'],
   'Bestätigt':  ['ma-bestaetigt', 'Bestätigt ✓'],
@@ -1519,14 +1519,25 @@ const BK_PLACEHOLDER = {
   sperrmuell:     'z.B. alter Sessel + Regal, ca. 50 kg · steht im Keller bereit',
   moebel:         'z.B. Schrank im Schlafzimmer, ca. 2 m breit · 2. Etage',
   kleiner_auftrag:'z.B. Badezimmerlampe wechseln, Schraube an Türrahmen locker',
-  paket:          'z.B. DHL-Paket, kommt Montag · ca. 3 kg · bitte an der Haustür abgeben'
+  paket:          'z.B. DHL-Paket, kommt Montag · ca. 3 kg · bitte an der Haustür abgeben',
+  tech_hilfe:     'z.B. Handy verbindet sich nicht mehr mit WLAN · Samsung Galaxy A54',
+  besorgungen:    'z.B. Apotheke: Ibuprofen 400mg (Rezept liegt bereit) · Post: Päckchen aufgeben',
+  fenster:        'z.B. Wohnzimmerfenster (2 Scheiben) + Küchenfenster, ca. 3. Etage',
+  urlaubsdienst:  'z.B. 18.08.–02.09.2026 · Blumen (3 Töpfe Fensterbrett) · Briefkasten täglich',
+  balkon:         'z.B. Balkon fegen + 4 Blumenkästen auswintern, Erde entsorgen'
 };
 const BK_HINT = {
-  sperrmuell: '🗓 Bitte stellen Sie die Gegenstände bis zum Termin im Flur oder Keller bereit.',
-  paket:      '📦 Ich nehme Ihr Paket gerne entgegen — bitte melden Sie, wann es eintrifft.'
+  sperrmuell:    '🗓 Bitte stellen Sie die Gegenstände bis zum Termin im Flur oder Keller bereit.',
+  paket:         '📦 Ich nehme Ihr Paket gerne entgegen — bitte melden Sie, wann es eintrifft.',
+  tech_hilfe:    '💡 Bitte haben Sie das Gerät griffbereit und wenn möglich schon eingeschaltet.',
+  besorgungen:   '🛒 Legen Sie Liste, Rezepte und ggf. Geld oder Karte griffbereit.',
+  urlaubsdienst: '🔑 Wir besprechen kurz vor Ihrer Abreise, wo der Schlüssel liegt.'
 };
 const BK_DESC_LABEL = {
-  paket: 'Paketdetails'
+  paket:          'Paketdetails',
+  besorgungen:    'Was soll ich erledigen?',
+  urlaubsdienst:  'Zeitraum & Aufgaben',
+  tech_hilfe:     'Was funktioniert nicht?'
 };
 
 function bkShowStep2(withSlot) {
