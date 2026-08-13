@@ -3397,7 +3397,7 @@ function renderZeit(){
           <div class="zeit-cat-icon">${c.icon}</div>
           <div>
             <div class="zeit-cat-name">${c.name}</div>
-            <div class="zeit-cat-sub">${c.auto ? 'Automatisch aus Schadensmeldungen' : c.id==='dauerpflege' ? 'Wöchentliche Grundpflege' : c.id==='buchungen' ? 'Aus Terminbuchungen' : 'Manuell erfassbar'}</div>
+            <div class="zeit-cat-sub">${c.id==='dauerpflege' ? 'Wöchentliche Grundpflege' : c.id==='buchungen' ? 'Aus Terminbuchungen' : c.auto ? 'Automatisch aus Schadensmeldungen' : 'Manuell erfassbar'}</div>
           </div>
         </div>
         <div class="zeit-cat-right">
