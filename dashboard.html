@@ -369,6 +369,51 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 
 /* RESPONSIVE */
 @media(min-width:480px){.bgt-grid{grid-template-columns:repeat(4,1fr)}}
+
+/* ── ZEITDOKU ─────────────────────────────────────────────────────────────── */
+.zeit-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.zeit-nav-btn{background:none;border:1px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px;color:var(--text-muted);display:flex;align-items:center;justify-content:center}
+.zeit-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.zeit-week-lbl{font-size:14px;font-weight:600;color:var(--text)}
+.zeit-total-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 16px;margin-bottom:12px;display:flex;align-items:center;gap:18px}
+.zeit-donut-wrap{flex-shrink:0;position:relative;width:84px;height:84px}
+.zeit-donut-wrap svg{width:84px;height:84px;transform:rotate(-90deg)}
+.zeit-donut-bg{fill:none;stroke:var(--border);stroke-width:10}
+.zeit-donut-fg{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transition:stroke-dasharray .4s}
+.zeit-donut-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.zeit-donut-h{font-size:20px;font-weight:700;color:var(--green-mid);line-height:1;font-variant-numeric:tabular-nums}
+.zeit-donut-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.zeit-summary{flex:1}
+.zeit-summary-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;align-items:center}
+.zeit-summary-bar{height:5px;border-radius:3px;background:var(--border);margin-bottom:8px;overflow:hidden}
+.zeit-summary-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.zeit-cat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+.zeit-cat-hdr{padding:13px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.zeit-cat-hdr:active{background:var(--bg)}
+.zeit-cat-left{display:flex;align-items:center;gap:10px}
+.zeit-cat-icon{font-size:20px;width:34px;height:34px;border-radius:9px;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.zeit-cat-name{font-size:14px;font-weight:600}
+.zeit-cat-sub{font-size:11px;color:var(--text-muted);margin-top:1px}
+.zeit-cat-right{display:flex;align-items:center;gap:8px}
+.zeit-cat-h{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--green-mid)}
+.zeit-cat-body{border-top:1px solid var(--border);padding:10px 14px;display:none}
+.zeit-cat-body.open{display:block}
+.zeit-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px}
+.zeit-item:last-child{border:none;padding-bottom:0}
+.zeit-item-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.zeit-item-label{flex:1;color:var(--text)}
+.zeit-item-h{color:var(--text-muted);font-size:12px;font-variant-numeric:tabular-nums}
+.zeit-manual-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;min-height:54px;margin-top:6px}
+.zeit-manual-input:focus{outline:none;border-color:var(--accent)}
+.zeit-add-row{display:flex;gap:8px;margin-top:8px}
+.zeit-add-h{width:70px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);font-family:inherit;font-variant-numeric:tabular-nums}
+.zeit-add-h:focus{outline:none;border-color:var(--accent)}
+.zeit-bericht-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;font-family:inherit}
+.zeit-bericht-btn:active{opacity:.85}
+.zeit-status{font-size:13px;font-weight:600;padding:3px 10px;border-radius:20px}
+.zeit-status-ok{background:var(--green-pale);color:var(--green-mid)}
+.zeit-status-warn{background:var(--yellow-pale);color:var(--yellow)}
+.zeit-status-low{background:var(--red-pale);color:var(--red)}
 </style>
 </head>
 <body>
@@ -635,6 +680,35 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
         <button class="set-btn" style="color:var(--text-muted)" onclick="logout()">Abmelden</button>
       </div>
     </div>
+  </div>
+
+
+  <!-- ZEITDOKUMENTATION -->
+  <div class="view" id="v-zeit">
+    <div class="zeit-nav">
+      <button class="zeit-nav-btn" onclick="zeitShift(-1)">‹</button>
+      <span class="zeit-week-lbl" id="zeit-week-lbl">—</span>
+      <button class="zeit-nav-btn" onclick="zeitShift(1)">›</button>
+    </div>
+
+    <!-- Total -->
+    <div class="zeit-total-card">
+      <div class="zeit-donut-wrap">
+        <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg">
+          <circle class="zeit-donut-bg" cx="42" cy="42" r="34"/>
+          <circle class="zeit-donut-fg" id="zeit-donut-fg" cx="42" cy="42" r="34" stroke-dasharray="0 214"/>
+        </svg>
+        <div class="zeit-donut-label">
+          <span class="zeit-donut-h" id="zeit-total-h">—</span>
+          <span class="zeit-donut-sub">/ 40 h</span>
+        </div>
+      </div>
+      <div class="zeit-summary" id="zeit-summary-bars"></div>
+    </div>
+
+    <div id="zeit-cat-cards"></div>
+
+    <button class="zeit-bericht-btn" onclick="exportWochenbericht()">📋 Wochenbericht exportieren</button>
   </div>
 
 </div><!-- /app -->
@@ -1138,7 +1212,7 @@ function initApp(){
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
        {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},
-       {id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+       {id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'zeit',lbl:'⏱️ Zeit'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
     : role==='sw'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'}]
     : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'📋 Schäden'},{id:'kasse',lbl:'💶 Kasse'}];
@@ -1163,6 +1237,7 @@ function showTab(id){
   fab.classList.toggle('hidden', id!=='schaeden' || role==='rep');
 
   if(id==='pflegeplan')renderPflegeplan();
+  if(id==='zeit')renderZeit();
   if(id==='log')renderLog();
   if(id==='budget')renderBudget();
   if(id==='uebersicht')renderOverview();
@@ -3102,6 +3177,314 @@ async function saveNewSchaden(){
     errEl.style.display = 'block';
   }
 }
+
+// ── ZEITDOKUMENTATION ────────────────────────────────────────────────────────
+let zeitOffset = 0; // weeks from current
+
+function zeitShift(d){ zeitOffset += d; renderZeit(); }
+
+function weekBounds(offset){
+  const d = new Date();
+  const day = d.getDay() || 7;
+  d.setDate(d.getDate() - day + 1 + offset * 7);
+  d.setHours(0,0,0,0);
+  const mon = new Date(d);
+  const sun = new Date(d);
+  sun.setDate(sun.getDate() + 6);
+  sun.setHours(23,59,59,999);
+  return {mon, sun};
+}
+
+function zeitKW(mon){
+  const tmp = new Date(Date.UTC(mon.getFullYear(), mon.getMonth(), mon.getDate()));
+  tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+  const y0 = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+  return Math.ceil((((tmp - y0) / 86400000) + 1) / 7);
+}
+
+function fmtShort(d){ return d.toLocaleDateString('de-DE',{day:'numeric',month:'short'}); }
+
+function zeitCats(){
+  const dp = parseInt(localStorage.getItem('zeit_dauerpflege') || '20');
+  const projekte = zeitGetProjekte();
+  const {mon, sun} = weekBounds(zeitOffset);
+
+  // Schadensfälle diese Woche
+  const schadenW = schaden.filter(s => {
+    const t = new Date(s.created_at || s.datum);
+    return t >= mon && t <= sun;
+  });
+  const schadenH = schadenW.reduce((acc, s) => {
+    if(s.kategorie === 'Notfall') return acc + 2.5;
+    if(s.kategorie === 'Gebäudeschaden') return acc + 2;
+    return acc + 1.5;
+  }, 0);
+
+  // Termine/Buchungen diese Woche (approx 45min each)
+  const buchW = buchungen ? buchungen.filter(b => {
+    const t = new Date(b.datum || b.created_at);
+    return t >= mon && t <= sun && b.status !== 'Storniert';
+  }) : [];
+  const buchH = Math.round(buchW.length * 0.75 * 10) / 10;
+
+  // Manual Sonstiges from localStorage (per week key)
+  const wkey = `zeit_sonstiges_${zeitOffset}`;
+  const sonstText = localStorage.getItem(wkey + '_text') || '';
+  const sonstH = parseFloat(localStorage.getItem(wkey + '_h') || '5');
+
+  return [
+    {
+      id: 'dauerpflege',
+      icon: '🌿',
+      name: 'Dauerpflege Grünanlage',
+      h: dp,
+      color: '#2d6a4f',
+      items: [
+        {label: 'Rasenmähen & Kantenschnitt', h: Math.round(dp * 0.35 * 10)/10},
+        {label: 'Bewässerung & Kontrolle', h: Math.round(dp * 0.15 * 10)/10},
+        {label: 'Wege & Sauberkeit', h: Math.round(dp * 0.2 * 10)/10},
+        {label: 'Allgemeine Grünpflege', h: Math.round(dp * 0.3 * 10)/10},
+      ],
+      editable: false,
+      editLbl: 'Stunden/Woche anpassen',
+      editKey: 'zeit_dauerpflege',
+      editH: dp,
+    },
+    {
+      id: 'schaeden',
+      icon: '🔧',
+      name: 'Schadensfälle',
+      h: Math.round(schadenH * 10) / 10,
+      color: '#d97706',
+      items: schadenW.map(s => ({
+        label: s.titel || s.ort || 'Schaden',
+        h: s.kategorie === 'Notfall' ? 2.5 : s.kategorie === 'Gebäudeschaden' ? 2 : 1.5,
+        sub: s.kategorie,
+      })),
+      auto: true,
+      autoNote: schadenW.length === 0 ? 'Keine Schadensmeldungen diese Woche' : null,
+    },
+    {
+      id: 'buchungen',
+      icon: '📅',
+      name: 'Termine & Services',
+      h: buchH,
+      color: '#40916c',
+      items: buchW.map(b => ({label: b.service_label || 'Termin', h: 0.75})),
+      auto: true,
+      autoNote: buchW.length === 0 ? 'Keine Termine diese Woche' : null,
+    },
+    {
+      id: 'projekte',
+      icon: '🏗️',
+      name: 'Projekte & Sondereinsätze',
+      h: projekte.h,
+      color: '#7A2430',
+      items: projekte.items,
+      editableAdd: true,
+      wkey: `zeit_proj_${zeitOffset}`,
+    },
+    {
+      id: 'sonstiges',
+      icon: '📋',
+      name: 'Verwaltung & Sonstiges',
+      h: sonstH,
+      color: '#8A8278',
+      items: sonstText ? [{label: sonstText, h: sonstH}] : [{label: 'Bewohnerkontakt, Absprachen, Büro', h: sonstH}],
+      editableAdd: true,
+      wkey: wkey,
+      sonstText,
+      sonstH,
+    },
+  ];
+}
+
+function zeitGetProjekte(){
+  const wkey = `zeit_proj_${zeitOffset}`;
+  try {
+    const stored = JSON.parse(localStorage.getItem(wkey) || '[]');
+    const h = stored.reduce((a,i) => a + (parseFloat(i.h)||0), 0);
+    return {h: Math.round(h*10)/10, items: stored};
+  } catch { return {h:0, items:[]}; }
+}
+
+function renderZeit(){
+  const {mon, sun} = weekBounds(zeitOffset);
+  const kw = zeitKW(mon);
+  document.getElementById('zeit-week-lbl').textContent =
+    `KW ${kw} · ${fmtShort(mon)} – ${fmtShort(sun)} ${sun.getFullYear()}`;
+
+  const cats = zeitCats();
+  const totalH = Math.round(cats.reduce((a,c) => a + (c.h||0), 0) * 10) / 10;
+  const pct = Math.min(totalH / 40, 1);
+  const circumference = 2 * Math.PI * 34;
+  const dash = Math.round(pct * circumference * 10) / 10;
+
+  document.getElementById('zeit-total-h').textContent = totalH.toFixed(1).replace('.',',');
+  const fg = document.getElementById('zeit-donut-fg');
+  if(fg) fg.setAttribute('stroke-dasharray', `${dash} ${circumference}`);
+
+  // status color
+  const statusCl = totalH >= 36 ? 'zeit-status-ok' : totalH >= 28 ? 'zeit-status-warn' : 'zeit-status-low';
+  const statusTxt = totalH >= 36 ? 'Auf Kurs ✓' : totalH >= 28 ? 'Im Plan' : 'Unter Soll';
+
+  // summary mini-bars
+  const barsEl = document.getElementById('zeit-summary-bars');
+  const barColors = {'dauerpflege':'#2d6a4f','schaeden':'#d97706','buchungen':'#40916c','projekte':'#7A2430','sonstiges':'#8A8278'};
+  barsEl.innerHTML = cats.map(c => {
+    const pct = totalH > 0 ? Math.round((c.h / totalH) * 100) : 0;
+    return `<div class="zeit-summary-row">
+      <span style="color:var(--text-muted)">${c.icon} ${c.name.split(' ')[0]}</span>
+      <span style="font-weight:600;font-variant-numeric:tabular-nums">${(c.h||0).toFixed(1).replace('.',',')} h</span>
+    </div>
+    <div class="zeit-summary-bar"><div class="zeit-summary-bar-fill" style="width:${pct}%;background:${barColors[c.id]||'var(--accent)'}"></div></div>`;
+  }).join('') + `<div style="display:flex;justify-content:space-between;margin-top:4px;font-size:12px;color:var(--text-muted)">
+    <span>Gesamt</span>
+    <span class="zeit-status ${statusCl}">${statusTxt}</span>
+  </div>`;
+
+  // Category cards
+  const cardsEl = document.getElementById('zeit-cat-cards');
+  cardsEl.innerHTML = cats.map((c,i) => {
+    const openCl = (localStorage.getItem('zeit_open_'+c.id)==='1') ? 'open' : '';
+    let bodyHtml = '';
+
+    if(c.auto && c.autoNote && c.items.length === 0){
+      bodyHtml = `<div style="font-size:13px;color:var(--text-muted);font-style:italic">${c.autoNote}</div>`;
+    } else {
+      bodyHtml = c.items.map(it => `<div class="zeit-item">
+        <div class="zeit-item-dot" style="background:${barColors[c.id]||'var(--accent)'}"></div>
+        <div class="zeit-item-label">${it.label}${it.sub ? ' <span style="color:var(--text-muted);font-size:11px">· '+it.sub+'</span>' : ''}</div>
+        <div class="zeit-item-h">${(it.h||0).toFixed(1).replace('.',',')} h</div>
+      </div>`).join('');
+    }
+
+    // Editable hours for Dauerpflege
+    if(c.editKey){
+      bodyHtml += `<div style="margin-top:10px;display:flex;align-items:center;gap:8px;font-size:13px">
+        <span style="color:var(--text-muted)">Stunden/Woche:</span>
+        <input class="zeit-add-h" type="number" id="zeit-dp-h" value="${c.editH}" min="0" max="40" style="width:70px" onchange="zeitSaveDauerpflege(this.value)">
+      </div>`;
+    }
+
+    // Projekte: add entries
+    if(c.id === 'projekte'){
+      bodyHtml += `<div class="zeit-add-row" style="margin-top:10px">
+        <input class="zeit-manual-input" type="text" id="zeit-proj-lbl" placeholder="Projektaufgabe beschreiben …" style="flex:1;min-height:auto;resize:none;height:36px;padding:8px">
+        <input class="zeit-add-h" type="number" id="zeit-proj-h" placeholder="h" min="0" max="20" step="0.5" style="width:60px">
+        <button class="set-btn" onclick="zeitAddProjekt()">+ Add</button>
+      </div>`;
+      if(c.items.length > 0){
+        bodyHtml += `<div style="margin-top:6px;font-size:12px;color:var(--text-muted);text-align:right;cursor:pointer" onclick="zeitClearProjekte()">× Alle löschen</div>`;
+      }
+    }
+
+    // Sonstiges: editable text + hours
+    if(c.id === 'sonstiges'){
+      bodyHtml += `<div style="margin-top:10px">
+        <textarea class="zeit-manual-input" id="zeit-sonst-text" placeholder="Was wurde sonst noch erledigt? (optional)">${c.sonstText||''}</textarea>
+        <div class="zeit-add-row">
+          <span style="font-size:13px;color:var(--text-muted);align-self:center;flex:1">Stunden:</span>
+          <input class="zeit-add-h" type="number" id="zeit-sonst-h" value="${c.sonstH}" min="0" max="20" step="0.5">
+          <button class="set-btn" onclick="zeitSaveSonstiges()">Speichern</button>
+        </div>
+      </div>`;
+    }
+
+    return `<div class="zeit-cat-card">
+      <div class="zeit-cat-hdr" onclick="zeitToggleCat('${c.id}')">
+        <div class="zeit-cat-left">
+          <div class="zeit-cat-icon">${c.icon}</div>
+          <div>
+            <div class="zeit-cat-name">${c.name}</div>
+            <div class="zeit-cat-sub">${c.auto ? 'Automatisch aus Schadensmeldungen' : c.id==='dauerpflege' ? 'Wöchentliche Grundpflege' : c.id==='buchungen' ? 'Aus Terminbuchungen' : 'Manuell erfassbar'}</div>
+          </div>
+        </div>
+        <div class="zeit-cat-right">
+          <span class="zeit-cat-h">${(c.h||0).toFixed(1).replace('.',',')} h</span>
+          <span style="color:var(--text-muted);font-size:14px">${openCl ? '▲' : '▼'}</span>
+        </div>
+      </div>
+      <div class="zeit-cat-body ${openCl}" id="zeit-body-${c.id}">${bodyHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function zeitToggleCat(id){
+  const b = document.getElementById('zeit-body-'+id);
+  if(!b) return;
+  const open = b.classList.toggle('open');
+  localStorage.setItem('zeit_open_'+id, open ? '1' : '0');
+  // update chevron
+  renderZeit();
+}
+
+function zeitSaveDauerpflege(val){
+  const h = Math.max(0, Math.min(40, parseFloat(val)||20));
+  localStorage.setItem('zeit_dauerpflege', String(h));
+  renderZeit();
+}
+
+function zeitAddProjekt(){
+  const lbl = document.getElementById('zeit-proj-lbl')?.value?.trim();
+  const h = parseFloat(document.getElementById('zeit-proj-h')?.value||'0');
+  if(!lbl || !h) return;
+  const wkey = `zeit_proj_${zeitOffset}`;
+  const arr = JSON.parse(localStorage.getItem(wkey)||'[]');
+  arr.push({label:lbl, h});
+  localStorage.setItem(wkey, JSON.stringify(arr));
+  renderZeit();
+  // re-open projekte
+  localStorage.setItem('zeit_open_projekte','1');
+}
+
+function zeitClearProjekte(){
+  if(!confirm('Alle Projekteinträge dieser Woche löschen?')) return;
+  localStorage.removeItem(`zeit_proj_${zeitOffset}`);
+  renderZeit();
+}
+
+function zeitSaveSonstiges(){
+  const wkey = `zeit_sonstiges_${zeitOffset}`;
+  const text = document.getElementById('zeit-sonst-text')?.value||'';
+  const h = parseFloat(document.getElementById('zeit-sonst-h')?.value||'5');
+  localStorage.setItem(wkey+'_text', text);
+  localStorage.setItem(wkey+'_h', String(h));
+  renderZeit();
+}
+
+function exportWochenbericht(){
+  const {mon, sun} = weekBounds(zeitOffset);
+  const kw = zeitKW(mon);
+  const cats = zeitCats();
+  const totalH = cats.reduce((a,c)=>a+(c.h||0),0);
+
+  let txt = `WOCHENBERICHT KW ${kw} · ${fmtShort(mon)} – ${fmtShort(sun)} ${sun.getFullYear()}\n`;
+  txt += `Sidonie-Scharfe-Stiftung Zehlendorf — Hausmeister\n`;
+  txt += `${'─'.repeat(50)}\n\n`;
+  txt += `Arbeitszeit gesamt: ca. ${totalH.toFixed(1).replace('.',',')} / 40 h\n\n`;
+
+  cats.forEach(c => {
+    if(!c.h) return;
+    txt += `${c.icon} ${c.name}: ${(c.h||0).toFixed(1).replace('.',',')} h\n`;
+    c.items.forEach(it => {
+      txt += `   • ${it.label}${it.sub?' ('+it.sub+')':''} — ${(it.h||0).toFixed(1).replace('.',',')} h\n`;
+    });
+    txt += '\n';
+  });
+
+  txt += `Erstellt: ${new Date().toLocaleDateString('de-DE',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+
+  const win = window.open('','_blank','width=600,height=700');
+  win.document.write(`<html><head><title>Wochenbericht KW ${kw}</title>
+    <style>body{font-family:monospace;white-space:pre-wrap;padding:30px;font-size:14px;line-height:1.6;color:#1a1510;background:#f6f1e9}
+    button{margin-bottom:20px;padding:10px 20px;background:#1c4a2e;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+    </style></head><body>
+    <button onclick="window.print()">🖨️ Drucken / Speichern</button>\n${txt.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+    </body></html>`);
+  win.document.close();
+}
+
 </script>
 </body>
 </html>
