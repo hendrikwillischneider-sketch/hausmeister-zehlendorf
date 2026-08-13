@@ -3102,7 +3102,8 @@ function openAddEntry(){
   // Bewohnerin dropdown befüllen
   const bwSel = document.getElementById('ns-bewohnerin');
   bwSel.innerHTML = '<option value="">— auswählen …</option>';
-  const aktiv = bewohner.filter(b=>b.aktiv && (b.vorname||b.nachname) && !GR_CODES.includes(b.zimmer));
+  const GR = ['WA','WB','GS','HR','BIB'];
+  const aktiv = bewohner.filter(b=>b.aktiv && (b.vorname||b.nachname) && !GR.includes(b.zimmer));
   aktiv.sort((a,b)=>(a.nachname||a.name||'').localeCompare(b.nachname||b.name||''));
   aktiv.forEach(b=>{
     const opt=document.createElement('option');
