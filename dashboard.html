@@ -1380,7 +1380,8 @@ function renderBewohner(){
   const ehemalige=bewohner.filter(b=>!b.aktiv).sort((a,b)=>sortnr(a)-sortnr(b));
 
   function bewohnerRow(b){
-    const name = [b.vorname,b.nachname].filter(Boolean).join(' ') || b.name||'—';
+    const hasName = b.vorname||b.nachname;
+    const name = hasName ? [b.vorname,b.nachname].filter(Boolean).join(' ') : null;
     const seit = b.eingezogen_am ? new Date(b.eingezogen_am).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
     const isAktiv = b.aktiv;
     const kontakt = [
@@ -1395,6 +1396,17 @@ function renderBewohner(){
       return `<div style="width:48px;height:44px;border-radius:9px;background:var(--bg);border:1.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
         <div style="font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);line-height:1">${lbl}</div>
         <div style="font-size:14px;font-weight:700;color:var(--accent);line-height:1.4;white-space:nowrap">${escHtml(val)}</div></div>`;
+    }
+    if(!hasName){
+      return `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);opacity:.45">
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          ${chip('Suite',b.zimmer)}${chip('Haus',b.haus||'')}${chip('Etage',b.stockwerk||'')}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-style:italic;color:var(--text-muted)">Leerstand</div>
+        </div>
+        <button class="set-btn" onclick="openEinzug('${b.id}')" title="Einzug erfassen" style="opacity:1;flex-shrink:0">+ Einzug</button>
+      </div>`;
     }
     return `<div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)">
       <div style="display:flex;gap:4px;flex-shrink:0">
