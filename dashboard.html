@@ -725,8 +725,29 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <input class="modal-in" id="ez-email" type="email" placeholder="z.B. m.mueller@email.de">
     </div>
     <div class="modal-row">
-      <div class="modal-lbl">Anmerkung (optional)</div>
+      <div class="modal-lbl">Anmerkung (kurz, erscheint in der Liste)</div>
       <input class="modal-in" id="ez-anmerkung" type="text" placeholder="z.B. Pflegegrad 2, Rollstuhlfahrer …">
+    </div>
+    <div class="modal-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="modal-lbl">Stromzählernr.</div>
+        <input class="modal-in" id="ez-stromzaehler" type="text" placeholder="z.B. 12345678">
+      </div>
+      <div>
+        <div class="modal-lbl">Wasserzählernr.</div>
+        <input class="modal-in" id="ez-wasserzaehler" type="text" placeholder="z.B. 87654321">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">Notizen (z.B. „Stromzähler im Keller, 2. Schrank links")</div>
+      <textarea class="modal-in" id="ez-notizen" rows="2" placeholder="Freie Notizen zur Suite …" style="resize:vertical;font-family:inherit"></textarea>
+    </div>
+    <div class="modal-row">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="modal-lbl" style="margin:0">Zusatzfelder</div>
+        <button class="set-btn" onclick="addExtraField()" style="font-size:12px">+ Feld hinzufügen</button>
+      </div>
+      <div id="ez-extras-list"></div>
     </div>
     <div id="ez-err" style="display:none;color:var(--red);font-size:13px;margin-bottom:8px;padding:8px 10px;background:var(--red-pale);border-radius:8px"></div>
     <div class="modal-actions">
@@ -1493,12 +1514,31 @@ function openEinzug(id){
   document.getElementById('ez-handy').value = b?.handy||'';
   document.getElementById('ez-email').value = b?.email||'';
   document.getElementById('ez-anmerkung').value = b?.anmerkung||'';
+  document.getElementById('ez-stromzaehler').value = b?.stromzaehler||'';
+  document.getElementById('ez-wasserzaehler').value = b?.wasserzaehler||'';
+  document.getElementById('ez-notizen').value = b?.notizen||'';
+  ezExtras = Object.entries(b?.extras||{}).map(([k,v])=>({k,v:String(v)}));
+  renderExtrasEditor();
   document.getElementById('ez-err').style.display='none';
   document.getElementById('ez-submit-btn').disabled=false;
   document.getElementById('ez-submit-btn').textContent='Speichern';
   document.getElementById('einzug-modal').classList.remove('gone');
   setTimeout(()=>document.getElementById('ez-vorname').focus(),100);
 }
+
+let ezExtras=[];
+function renderExtrasEditor(){
+  const list=document.getElementById('ez-extras-list');
+  if(!list)return;
+  if(!ezExtras.length){list.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:4px 0">Noch keine Zusatzfelder.</div>';return;}
+  list.innerHTML=ezExtras.map((f,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center">
+      <input class="modal-in" style="font-size:13px" placeholder="Feldname" value="${escHtml(f.k)}" oninput="ezExtras[${i}].k=this.value">
+      <input class="modal-in" style="font-size:13px" placeholder="Wert" value="${escHtml(f.v)}" oninput="ezExtras[${i}].v=this.value">
+      <button onclick="ezExtras.splice(${i},1);renderExtrasEditor()" style="background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:0 4px;line-height:1">×</button>
+    </div>`).join('');
+}
+function addExtraField(){ezExtras.push({k:'',v:''});renderExtrasEditor();setTimeout(()=>{const ins=document.querySelectorAll('#ez-extras-list input');if(ins.length)ins[ins.length-2].focus();},50);}
 
 async function saveEinzug(){
   const vn=document.getElementById('ez-vorname').value.trim();
@@ -1509,6 +1549,10 @@ async function saveEinzug(){
   const tel=document.getElementById('ez-telefon').value.trim()||null;
   const handy=document.getElementById('ez-handy').value.trim()||null;
   const email=document.getElementById('ez-email').value.trim()||null;
+  const stromzaehler=document.getElementById('ez-stromzaehler').value.trim()||null;
+  const wasserzaehler=document.getElementById('ez-wasserzaehler').value.trim()||null;
+  const notizen=document.getElementById('ez-notizen').value.trim()||null;
+  const extras=Object.fromEntries(ezExtras.filter(f=>f.k.trim()).map(f=>[f.k.trim(),f.v]));
   const errEl=document.getElementById('ez-err');
   if(!vn||!nn||!zm){errEl.textContent='Bitte Vor-/Nachname und Suite-Nr. ausfüllen.';errEl.style.display='block';return;}
   errEl.style.display='none';
@@ -1516,7 +1560,7 @@ async function saveEinzug(){
   btn.disabled=true; btn.textContent='Wird gespeichert …';
   const haus=document.getElementById('ez-haus').value||null;
   const stockwerk=document.getElementById('ez-stockwerk').value||null;
-  const payload={vorname:vn,nachname:nn,name:vn+' '+nn,zimmer:zm,haus,stockwerk,eingezogen_am:dt||null,anmerkung:an,telefon:tel,handy,email,aktiv:true};
+  const payload={vorname:vn,nachname:nn,name:vn+' '+nn,zimmer:zm,haus,stockwerk,eingezogen_am:dt||null,anmerkung:an,telefon:tel,handy,email,stromzaehler,wasserzaehler,notizen,extras,aktiv:true};
   try{
     if(ezEditId){
       const r=await sbReq('bewohner?id=eq.'+ezEditId,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(payload)});
