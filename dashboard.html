@@ -337,6 +337,21 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
 .eink-preis{font-size:13px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
 .eink-link{font-size:12px;color:var(--green-mid);text-decoration:none;background:var(--green-pale);padding:3px 9px;border-radius:6px;white-space:nowrap}
 
+/* KASSE */
+.kasse-bar-wrap{background:var(--border);border-radius:6px;height:10px;overflow:hidden;margin:8px 0 6px}
+.kasse-bar{height:100%;border-radius:6px;transition:width .4s,background .3s}
+.kasse-in{padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.kasse-in:focus{outline:none;border-color:var(--accent)}
+.kasse-entry{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.kasse-entry:last-child{border:none}
+.kasse-entry-date{font-size:12px;color:var(--text-muted);flex-shrink:0;width:42px}
+.kasse-entry-desc{flex:1;font-size:13.5px}
+.kasse-entry-amt{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text);flex-shrink:0}
+.kasse-entry-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px;flex-shrink:0}
+.kasse-entry-del:hover{color:#dc2626}
+.kasse-total-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:2px solid var(--border);font-weight:700}
+.kasse-note{margin-top:14px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:12.5px;color:var(--text-muted);line-height:1.6;text-align:center}
+
 /* RESPONSIVE */
 @media(min-width:480px){.bgt-grid{grid-template-columns:repeat(4,1fr)}}
 </style>
@@ -523,6 +538,56 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
       <div class="bk-bestaetigt-list" id="bk-best-list"></div>
     </div>
     <div class="card" id="buch-list"></div>
+  </div>
+
+  <!-- KASSE (beide Rollen) -->
+  <div class="view" id="v-kasse">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <button class="set-btn" onclick="kasseNavMonth(-1)">‹ Vormonat</button>
+      <div style="text-align:center">
+        <div class="sec" style="margin:0" id="kasse-monat-lbl">—</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:1px">Vorschuss-Kasse</div>
+      </div>
+      <button class="set-btn" id="kasse-nav-next" onclick="kasseNavMonth(1)">Nächster ›</button>
+    </div>
+
+    <div class="card" style="padding:16px 18px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+        <span style="font-size:22px;font-weight:700;font-variant-numeric:tabular-nums" id="kasse-spent-lbl">0,00 €</span>
+        <span style="font-size:12px;color:var(--text-muted)">Budget: <strong>150,00 €</strong></span>
+      </div>
+      <div class="kasse-bar-wrap"><div class="kasse-bar" id="kasse-bar" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)">
+        <span id="kasse-rest-lbl">150,00 € verbleibend</span>
+        <span id="kasse-pct-lbl">0 %</span>
+      </div>
+    </div>
+
+    <!-- Schnell-Eintrag (nur HM, nur aktueller Monat) -->
+    <div id="kasse-form-wrap" style="display:none;margin-bottom:14px">
+      <div class="card" style="padding:14px 16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Eintrag hinzufügen</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+          <input type="date" id="kasse-datum" class="kasse-in" style="flex:0 0 138px">
+          <input type="text" id="kasse-desc" class="kasse-in" placeholder="Beschreibung (z.B. Dübel + Schrauben)" style="flex:1;min-width:180px">
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="number" id="kasse-betrag" class="kasse-in" placeholder="0,00" step="0.01" min="0.01" style="width:80px">
+            <span style="font-size:13px;color:var(--text-muted);flex-shrink:0">€</span>
+          </div>
+          <button class="bk-save" onclick="saveKasseEntry()" style="white-space:nowrap">+ Hinzufügen</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eintrags-Liste -->
+    <div id="kasse-list"></div>
+
+    <!-- Hinweis Frau Schwade -->
+    <div id="kasse-sw-note" class="kasse-note" style="display:none">
+      Dieser Monatsbericht wird automatisch aktualisiert.<br>
+      Kleinstmaterial bis 150 € / Monat benötigt keine Einzelfreigabe.<br>
+      Anfragen bei Überschreitung direkt an Hendrik.
+    </div>
   </div>
 
   <!-- EINSTELLUNGEN (Hendrik only) -->
@@ -856,8 +921,8 @@ function initApp(){
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
        {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'budget',lbl:'💰 Budget'},
-       {id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
-    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'budget',lbl:'💰 Budget'}];
+       {id:'kasse',lbl:'💶 Kasse'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+    : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'budget',lbl:'💰 Budget'},{id:'kasse',lbl:'💶 Kasse'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
 
@@ -887,6 +952,7 @@ function showTab(id){
   if(id==='einkauf')renderEinkauf();
   if(id==='buchungen')renderBuchungen();
   if(id==='termine')renderTermine();
+  if(id==='kasse')loadKasse();
   if(id==='services')renderServices();
 }
 
@@ -1780,6 +1846,119 @@ async function saveTerminEdit(id, idx){
     setSyncDot('err');
     alert('Speichern fehlgeschlagen — bitte erneut versuchen.');
   }
+}
+
+// ── KASSE ─────────────────────────────────────────────────────────────────────
+const KASSE_BUDGET = 150;
+let kasseEntries = [];
+let kasseMonat = new Date(); kasseMonat.setDate(1);
+
+async function loadKasse(){
+  const y = kasseMonat.getFullYear();
+  const m = String(kasseMonat.getMonth()+1).padStart(2,'0');
+  const from = `${y}-${m}-01`;
+  const to   = `${y}-${m}-31`;
+  try{
+    const r = await sbReq(`budget_eintraege?kat=eq.kleinst&datum=gte.${from}&datum=lte.${to}&order=datum.desc,created_at.desc`);
+    kasseEntries = r.ok ? await r.json() : [];
+  }catch{ kasseEntries=[]; }
+  renderKasse();
+}
+
+function kasseNavMonth(dir){
+  const now = new Date();
+  kasseMonat.setMonth(kasseMonat.getMonth()+dir);
+  if(kasseMonat > now){ kasseMonat = new Date(); kasseMonat.setDate(1); }
+  loadKasse();
+}
+
+function renderKasse(){
+  const now = new Date();
+  const isCurrent = kasseMonat.getMonth()===now.getMonth() && kasseMonat.getFullYear()===now.getFullYear();
+  const monatStr = kasseMonat.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  const el = id => document.getElementById(id);
+
+  el('kasse-monat-lbl').textContent = monatStr;
+  const nextBtn = el('kasse-nav-next');
+  if(nextBtn) nextBtn.disabled = isCurrent;
+
+  const total = kasseEntries.reduce((s,e)=>s+parseFloat(e.betrag||0),0);
+  const pct   = Math.min(100,(total/KASSE_BUDGET)*100);
+  const rest  = KASSE_BUDGET - total;
+  const over  = total > KASSE_BUDGET;
+
+  const bar = el('kasse-bar');
+  if(bar){ bar.style.width=pct+'%'; bar.style.background = over?'#dc2626':pct>80?'#d97706':'var(--green-mid)'; }
+  el('kasse-spent-lbl').textContent = eur(total)+' verbraucht';
+  el('kasse-rest-lbl').textContent  = over ? `⚠️ ${eur(total-KASSE_BUDGET)} über Budget` : `${eur(rest)} verbleibend`;
+  el('kasse-pct-lbl').textContent   = Math.round(pct)+' %';
+
+  const formWrap = el('kasse-form-wrap');
+  if(formWrap){
+    formWrap.style.display = (role==='hm'&&isCurrent) ? 'block' : 'none';
+    if(role==='hm'&&isCurrent){
+      const datumIn = el('kasse-datum');
+      if(datumIn&&!datumIn.value) datumIn.value = now.toISOString().slice(0,10);
+    }
+  }
+  const swNote = el('kasse-sw-note');
+  if(swNote) swNote.style.display = role==='sw' ? 'block' : 'none';
+
+  const listEl = el('kasse-list');
+  if(!kasseEntries.length){
+    listEl.innerHTML='<div class="empty" style="padding:20px 16px">Keine Einträge in diesem Monat.</div>';
+    return;
+  }
+  let html = '<div class="card" style="padding:0">';
+  kasseEntries.forEach(e=>{
+    const d = e.datum ? new Date(e.datum+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : '—';
+    const canDel = role==='hm' && isCurrent;
+    html += `<div class="kasse-entry">
+      <span class="kasse-entry-date">${d}</span>
+      <span class="kasse-entry-desc">${escHtml(e.beschreibung||'—')}</span>
+      <span class="kasse-entry-amt">−${eur(parseFloat(e.betrag||0))}</span>
+      ${canDel?`<button class="kasse-entry-del" onclick="delKasseEntry('${e.id}')" title="Löschen">✕</button>`:''}
+    </div>`;
+  });
+  html += `<div class="kasse-total-row">
+    <span class="kasse-entry-date"></span>
+    <span class="kasse-entry-desc" style="color:var(--text-muted);font-size:12px">Gesamt ${monatStr}</span>
+    <span class="kasse-entry-amt" style="color:${over?'#dc2626':'var(--green-mid)'}">${eur(total)}</span>
+  </div></div>`;
+  listEl.innerHTML = html;
+}
+
+async function saveKasseEntry(){
+  const desc   = document.getElementById('kasse-desc').value.trim();
+  const betrag = parseFloat(document.getElementById('kasse-betrag').value);
+  const datum  = document.getElementById('kasse-datum').value;
+  if(!desc)            { alert('Bitte Beschreibung eingeben.'); return; }
+  if(isNaN(betrag)||betrag<=0){ alert('Bitte gültigen Betrag eingeben.'); return; }
+  if(!datum)           { alert('Bitte Datum auswählen.'); return; }
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('budget_eintraege',{
+      method:'POST',
+      headers:{Prefer:'return=minimal'},
+      body:JSON.stringify({kat:'kleinst',betrag,beschreibung:desc,datum})
+    });
+    if(!r.ok) throw 0;
+    setSyncDot('ok');
+    document.getElementById('kasse-desc').value='';
+    document.getElementById('kasse-betrag').value='';
+    loadKasse();
+  }catch{ setSyncDot('err'); alert('Fehler beim Speichern.'); }
+}
+
+async function delKasseEntry(id){
+  setSyncDot('busy');
+  try{
+    const r = await sbReq('budget_eintraege?id=eq.'+id,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+    if(!r.ok) throw 0;
+    kasseEntries = kasseEntries.filter(e=>e.id!==id);
+    setSyncDot('ok');
+    renderKasse();
+  }catch{ setSyncDot('err'); }
 }
 
 // ── PFLEGEPLAN ───────────────────────────────────────────────────────────────
