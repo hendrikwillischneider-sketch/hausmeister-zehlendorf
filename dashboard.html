@@ -643,13 +643,14 @@ details[open] .dm-teile-summary::before{transform:rotate(90deg)}
   <div class="modal">
     <div class="modal-drag"></div>
     <div class="modal-title">Eingang erfassen</div>
-    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Telefonisch entgegengenommener Schaden oder Notfall</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Schaden, Notfall oder Gebäudeschaden manuell erfassen</div>
 
     <div class="modal-row">
       <div class="modal-lbl">Art der Meldung</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-        <button class="status-opt sel" id="ns-kat-schaden" onclick="nsSelKat(this,'Schaden')">🔧 Schaden</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px">
+        <button class="status-opt sel" id="ns-kat-schaden" onclick="nsSelKat(this,'Schaden')">🔧 Bewohnerschaden</button>
         <button class="status-opt" id="ns-kat-notfall" onclick="nsSelKat(this,'Notfall')" style="border-color:var(--red)">🚨 Notfall</button>
+        <button class="status-opt" id="ns-kat-gebaeude" onclick="nsSelKat(this,'Gebäudeschaden')" style="border-color:#8b5cf6">🏢 Gebäudeschaden</button>
       </div>
     </div>
     <div class="modal-row">
@@ -1332,55 +1333,81 @@ function renderOverview(){
 
 function renderOverviewRep(){
   const now = new Date(); now.setDate(1);
-  const entries = kasseSchadenForMonth(now);
-  const total   = entries.reduce((s,e)=>s+(e.kosten||0),0);
-  const pct     = Math.min(100,Math.round(total/KASSE_BUDGET*100));
-  const count   = entries.length;
-  const avg     = count>0 ? total/count : 0;
-  const monatStr= now.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  const monatStr = now.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  const m = now.getMonth()+1, y = now.getFullYear();
 
-  // Alle Monate mit Kosten für Jahresübersicht
-  const allMitKosten = schaden.filter(s=>s.kosten>0);
-  const byMonth={};
-  allMitKosten.forEach(s=>{
+  // Bewohnerschäden (Kasse)
+  const kasseEntries = kasseSchadenForMonth(now);
+  const kasseTotal   = kasseEntries.reduce((s,e)=>s+(e.kosten||0),0);
+  const pct          = Math.min(100,Math.round(kasseTotal/KASSE_BUDGET*100));
+
+  // Gebäudeschäden dieses Monats
+  const gebEntries = schaden.filter(s=>{
+    if(s.kategorie!=='Gebäudeschaden'||!s.kosten||s.kosten<=0) return false;
     const p=(s.datum||'').split('.');
-    if(p.length<3)return;
+    return p.length>=3 && parseInt(p[1])===m && parseInt(p[2])===y;
+  }).sort((a,b)=>(b.datum||'').localeCompare(a.datum||''));
+  const gebTotal = gebEntries.reduce((s,e)=>s+(e.kosten||0),0);
+
+  // Monatsübersicht (alle Schäden mit Kosten, letzte 6 Monate)
+  const byMonthKasse={}, byMonthGeb={};
+  schaden.filter(s=>s.kosten>0).forEach(s=>{
+    const p=(s.datum||'').split('.');
+    if(p.length<3) return;
     const key=`${p[2]}-${p[1].padStart(2,'0')}`;
-    byMonth[key]=(byMonth[key]||0)+(s.kosten||0);
+    if(s.kategorie==='Gebäudeschaden') byMonthGeb[key]=(byMonthGeb[key]||0)+(s.kosten||0);
+    else byMonthKasse[key]=(byMonthKasse[key]||0)+(s.kosten||0);
   });
-  const months=Object.keys(byMonth).sort().reverse().slice(0,6);
+  const allKeys=[...new Set([...Object.keys(byMonthKasse),...Object.keys(byMonthGeb)])].sort().reverse().slice(0,6);
+
+  function entryRow(e){
+    const p=(e.datum||'').split('.');
+    const d=p.length>=2?`${p[0]}.${p[1]}.`:'—';
+    const desc=[e.ort,e.prob].filter(Boolean).join(' — ');
+    return `<div class="kasse-entry" onclick="openDetail('${e.id}')" style="cursor:pointer">
+      <span class="kasse-entry-date">${d}</span>
+      <span class="kasse-entry-desc">${escHtml(desc||'Reparatur')}</span>
+      <span class="kasse-entry-amt">−${eur(e.kosten||0)}</span>
+    </div>`;
+  }
 
   document.getElementById('v-uebersicht').innerHTML=`
     <div class="kpi-row">
-      <div class="kpi"><div class="kpi-val${total>KASSE_BUDGET?' alert':total>=KASSE_BUDGET*0.8?' warn':''}">${eur(total)}</div><div class="kpi-lbl">Verbraucht (${monatStr.split(' ')[0]})</div></div>
+      <div class="kpi"><div class="kpi-val${kasseTotal>KASSE_BUDGET?' alert':kasseTotal>=KASSE_BUDGET*0.8?' warn':''}">${eur(kasseTotal)}</div><div class="kpi-lbl">Kasse (${monatStr.split(' ')[0]})</div></div>
       <div class="kpi"><div class="kpi-val${pct>=100?' alert':pct>=80?' warn':''}">${pct}%</div><div class="kpi-lbl">Kasse genutzt</div></div>
-      <div class="kpi"><div class="kpi-val">${count}</div><div class="kpi-lbl">Reparaturen</div></div>
-      <div class="kpi"><div class="kpi-val">${count>0?eur(avg):'—'}</div><div class="kpi-lbl">Ø pro Reparatur</div></div>
+      <div class="kpi"><div class="kpi-val">${eur(gebTotal)}</div><div class="kpi-lbl">Gebäude (${monatStr.split(' ')[0]})</div></div>
+      <div class="kpi"><div class="kpi-val">${eur(kasseTotal+gebTotal)}</div><div class="kpi-lbl">Gesamt</div></div>
     </div>
-    <div class="sec">Kosten — ${monatStr}</div>
+
+    <div class="sec">🔧 Bewohnerschäden — ${monatStr}</div>
     <div class="card" style="padding:0;margin-bottom:14px">${
-      entries.length ? entries.map(e=>{
-        const p=(e.datum||'').split('.');
-        const d=p.length>=2?`${p[0]}.${p[1]}.`:'—';
-        const desc=[e.ort,e.prob].filter(Boolean).join(' — ');
-        return `<div class="kasse-entry" onclick="openDetail('${e.id}')" style="cursor:pointer">
-          <span class="kasse-entry-date">${d}</span>
-          <span class="kasse-entry-desc">${escHtml(desc||'Reparatur')}</span>
-          <span class="kasse-entry-amt">−${eur(e.kosten||0)}</span>
-        </div>`;
-      }).join('')+`<div class="kasse-total-row">
+      kasseEntries.length ? kasseEntries.map(entryRow).join('')+`<div class="kasse-total-row">
         <span class="kasse-entry-date"></span>
         <span class="kasse-entry-desc" style="color:var(--text-muted);font-size:12px">Gesamt</span>
-        <span class="kasse-entry-amt" style="color:var(--green-mid)">${eur(total)}</span>
-      </div>`
-      : '<div class="empty" style="padding:20px">Keine Kosten diesen Monat</div>'
+        <span class="kasse-entry-amt" style="color:var(--green-mid)">${eur(kasseTotal)}</span>
+      </div>` : '<div class="empty" style="padding:20px">Keine Bewohnerschäden diesen Monat</div>'
     }</div>
-    ${months.length>1?`<div class="sec">Vorherige Monate</div><div class="card" style="padding:0">${
-      months.map(k=>{
+
+    <div class="sec">🏢 Gebäudeschäden — ${monatStr}</div>
+    <div class="card" style="padding:0;margin-bottom:14px">${
+      gebEntries.length ? gebEntries.map(entryRow).join('')+`<div class="kasse-total-row">
+        <span class="kasse-entry-date"></span>
+        <span class="kasse-entry-desc" style="color:var(--text-muted);font-size:12px">Gesamt</span>
+        <span class="kasse-entry-amt" style="color:var(--green-mid)">${eur(gebTotal)}</span>
+      </div>` : '<div class="empty" style="padding:20px">Keine Gebäudeschäden diesen Monat</div>'
+    }</div>
+
+    ${allKeys.length>1?`<div class="sec">Vorherige Monate</div><div class="card" style="padding:0">${
+      allKeys.map(k=>{
         const [y,m]=k.split('-');
         const lbl=new Date(+y,+m-1,1).toLocaleDateString('de-DE',{month:'long',year:'numeric'});
-        const v=byMonth[k];
-        return `<div class="kasse-entry"><span class="kasse-entry-date" style="width:auto;flex:1">${lbl}</span><span class="kasse-entry-amt">${eur(v)}</span></div>`;
+        const kv=byMonthKasse[k]||0, gv=byMonthGeb[k]||0;
+        return `<div class="kasse-entry">
+          <span class="kasse-entry-date" style="width:auto;flex:1">${lbl}</span>
+          ${kv>0?`<span style="font-size:12px;color:var(--text-muted);margin-right:4px">🔧${eur(kv)}</span>`:''}
+          ${gv>0?`<span style="font-size:12px;color:#7c3aed;margin-right:4px">🏢${eur(gv)}</span>`:''}
+          <span class="kasse-entry-amt">${eur(kv+gv)}</span>
+        </div>`;
       }).join('')
     }</div>`:''}
   `;
@@ -1419,17 +1446,19 @@ function parseFotos(raw){
 
 function siHTML(s){
   const isNotfall = s.kategorie==='Notfall';
+  const isGebaeude = s.kategorie==='Gebäudeschaden';
   const done = s.status==='Abgeschlossen';
   const pc = isNotfall?'p-hoch': s.prio==='Hoch'?'p-hoch': done?'p-done':'p-mittel';
   const bc = done?'b-done': isNotfall?'b-offen': ['In Umsetzung','Handwerker beauftragt'].includes(s.status)?'b-laufend':'b-offen';
   const fotos = parseFotos(s.foto);
   const thumb = fotos[0] ? `<img class="si-thumb" src="${fotos[0]}" alt="Foto">` : '';
+  const gebBadge = isGebaeude ? `<span class="si-badge" style="background:#ede9fe;color:#7c3aed;border:none;font-size:11px">🏢 Gebäude</span>` : '';
   return `<div class="si${isNotfall?' si-notfall':''}" onclick="openDetail('${s.id}')">
     <div class="si-prio ${pc}"></div>
     <div class="si-body">
       <div class="si-top">
-        <div class="si-title">${isNotfall?'🚨 ':''}${s.ort||'Ort unbekannt'}</div>
-        <span class="si-badge ${bc}">${s.status}</span>
+        <div class="si-title">${isNotfall?'🚨 ':isGebaeude?'🏢 ':''}${s.ort||'Ort unbekannt'}</div>
+        <div style="display:flex;gap:6px;align-items:center">${gebBadge}<span class="si-badge ${bc}">${s.status}</span></div>
       </div>
       <div class="si-meta">${s.prob||'—'}${s.zimmer?' · Suite '+s.zimmer:''} · ${s.datum}</div>
     </div>
@@ -1443,8 +1472,9 @@ function openDetail(id){
   if(!editItem)return;
   const s=editItem;
   const isNotfall = s.kategorie==='Notfall';
+  const isGebaeude = s.kategorie==='Gebäudeschaden';
 
-  document.getElementById('dm-title').textContent = (isNotfall?'🚨 Notfall — ':'🔧 Schaden — ') + (s.ort||'');
+  document.getElementById('dm-title').textContent = (isNotfall?'🚨 Notfall — ':isGebaeude?'🏢 Gebäudeschaden — ':'🔧 Schaden — ') + (s.ort||'');
   document.getElementById('dm-badges').innerHTML =
     `<span class="si-badge b-${s.status==='Abgeschlossen'?'done':'offen'}">${s.status}</span>`+
     (s.prio?`<span class="si-badge" style="background:var(--bg);border:1px solid var(--border)">${s.prio}</span>`:'')+
@@ -1944,6 +1974,7 @@ function kasseSchadenForMonth(monat){
   const m = monat.getMonth()+1, y = monat.getFullYear();
   return schaden.filter(s=>{
     if(s.kosten==null||s.kosten<=0) return false;
+    if(s.kategorie==='Gebäudeschaden') return false;
     const p=(s.datum||'').split('.');
     return p.length>=3 && parseInt(p[1])===m && parseInt(p[2])===y;
   }).sort((a,b)=>(b.datum||'').localeCompare(a.datum||''));
@@ -2343,6 +2374,7 @@ function openAddEntry(){
   nsFotos = []; nsParts = [];
   document.getElementById('ns-kat-schaden').classList.add('sel');
   document.getElementById('ns-kat-notfall').classList.remove('sel');
+  document.getElementById('ns-kat-gebaeude').classList.remove('sel');
   document.getElementById('ns-ort').value = '';
   document.getElementById('ns-prob').value = '';
   document.getElementById('ns-zimmer').value = '';
@@ -2363,8 +2395,8 @@ function nsSelKat(el, kat){
   nsKat = kat;
   document.getElementById('ns-kat-schaden').classList.remove('sel');
   document.getElementById('ns-kat-notfall').classList.remove('sel');
+  document.getElementById('ns-kat-gebaeude').classList.remove('sel');
   el.classList.add('sel');
-  // Set prio to Hoch automatically for Notfall
   if(kat==='Notfall') document.getElementById('ns-prio').value='Hoch';
 }
 
