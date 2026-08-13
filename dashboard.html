@@ -1375,7 +1375,7 @@ async function loadBewohner(){
 function renderBewohner(){
   const el=document.getElementById('bewohner-list');
   if(!el)return;
-  const sortnr=b=>parseInt(b.zimmer||0);
+  const sortnr=b=>{const n=parseInt(b.zimmer||'');return isNaN(n)?9999:n;};
   const aktive=bewohner.filter(b=>b.aktiv).sort((a,b)=>sortnr(a)-sortnr(b));
   const ehemalige=bewohner.filter(b=>!b.aktiv).sort((a,b)=>sortnr(a)-sortnr(b));
 
