@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a3c2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Hausmeister Intern — Sidonie-Scharfe-Stiftung</title>
+<style>
+:root{--green:#1C4A2E;--green-d:#132E1C;--green-mid:#2d6a4f;--green-light:#40916c;--green-pale:#d8f3dc;--burg:#7A2430;--accent:#52b788;--gold:#B8892A;--red:#c1121f;--red-pale:#ffe5e5;--yellow:#e9a720;--yellow-pale:#fff3cd;--purple:#6b46c1;--purple-pale:#ede9fe;--gray:#6c757d;--bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;--radius:12px;--shadow:0 1px 3px rgba(26,21,16,.06),0 4px 16px rgba(26,21,16,.04)}
+@media(prefers-color-scheme:dark){:root{--bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--purple-pale:#1e1535;--shadow:0 1px 4px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--purple-pale:#1e1535;--shadow:0 1px 4px rgba(0,0,0,.4)}
+:root[data-theme="light"]{--bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;--shadow:0 1px 3px rgba(26,21,16,.06),0 4px 16px rgba(26,21,16,.04)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
+
+/* PASSWORD GATE */
+.pw-gate{position:fixed;inset:0;background:var(--green);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.pw-gate.hidden{display:none}
+.pw-box{background:var(--card);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.pw-box h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.pw-box p{font-size:13px;color:var(--text-muted);margin-bottom:18px}
+.pw-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:17px;background:var(--bg);color:var(--text);font-family:inherit}
+.pw-input:focus{outline:none;border-color:var(--accent)}
+.pw-btn{display:block;width:100%;padding:13px;background:var(--green-mid);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
+.pw-err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.pw-err.show{display:block}
+
+/* HEADER */
+.hdr{background:var(--green);color:#fff;padding:13px 16px 11px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.hdr-sub{font-size:11px;opacity:.65;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-badge{background:var(--red);color:#fff;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;opacity:0;transition:opacity .2s}
+.hdr-badge.show{opacity:1}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#52b788;flex-shrink:0}
+.sync-dot.syncing{background:var(--yellow);animation:pulse .8s infinite}
+.sync-dot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* NAV */
+nav{background:var(--card);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1;min-width:72px;padding:11px 6px;border:none;background:none;color:var(--text-muted);font-size:12.5px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
+nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);font-weight:600}
+
+/* VIEWS */
+.view{display:none;padding:12px 12px 88px;max-width:680px;margin:0 auto}
+.view.active{display:block}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow)}
+.stat-val{font-size:22px;font-weight:700;color:var(--green-mid)}
+.stat-val.warn{color:var(--red)}
+.stat-val.alert{color:var(--orange,#d97706)}
+.stat-lbl{font-size:11px;color:var(--text-muted);margin-top:1px}
+
+/* SECTION LABEL */
+.sec{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+
+/* FILTER CHIPS */
+.chips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:5px 13px;border-radius:20px;border:1px solid var(--border);font-size:12.5px;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--text-muted);transition:all .15s}
+.chip.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:500}
+
+/* SCHADEN ITEM */
+.si{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:background .1s}
+.si:last-child{border:none}
+.si:active{background:var(--bg)}
+.si-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.d-hoch{background:var(--red)}.d-mittel{background:var(--yellow)}.d-niedrig{background:var(--accent)}.d-done{background:var(--border)}
+.si-body{flex:1;min-width:0}
+.si-title{font-size:14px;font-weight:500;line-height:1.3}
+.si-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.si-thumb{width:40px;height:40px;border-radius:7px;object-fit:cover;flex-shrink:0}
+.si-right{text-align:right;flex-shrink:0}
+
+/* BADGES */
+.badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.b-offen{background:var(--red-pale);color:var(--red)}
+.b-laufend{background:var(--yellow-pale);color:var(--yellow)}
+.b-beauftragt{background:#dbeafe;color:#1d4ed8;font-weight:600}
+.b-done{background:var(--green-pale);color:var(--green-mid)}
+.b-hoch{background:var(--red-pale);color:var(--red)}
+.b-mittel{background:var(--yellow-pale);color:var(--yellow)}
+.b-niedrig{background:var(--green-pale);color:var(--green-mid)}
+.b-bewohner{background:var(--purple-pale);color:var(--purple);font-size:9.5px;margin-left:4px;padding:1px 6px}
+.b-kat{font-size:9.5px;padding:1px 6px;border-radius:20px;font-weight:600;margin-left:4px;display:inline-block}
+.b-kat-schaden{background:var(--red-pale);color:var(--red)}
+/* ORT-PICKER */
+.ort-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.ort-chip{background:var(--card);border:1.5px solid var(--border);color:var(--text);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit}
+.ort-chip:hover{border-color:var(--green-mid);color:var(--green-mid)}
+.ort-chip.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:600}
+.prob-chip{font-size:12px;padding:5px 11px}
+.b-kat-moebel{background:#dbeafe;color:#1d4ed8}
+.b-kat-sperr{background:#dcfce7;color:#166534}
+.b-kat-auftrag{background:var(--yellow-pale);color:#92400e}
+.b-kosten{background:#fef3c7;color:#d97706;font-weight:600}
+.b-freigegeben{background:#dcfce7;color:#166534;font-weight:600}
+.b-abgeschlossen{background:var(--green-pale);color:var(--green-mid);font-weight:600}
+
+/* TASK ITEM */
+.ti{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.ti:last-child{border:none}
+.ti-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--bg)}
+.ti-check.on{background:var(--green-mid);border-color:var(--green-mid)}
+.ti-check.on::after{content:'✓';color:#fff;font-size:12px;font-weight:800}
+.ti-info{flex:1;min-width:0}
+.ti-name{font-size:14px;line-height:1.3}
+.ti-name.done{text-decoration:line-through;color:var(--text-muted)}
+.ti-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.ti-right{flex-shrink:0;text-align:right;min-width:44px}
+.ti-h{font-size:13px;font-weight:600;color:var(--text-muted)}
+
+/* PROGRESS */
+.prog-wrap{margin:4px 0 12px}
+.prog-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px}
+.prog-row span:last-child{font-weight:600;color:var(--text)}
+.prog{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.prog-fill.warn{background:var(--red)}
+
+/* WEEK BAR */
+.week-bar{background:var(--card);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow);margin-bottom:10px}
+.week-bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.week-bar h3{font-size:14px;font-weight:600}
+.week-bar span{font-size:13px;color:var(--green-mid);font-weight:700}
+.week-prog{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.week-prog-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .4s}
+
+/* MONTH TABS */
+.mtabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;margin-bottom:10px}
+.mtabs::-webkit-scrollbar{display:none}
+.mtab{padding:6px 13px;border-radius:20px;border:1px solid var(--border);font-size:13px;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--text-muted);transition:all .15s}
+.mtab.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff}
+
+/* CAT HEADER */
+.cat-hdr{padding:7px 13px 5px;background:var(--bg);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:16px;width:54px;height:54px;border-radius:50%;background:var(--green-mid);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:200;display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s}
+.fab:active{transform:scale(.92)}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:680px;padding:20px 16px 40px;max-height:92vh;overflow-y:auto}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-hdr h2{font-size:17px;font-weight:700}
+.modal-close{background:var(--bg);border:none;width:30px;height:30px;border-radius:50%;font-size:18px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* FORM */
+label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.3px}
+input[type=text],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:15px;background:var(--bg);color:var(--text);font-family:inherit;transition:border-color .15s}
+textarea{min-height:80px;resize:vertical}
+input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.btn{display:block;width:100%;padding:13px;border-radius:11px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px;transition:opacity .15s}
+.btn:active{opacity:.85}
+.btn-primary{background:var(--green-mid);color:#fff}
+.btn-ghost{background:var(--bg);color:var(--text-muted);border:1.5px solid var(--border)}
+.btn-danger{background:var(--red-pale);color:var(--red);border:none}
+.btn-sm{display:inline-block;width:auto;padding:7px 15px;font-size:13px;border-radius:8px}
+
+
+/* BUDGET BAR */
+.budget-bar{background:var(--card);border-radius:var(--radius);padding:11px 13px;box-shadow:var(--shadow);margin-bottom:12px}
+.budget-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:5px}
+.budget-lbl{color:var(--text-muted)}
+.budget-val{font-weight:700;color:var(--gold)}
+.budget-val.warn{color:var(--red)}
+.budget-prog{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.budget-fill{height:100%;border-radius:4px;transition:width .4s;background:var(--gold)}
+.budget-fill.warn{background:var(--red)}
+/* PHOTO */
+.photo-zone{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:13px;margin-top:4px;transition:border-color .15s;position:relative;overflow:hidden}
+.photo-zone:hover{border-color:var(--accent)}
+.photo-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.photo-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photo-thumb-wrap{position:relative;width:72px;height:72px}
+.photo-thumb-wrap img{width:72px;height:72px;border-radius:8px;object-fit:cover}
+.photo-rm{position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* DETAIL */
+.detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;align-items:center}
+.detail-row:last-child{border:none}
+.detail-row .lbl{font-size:12.5px;color:var(--text-muted)}
+.status-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;margin-bottom:4px}
+.status-btn{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12.5px;cursor:pointer;text-align:center;transition:all .15s}
+.status-btn.active{border-color:var(--green-mid);background:var(--green-pale);color:var(--green-mid);font-weight:600}
+.detail-photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.detail-photos img{width:80px;height:80px;border-radius:9px;object-fit:cover;cursor:pointer}
+
+/* SETTINGS */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid var(--border)}
+.set-row:last-child{border:none}
+.set-row .lbl{font-size:14px}
+.set-row .sub{font-size:12px;color:var(--text-muted)}
+.set-btn{padding:7px 15px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text)}
+
+/* BEWOHNER LIST */
+.bw-row{display:flex;align-items:center;gap:12px;padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.bw-row:last-child{border:none}
+.bw-row:active{background:var(--bg)}
+.bw-zimmer{width:42px;height:42px;border-radius:10px;background:var(--green-pale);color:var(--green-mid);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-align:center;line-height:1.2}
+.bw-info{flex:1;min-width:0}
+.bw-rname{font-size:14px;font-weight:500}
+.bw-rmeta{font-size:12px;color:var(--text-muted);margin-top:1px}
+.bw-toggle{width:40px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.bw-toggle.on{background:var(--green-mid)}
+.bw-toggle.off{background:var(--border)}
+.bw-toggle::after{content:'';position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.bw-toggle.on::after{left:19px}.bw-toggle.off::after{left:3px}
+
+/* SYNC BANNER */
+.sync-banner{background:var(--purple-pale);border-left:3px solid var(--purple);border-radius:9px;padding:10px 13px;font-size:12.5px;color:var(--purple);margin-bottom:10px;display:none}
+.sync-banner.show{display:block}
+
+/* KONTAKT BANNER */
+.kontakt-banner{display:flex;align-items:center;gap:8px;border-radius:8px;padding:10px 13px;font-size:13px;margin-bottom:12px;line-height:1.5}
+.kontakt-banner a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.k-email{background:#dbeafe;color:#1d4ed8;border-left:3px solid #3b82f6}
+.k-call{background:#dcfce7;color:#166534;border-left:3px solid #22c55e}
+.k-person{background:var(--yellow-pale);color:#92400e;border-left:3px solid var(--yellow)}
+.k-zettel{background:var(--gold-faint,rgba(184,137,42,.1));color:#92400e;border-left:3px solid var(--gold)}
+
+/* EMPTY / NOTICE */
+.empty{text-align:center;padding:36px 20px;color:var(--text-muted)}
+.empty-icon{font-size:38px;margin-bottom:8px}
+.empty p{font-size:13.5px}
+.notice{padding:10px 13px;border-radius:9px;border-left:3px solid var(--yellow);background:var(--yellow-pale);font-size:12.5px;color:var(--yellow);margin-top:6px}
+
+/* NEU MODAL — KATEGORIE KACHELN */
+.n-kat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.n-kat-tile{padding:11px 10px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:left;transition:all .15s;display:flex;flex-direction:column;gap:3px;width:100%}
+.n-kat-tile:hover{border-color:var(--green-mid);background:var(--green-pale)}
+.n-kat-tile.active{border-color:var(--green-mid);background:var(--green-pale)}
+.nt-icon{font-size:20px;line-height:1}
+.nt-name{font-size:13px;font-weight:600;color:var(--text)}
+.nt-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+.n-kat-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.n-kat-hdr-icon{font-size:22px}
+.n-kat-hdr-title{font-size:15px;font-weight:600;color:var(--green-mid)}
+.n-back{background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:14px;text-decoration:underline;text-underline-offset:2px;font-family:inherit}
+
+/* PHOTO FS */
+.photo-fs{display:none;position:fixed;inset:0;background:#000;z-index:400;align-items:center;justify-content:center;cursor:pointer}
+.photo-fs.open{display:flex}
+.photo-fs img{max-width:100%;max-height:100%;object-fit:contain}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div class="pw-gate" id="pw-gate">
+  <div class="pw-box">
+    <h2>🌿 Hausmeister Intern</h2>
+    <p>Sidonie-Scharfe-Stiftung · Zehlendorf</p>
+    <label for="pw-in" style="text-transform:none;font-size:14px;color:var(--text);margin-top:0">Passwort</label>
+    <input type="password" class="pw-input" id="pw-in" placeholder="Passwort eingeben …" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Anmelden</button>
+    <div class="pw-err" id="pw-err">Falsches Passwort.</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <h1>🌿 Hausmeister Intern</h1>
+    <div class="hdr-sub">Sidonie-Scharfe-Stiftung · Zehlendorf</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-badge" id="open-badge">0 offen</div>
+    <div class="sync-dot" id="sync-dot" title="Sync-Status"></div>
+  </div>
+</div>
+
+<nav>
+  <button class="active" onclick="show('dashboard',this)">Übersicht</button>
+  <button onclick="show('schaden',this)">Schäden</button>
+  <button onclick="show('woche',this)">Wochenlog</button>
+  <button onclick="show('plan',this)">Pflegeplan</button>
+  <button onclick="show('bewohner',this)">Bewohner</button>
+  <button onclick="show('settings',this)">Einstellungen</button>
+  <button onclick="show('artikel',this)">Artikel</button>
+  <button onclick="show('pflanzen',this)">Pflanzen</button>
+  <button onclick="show('baumkataster',this)">Baumkataster</button>
+</nav>
+
+<!-- ÜBERSICHT -->
+<div class="view active" id="view-dashboard">
+  <div class="sync-banner" id="sync-banner">⚠️ Offline-Modus — Keine Verbindung zu Supabase. Daten aus lokalem Speicher.</div>
+  <div class="stat-row" id="ds-stats"></div>
+  <div id="ds-budget"></div>
+  <div class="sec">Offene Schadensmeldungen</div>
+  <div class="card" id="ds-schaden"></div>
+  <div class="sec">Diese Woche — Aufgaben</div>
+  <div class="card" id="ds-tasks"></div>
+</div>
+
+<!-- SCHÄDEN -->
+<div class="view" id="view-schaden">
+  <div class="stat-row" id="sc-stats"></div>
+  <div id="sc-budget"></div>
+  <div class="chips" id="sc-filter">
+    <button class="chip active" onclick="setFilter('Alle',this)">Alle</button>
+    <button class="chip" onclick="setFilter('Offen',this)">Offen</button>
+    <button class="chip" onclick="setFilter('Kosten geschätzt',this)">💰 Kosten geschätzt</button>
+    <button class="chip" onclick="setFilter('Freigegeben',this)">✅ Freigegeben</button>
+    <button class="chip" onclick="setFilter('In Umsetzung',this)">🔨 In Umsetzung</button>
+    <button class="chip" onclick="setFilter('Abgeschlossen',this)">✓ Abgeschlossen</button>
+    <button class="chip" onclick="setFilter('Bewohner',this)">🟣 Bewohner-App</button>
+  </div>
+  <div class="chips" id="sc-kat-filter">
+    <button class="chip active" onclick="setKatFilter('Alle',this)">Alle Kategorien</button>
+    <button class="chip" onclick="setKatFilter('Schaden',this)">🔧 Schaden</button>
+    <button class="chip" onclick="setKatFilter('Möbel & Aufbau',this)">🛋️ Möbel</button>
+    <button class="chip" onclick="setKatFilter('Sperrmüll',this)">🗑️ Sperrmüll</button>
+    <button class="chip" onclick="setKatFilter('Kleiner Auftrag',this)">🔨 Auftrag</button>
+  </div>
+  <div class="card" id="sc-list"></div>
+</div>
+
+<!-- WOCHENLOG -->
+<div class="view" id="view-woche">
+  <div id="wl-bar"></div>
+  <div class="sec" id="wl-label"></div>
+  <div class="card" id="wl-list"></div>
+  <div class="notice">Haken werden pro Woche gespeichert. Nächste Woche beginnt die Liste neu.</div>
+</div>
+
+<!-- PFLEGEPLAN -->
+<div class="view" id="view-plan">
+  <div class="mtabs" id="pl-tabs"></div>
+  <div class="stat-row" id="pl-stats"></div>
+  <div class="prog-wrap" id="pl-prog"></div>
+  <div class="card" id="pl-list"></div>
+</div>
+
+<!-- BEWOHNER -->
+<div class="view" id="view-bewohner">
+  <div class="stat-row" id="bw-stats"></div>
+  <div class="sec">Bewohnerliste</div>
+  <div class="card" id="bw-list">
+    <div class="empty"><div class="empty-icon">⏳</div><p>Wird geladen …</p></div>
+  </div>
+  <div class="notice" style="margin-top:10px">Bewohner werden im öffentlichen Meldeformular zur Auswahl angezeigt. Inaktive Bewohner sind dort ausgeblendet.</div>
+</div>
+
+<!-- EINSTELLUNGEN -->
+<div class="view" id="view-settings">
+  <div class="sec">Bewohner-Formular</div>
+  <div class="card">
+    <div class="set-row">
+      <div><div class="lbl">Öffentliches Meldeformular</div><div class="sub" id="melden-url">hendrikwillischneider-sketch.github.io/hausmeister-zehlendorf/</div></div>
+      <button class="set-btn" onclick="window.open('https://hendrikwillischneider-sketch.github.io/hausmeister-zehlendorf/','_blank')">Öffnen</button>
+    </div>
+  </div>
+
+
+  <div class="sec">Budget</div>
+  <div class="card">
+    <div class="set-row">
+      <div><div class="lbl">Monatsbudget</div><div class="sub" id="budget-display">Wird geladen …</div></div>
+      <button class="set-btn" onclick="setBudget()">Ändern</button>
+    </div>
+  </div>
+  <div class="sec">Supabase-Sync</div>
+  <div class="card">
+    <div class="set-row"><div><div class="lbl">Status</div><div class="sub" id="sb-status-text">Wird geprüft …</div></div><button class="set-btn" onclick="syncNow()">Jetzt sync</button></div>
+    <div class="set-row"><div class="lbl">Letzte Synchronisation</div><span style="color:var(--text-muted);font-size:13px" id="last-sync-text">–</span></div>
+  </div>
+
+  <div class="sec">Sicherheit</div>
+  <div class="card">
+    <div class="set-row"><div><div class="lbl">Passwort ändern</div><div class="sub">Gilt für diese App</div></div><button class="set-btn" onclick="changePw()">Ändern</button></div>
+    <div class="set-row"><div class="lbl">Abmelden</div><button class="set-btn" style="color:var(--red)" onclick="logout()">Abmelden</button></div>
+  </div>
+
+  <div class="sec">Daten</div>
+  <div class="card">
+    <div class="set-row"><div><div class="lbl">Export</div><div class="sub">JSON-Backup herunterladen</div></div><button class="set-btn" onclick="exportData()">Exportieren</button></div>
+    <div class="set-row"><div><div class="lbl">Import</div><div class="sub">JSON-Backup einspielen</div></div><button class="set-btn" onclick="document.getElementById('imp').click()">Importieren</button></div>
+    <div class="set-row"><div><div class="lbl" style="color:var(--red)">Lokale Daten löschen</div><div class="sub">Supabase-Daten bleiben erhalten</div></div><button class="set-btn" style="color:var(--red)" onclick="clearLocal()">Löschen</button></div>
+  </div>
+
+  <div class="sec">Info</div>
+  <div class="card">
+    <div class="set-row"><div class="lbl">Version</div><span style="color:var(--text-muted);font-size:13px">2.0 · Aug 2026</span></div>
+    <div class="set-row"><div class="lbl">Datenspeicher</div><span style="color:var(--text-muted);font-size:13px">Supabase + Browser-Cache</span></div>
+    <div class="set-row"><div class="lbl">Objekt</div><span style="color:var(--text-muted);font-size:13px">~2.000 m² Grünfläche</span></div>
+  </div>
+  <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(event)">
+</div>
+
+
+<!-- ARTIKEL CMS -->
+<div class="view" id="view-artikel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="sec" style="margin:0">Artikel verwalten</div>
+    <button class="chip" onclick="openArtikelForm(null)" style="background:var(--green-mid);color:#fff;border-color:var(--green-mid)">+ Neuer Artikel</button>
+  </div>
+  <div class="chips" id="ak-monat-filter" style="margin-bottom:10px"></div>
+  <div class="card" id="ak-list"></div>
+</div>
+
+<!-- ARTIKEL FORM MODAL -->
+<div class="overlay" id="ak-modal" style="display:none">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="ak-modal-title">Neuer Artikel</div>
+      <button class="modal-close" onclick="closeArtikelForm()">✕</button>
+    </div>
+    <div style="padding:14px;display:grid;gap:10px">
+      <input type="hidden" id="ak-id">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Monat</label>
+          <select id="ak-monat" class="inp">
+            <option value="1">Januar</option><option value="2">Februar</option>
+            <option value="3">März</option><option value="4">April</option>
+            <option value="5">Mai</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8" selected>August</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Dezember</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Kategorie</label>
+          <input type="text" id="ak-kat" class="inp" placeholder="z.B. Rasen, Hecken …">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Icon</label>
+          <input type="text" id="ak-ico" class="inp" placeholder="🌿">
+        </div>
+        <div>
+          <label class="lbl">Bild-Dateiname</label>
+          <input type="text" id="ak-bild" class="inp" placeholder="DSC01289b.jpg">
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Titel *</label>
+        <input type="text" id="ak-titel" class="inp" placeholder="Artikelüberschrift …">
+      </div>
+      <div>
+        <label class="lbl">Teaser (Kartentext)</label>
+        <textarea id="ak-teaser" class="inp" rows="2" placeholder="1–2 Sätze für die Karte auf der Startseite …" style="resize:vertical"></textarea>
+      </div>
+      <div>
+        <label class="lbl">Tipp</label>
+        <input type="text" id="ak-tipp" class="inp" placeholder="Praxis-Tipp …">
+      </div>
+      <div>
+        <label class="lbl">Zeitraum</label>
+        <input type="text" id="ak-dauer" class="inp" placeholder="z.B. August–Oktober">
+      </div>
+      <div>
+        <label class="lbl">Für Bewohnerinnen</label>
+        <textarea id="ak-bew" class="inp" rows="2" style="resize:vertical" placeholder="Text für den Bewohnerinnen-Abschnitt …"></textarea>
+      </div>
+      <div id="ak-err" style="color:var(--red);font-size:13px;display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="saveArtikel()" style="flex:1;background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">Speichern</button>
+        <button onclick="closeArtikelForm()" style="padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:14px">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- PFLANZEN CMS -->
+<div class="view" id="view-pflanzen">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)">Pflanzendatenbank</div>
+    <button onclick="openPflanzForm(null)" style="background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer">+ Neue Pflanze</button>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="pfl-int-filter"></div>
+  <div id="pfl-int-summary" style="font-size:13px;color:var(--text-muted);margin-bottom:12px"></div>
+  <div id="pfl-int-list"><p style="color:var(--text-muted);font-size:14px">Wird geladen …</p></div>
+</div>
+
+<!-- PFLANZE FORM MODAL -->
+<div class="overlay" id="pfl-int-modal" style="display:none">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="pfl-int-modal-title">Neue Pflanze</div>
+      <button class="modal-close" onclick="closePflanzForm()">✕</button>
+    </div>
+    <div style="padding:14px;display:grid;gap:10px;max-height:72vh;overflow-y:auto">
+      <input type="hidden" id="pfl-int-id">
+
+      <!-- Name -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Deutscher Name *</label>
+          <input type="text" id="pfl-int-name-de" class="inp" placeholder="z.B. Funkie">
+        </div>
+        <div>
+          <label class="lbl">Lateinischer Name</label>
+          <input type="text" id="pfl-int-name-lat" class="inp" placeholder="Hosta">
+        </div>
+      </div>
+
+      <!-- Typ + Kategorie -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Typ</label>
+          <select id="pfl-int-typ" class="inp">
+            <option value="">— wählen —</option>
+            <option>Baum</option><option>Strauch</option><option>Staude</option>
+            <option>Einjährige</option><option>Zweijährige</option>
+            <option>Zwiebelpflanze</option><option>Knollenpflanze</option>
+            <option>Kletterpflanze</option><option>Bodendecker</option><option>Gras</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Kategorie</label>
+          <input type="text" id="pfl-int-kat" class="inp" placeholder="z.B. Zierstaude, Hecke …">
+        </div>
+      </div>
+
+      <!-- Standort -->
+      <div>
+        <label class="lbl">Standort</label>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+            <input type="checkbox" id="pfl-st-sonne"> ☀️ Sonne
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+            <input type="checkbox" id="pfl-st-halb"> 🌤️ Halbschatten
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+            <input type="checkbox" id="pfl-st-schatten"> 🌥️ Schatten
+          </label>
+        </div>
+      </div>
+
+      <!-- Wasser + Blütezeit -->
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Wasserbedarf</label>
+          <select id="pfl-int-wasser" class="inp">
+            <option value="">—</option>
+            <option>gering</option><option>mittel</option><option>hoch</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Blüte von</label>
+          <select id="pfl-int-bluete-von" class="inp">
+            <option value="">—</option>
+            <option value="1">Januar</option><option value="2">Februar</option>
+            <option value="3">März</option><option value="4">April</option>
+            <option value="5">Mai</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">August</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Dezember</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Blüte bis</label>
+          <select id="pfl-int-bluete-bis" class="inp">
+            <option value="">—</option>
+            <option value="1">Januar</option><option value="2">Februar</option>
+            <option value="3">März</option><option value="4">April</option>
+            <option value="5">Mai</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">August</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Dezember</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Blütenfarbe + Höhe -->
+      <div style="display:grid;grid-template-columns:1fr 80px 80px;gap:8px">
+        <div>
+          <label class="lbl">Blütenfarbe</label>
+          <input type="text" id="pfl-int-bluetfarbe" class="inp" placeholder="rot, weiß, …">
+        </div>
+        <div>
+          <label class="lbl">Höhe min (cm)</label>
+          <input type="number" id="pfl-int-hoehe-min" class="inp" placeholder="20">
+        </div>
+        <div>
+          <label class="lbl">Höhe max (cm)</label>
+          <input type="number" id="pfl-int-hoehe-max" class="inp" placeholder="80">
+        </div>
+      </div>
+
+      <!-- Flags -->
+      <div style="display:flex;gap:16px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+          <input type="checkbox" id="pfl-int-winterhart" checked> Winterhart
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer">
+          <input type="checkbox" id="pfl-int-im-park" checked> Im Park vorhanden
+        </label>
+      </div>
+
+      <!-- Park-Standort + Bild -->
+      <div style="display:grid;grid-template-columns:1fr 160px;gap:8px">
+        <div>
+          <label class="lbl">Standort im Park</label>
+          <input type="text" id="pfl-int-park-standort" class="inp" placeholder="z.B. Innenhof, Parkrand">
+        </div>
+        <div>
+          <label class="lbl">Bild-Dateiname</label>
+          <input type="text" id="pfl-int-bild" class="inp" placeholder="DSC01289b.jpg">
+        </div>
+      </div>
+
+      <!-- Pflegehinweise -->
+      <div>
+        <label class="lbl">Pflegehinweise</label>
+        <textarea id="pfl-int-pflege" class="inp" rows="2" style="resize:vertical" placeholder="Schnitt, Düngung, Besonderheiten …"></textarea>
+      </div>
+
+      <!-- Schnittmonate -->
+      <div>
+        <label class="lbl">Schnittmonate (kommagetrennt, z.B. 3,8)</label>
+        <input type="text" id="pfl-int-schnitt" class="inp" placeholder="3, 8">
+      </div>
+
+      <!-- Gießhinweis -->
+      <div>
+        <label class="lbl">Gießhinweis</label>
+        <input type="text" id="pfl-int-giessen" class="inp" placeholder="z.B. Täglich bei Hitze">
+      </div>
+
+      <!-- Tags -->
+      <div>
+        <label class="lbl">Tags (kommagetrennt)</label>
+        <input type="text" id="pfl-int-tags" class="inp" placeholder="giftig, duftend, bienenpflanze, wintergrün">
+      </div>
+
+      <!-- Bewohner-Info -->
+      <div>
+        <label class="lbl">Info für Bewohnerinnen</label>
+        <textarea id="pfl-int-bew-info" class="inp" rows="2" style="resize:vertical" placeholder="Interessanter Fakt, der auf der Startseite erscheint …"></textarea>
+      </div>
+
+      <div id="pfl-int-err" style="color:var(--red);font-size:13px;display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="savePflanz()" style="flex:1;background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">Speichern</button>
+        <button onclick="closePflanzForm()" style="padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:14px">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BAUMKATASTER -->
+<div class="view" id="view-baumkataster">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)">Baumkataster</div>
+    <button onclick="openBaumForm(null)" style="background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer">+ Neuer Baum</button>
+  </div>
+
+  <!-- Filter -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="baum-bereich-filter"></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="baum-prio-filter"></div>
+
+  <!-- Summary-Zeile -->
+  <div id="baum-summary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:13px"></div>
+
+  <!-- Liste -->
+  <div id="baum-list"><p style="color:var(--text-muted);font-size:14px">Wird geladen …</p></div>
+</div>
+
+<!-- BAUM FORM MODAL -->
+<div class="overlay" id="baum-modal" style="display:none">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="baum-modal-title">Neuer Baum</div>
+      <button class="modal-close" onclick="closeBaumForm()">✕</button>
+    </div>
+    <div style="padding:14px;display:grid;gap:10px;max-height:70vh;overflow-y:auto">
+      <input type="hidden" id="baum-id">
+
+      <!-- Zeile 1: Nr + Art -->
+      <div style="display:grid;grid-template-columns:100px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Nr *</label>
+          <input type="text" id="baum-nr" class="inp" placeholder="B-016">
+        </div>
+        <div>
+          <label class="lbl">Deutscher Name *</label>
+          <input type="text" id="baum-name-de" class="inp" placeholder="z.B. Sand-Birke">
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Lateinischer Name</label>
+        <input type="text" id="baum-name-lat" class="inp" placeholder="Betula pendula">
+      </div>
+
+      <!-- Standort -->
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Bereich</label>
+          <select id="baum-bereich" class="inp">
+            <option value="Park">Park</option>
+            <option value="Innenhof">Innenhof</option>
+            <option value="Eingang">Eingang</option>
+            <option value="Parkrand">Parkrand</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Standort-Beschreibung</label>
+          <input type="text" id="baum-standort" class="inp" placeholder="Park, Nordseite nahe Eingang">
+        </div>
+      </div>
+
+      <!-- Maße -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Höhe (m)</label>
+          <input type="number" id="baum-hoehe" class="inp" step="0.5" placeholder="12">
+        </div>
+        <div>
+          <label class="lbl">Stamm-Ø (cm)</label>
+          <input type="number" id="baum-umfang" class="inp" placeholder="85">
+        </div>
+        <div>
+          <label class="lbl">Krone (m)</label>
+          <input type="number" id="baum-krone" class="inp" step="0.5" placeholder="6">
+        </div>
+        <div>
+          <label class="lbl">Alter (J.)</label>
+          <input type="number" id="baum-alter" class="inp" placeholder="40">
+        </div>
+      </div>
+
+      <!-- Zustand -->
+      <div style="display:grid;grid-template-columns:160px 1fr;gap:8px">
+        <div>
+          <label class="lbl">Vitalität</label>
+          <select id="baum-vital" class="inp">
+            <option value="1">1 — Vital / gut</option>
+            <option value="2">2 — Leicht geschwächt</option>
+            <option value="3">3 — Stark geschwächt</option>
+            <option value="4">4 — Abgestorben</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Maßnahmen-Priorität</label>
+          <select id="baum-prio" class="inp">
+            <option value="keine">Keine</option>
+            <option value="beobachten">Beobachten</option>
+            <option value="dringend">Dringend</option>
+            <option value="sofort">Sofort</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Zustand / Schäden</label>
+        <textarea id="baum-zustand" class="inp" rows="2" style="resize:vertical" placeholder="Beschreibung von Schäden, Auffälligkeiten …"></textarea>
+      </div>
+
+      <!-- Maßnahmen -->
+      <div>
+        <label class="lbl">Nächste Maßnahme</label>
+        <input type="text" id="baum-naechste-massnahme" class="inp" placeholder="z.B. Kronenbegehung durch Fachbetrieb">
+      </div>
+      <div>
+        <label class="lbl">Letzte Maßnahme</label>
+        <input type="text" id="baum-letzte-massnahme" class="inp" placeholder="Was wurde zuletzt gemacht?">
+      </div>
+
+      <!-- Prüfdaten -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label class="lbl">Letzte Prüfung</label>
+          <input type="date" id="baum-letzte-pruefung" class="inp">
+        </div>
+        <div>
+          <label class="lbl">Nächste Prüfung</label>
+          <input type="date" id="baum-naechste-pruefung" class="inp">
+        </div>
+      </div>
+
+      <!-- Sonstiges -->
+      <div>
+        <label class="lbl">Notizen</label>
+        <textarea id="baum-notizen" class="inp" rows="2" style="resize:vertical" placeholder="Interne Notizen …"></textarea>
+      </div>
+      <div>
+        <label class="lbl">Bild-Dateiname</label>
+        <input type="text" id="baum-bild" class="inp" placeholder="DSC00866b.jpg">
+      </div>
+
+      <div id="baum-err" style="color:var(--red);font-size:13px;display:none"></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="saveBaum()" style="flex:1;background:var(--green-mid);color:#fff;border:none;border-radius:10px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">Speichern</button>
+        <button onclick="closeBaumForm()" style="padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:none;cursor:pointer;font-size:14px">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openNew()">+</button>
+
+<!-- NEUE MELDUNG MODAL -->
+<div class="overlay" id="ov-new" onclick="ovClose('ov-new',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="n-modal-title">Neuer Auftrag</h2>
+      <button class="modal-close" onclick="ovClose('ov-new')">×</button>
+    </div>
+
+    <!-- SCHRITT 1: KATEGORIE -->
+    <div id="n-kat-picker">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Kategorie wählen:</div>
+      <div class="n-kat-grid">
+        <button class="n-kat-tile" onclick="setNewKat(this,'Schaden')">
+          <span class="nt-icon">🔧</span><span class="nt-name">Schaden melden</span>
+          <span class="nt-desc">Defekt, kaputt, nicht funktionierend</span>
+        </button>
+        <button class="n-kat-tile" onclick="setNewKat(this,'Möbel & Aufbau')">
+          <span class="nt-icon">🛋️</span><span class="nt-name">Möbel & Aufbau</span>
+          <span class="nt-desc">Aufbauen, abbauen, umstellen</span>
+        </button>
+        <button class="n-kat-tile" onclick="setNewKat(this,'Sperrmüll')">
+          <span class="nt-icon">🗑️</span><span class="nt-name">Sperrmüll</span>
+          <span class="nt-desc">Sperrige Gegenstände entsorgen</span>
+        </button>
+        <button class="n-kat-tile" onclick="setNewKat(this,'Kleiner Auftrag')">
+          <span class="nt-icon">🔨</span><span class="nt-name">Kleiner Auftrag</span>
+          <span class="nt-desc">Bild, Regal, Glühbirne …</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SCHRITT 2: FORMULAR -->
+    <div id="n-form" style="display:none">
+      <button class="n-back" onclick="backToKatPicker()">← Kategorie ändern</button>
+      <div class="n-kat-hdr">
+        <span class="n-kat-hdr-icon" id="n-kat-icon"></span>
+        <span class="n-kat-hdr-title" id="n-kat-title"></span>
+      </div>
+
+      <label>Bewohnerin <span style="text-transform:none;font-weight:400;font-size:11px">— optional, bei telefonischer Meldung</span></label>
+      <select id="n-bw" onchange="onBwChange()"><option value="">Keine Zuordnung</option></select>
+
+      <!-- Schaden -->
+      <div id="nf-schaden" class="nf-cat">
+        <label>Wo ist das Problem?</label>
+        <!-- Gemeinschaftsbereiche (Standard, kein Bewohner gewählt) -->
+        <div class="ort-chips" id="ort-chips-allgemein">
+          <button type="button" class="ort-chip" data-ort="Treppenhaus" onclick="selectOrt(this)">🏛 Treppenhaus</button>
+          <button type="button" class="ort-chip" data-ort="Eingang" onclick="selectOrt(this)">🚪 Eingang</button>
+          <button type="button" class="ort-chip" data-ort="Keller" onclick="selectOrt(this)">📦 Keller</button>
+          <button type="button" class="ort-chip" data-ort="Außenbereich" onclick="selectOrt(this)">🌿 Außen</button>
+          <button type="button" class="ort-chip" data-ort="Gemeinschaftsküche" onclick="selectOrt(this)">🍴 Gemeinschaftsküche</button>
+          <button type="button" class="ort-chip" data-ort="Waschkeller" onclick="selectOrt(this)">🫧 Waschkeller</button>
+          <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+        </div>
+        <!-- Bewohnerwohnung (zeigt wenn Bewohnerin gewählt) -->
+        <div class="ort-chips" id="ort-chips-bewohner" style="display:none">
+          <button type="button" class="ort-chip" data-ort="Zimmer" onclick="selectOrt(this)">🛏 Zimmer</button>
+          <button type="button" class="ort-chip" data-ort="Küche" onclick="selectOrt(this)">🍳 Küche</button>
+          <button type="button" class="ort-chip" data-ort="Badezimmer" onclick="selectOrt(this)">🚿 Bad</button>
+          <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+        </div>
+        <input type="text" id="n-s-ort-frei" placeholder="Genauer Ort …" style="display:none;margin-top:8px">
+        <input type="hidden" id="n-s-ort">
+        <!-- Problem-Vorschläge (erscheinen nach Ort-Auswahl) -->
+        <div id="n-s-prob-section" style="display:none">
+          <label style="margin-top:16px">Was ist das Problem?</label>
+          <div class="ort-chips" id="prob-chips" style="margin-bottom:8px"></div>
+          <textarea id="n-s-prob" placeholder="So genau wie möglich beschreiben …"></textarea>
+        </div>
+      </div>
+
+      <!-- Möbel -->
+      <div id="nf-moebel" class="nf-cat" style="display:none">
+        <label>Was soll gemacht werden?</label>
+        <select id="n-m-art">
+          <option>Möbel aufbauen</option><option>Möbel abbauen</option>
+          <option>Möbel umstellen</option><option>Sonstiges</option>
+        </select>
+        <label>Was genau?</label>
+        <textarea id="n-m-was" placeholder="z. B. Kleiderschrank 2-türig, Kommode …"></textarea>
+        <label>Aktueller Standort</label>
+        <input type="text" id="n-m-wo" placeholder="z. B. Zimmer 3, Flur …">
+        <label>Neuer Standort <span style="text-transform:none;font-weight:400;font-size:11px">— falls umstellen</span></label>
+        <input type="text" id="n-m-ziel" placeholder="z. B. Wohnbereich, Schlafzimmer …">
+      </div>
+
+      <!-- Sperrmüll -->
+      <div id="nf-sperr" class="nf-cat" style="display:none">
+        <label>Was soll entsorgt werden?</label>
+        <textarea id="n-sp-was" placeholder="z. B. alter Sessel, ca. 80 cm breit …"></textarea>
+        <label>Wo steht es?</label>
+        <input type="text" id="n-sp-wo" placeholder="z. B. Zimmer 3, Keller, Flur …">
+        <label>Wunschtermin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+        <input type="text" id="n-sp-termin" placeholder="z. B. Ende August, KW 35 …">
+      </div>
+
+      <!-- Kleiner Auftrag -->
+      <div id="nf-auftrag" class="nf-cat" style="display:none">
+        <label>Was soll gemacht werden?</label>
+        <select id="n-a-art">
+          <option>Bild aufhängen</option><option>Regal montieren</option>
+          <option>Glühbirne wechseln</option><option>Gardine aufhängen</option>
+          <option>Sonstiges</option>
+        </select>
+        <label>Wo? (Zimmer / Bereich)</label>
+        <input type="text" id="n-a-wo" placeholder="z. B. Zimmer 3, Wohnzimmer …">
+        <label>Details <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+        <textarea id="n-a-details" placeholder="z. B. 3 Bilder, Haken vorhanden …"></textarea>
+      </div>
+
+      <!-- Gemeinsame Felder -->
+      <label>Priorität</label>
+      <select id="n-prio">
+        <option value="Hoch">🔴 Hoch — sofort erledigen</option>
+        <option value="Mittel" selected>🟡 Mittel — bald erledigen</option>
+        <option value="Niedrig">🟢 Niedrig — kann warten</option>
+      </select>
+      <label>Gemeldet von</label>
+      <select id="n-von">
+        <option value="Frau Schwade">Frau Schwade</option>
+        <option value="Hendrik">Hendrik</option>
+        <option value="Bewohner">Bewohnerin (direkt)</option>
+      </select>
+      <label>Foto <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+      <div class="photo-zone" id="photo-zone">
+        📷 Foto aufnehmen oder auswählen
+        <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
+      </div>
+      <div class="photo-previews" id="photo-previews"></div>
+      <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Auftrag speichern</button>
+      <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- BEWOHNER MODAL -->
+<div class="overlay" id="ov-bewohner" onclick="ovClose('ov-bewohner',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="bw-modal-title">Neue Bewohnerin</h2>
+      <button class="modal-close" onclick="ovClose('ov-bewohner')">×</button>
+    </div>
+    <label>Vorname</label>
+    <input type="text" id="bw-name" placeholder="z. B. Maria">
+    <label>Suite-Nummer</label>
+    <input type="text" id="bw-zimmer" placeholder="z. B. 7">
+    <label>Kontaktweg für Rückmeldungen</label>
+    <select id="bw-kontakt" onchange="toggleKontaktFelder()">
+      <option value="Türzettel">🖨 Türzettel (Standard)</option>
+      <option value="E-Mail">📧 E-Mail</option>
+      <option value="Anruf">📞 Telefonanruf</option>
+      <option value="Persönlich">🤝 Persönlicher Kontakt</option>
+    </select>
+    <div id="bw-email-wrap" style="display:none">
+      <label>E-Mail-Adresse</label>
+      <input type="email" id="bw-email" placeholder="name@beispiel.de">
+    </div>
+    <div id="bw-telefon-wrap" style="display:none">
+      <label>Telefonnummer</label>
+      <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
+    </div>
+    <button class="btn btn-primary" id="bw-save-btn" onclick="saveBewohner()">Speichern</button>
+    <button class="btn btn-ghost" onclick="ovClose('ov-bewohner')">Abbrechen</button>
+    <button class="btn btn-danger" id="bw-delete-btn" onclick="deleteBewohnerRow()" style="margin-top:8px;display:none">Bewohnerin löschen</button>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="ov-detail" onclick="ovClose('ov-detail',event)">
+  <div class="modal" id="detail-body"></div>
+</div>
+
+<!-- FOTO FULLSCREEN -->
+<div class="photo-fs" id="photo-fs" onclick="this.classList.remove('open')">
+  <img id="photo-fs-img" src="" alt="">
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SB_URL = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
+const SB_KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+const LOCAL_KEY = 'hm_v2';
+const AUTH_KEY = 'hm_auth';
+const SYNC_KEY = 'hm_last_sync';
+
+let PW = localStorage.getItem('hm_pw') || 'Zehlendorf26';
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function checkPw() {
+  const val = document.getElementById('pw-in').value;
+  if (val === PW) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('pw-gate').classList.add('hidden');
+    init();
+  } else {
+    document.getElementById('pw-err').classList.add('show');
+    document.getElementById('pw-in').value = '';
+    document.getElementById('pw-in').focus();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+function changePw() {
+  const np = prompt('Neues Passwort:');
+  if (!np || np.length < 4) { alert('Passwort muss mindestens 4 Zeichen haben.'); return; }
+  PW = np;
+  localStorage.setItem('hm_pw', np);
+  alert('Passwort geändert. Merke es dir gut!');
+}
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+let S = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null') || {schaden: [], wlog: {}, nr: 1};
+const saveLocal = () => localStorage.setItem(LOCAL_KEY, JSON.stringify(S));
+
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+let sbOnline = false;
+let lastSync = localStorage.getItem(SYNC_KEY) || null;
+
+async function sbReq(path, opts = {}) {
+  return fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+}
+
+function setSyncStatus(state) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sb-status-text');
+  dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  if (txt) {
+    if (state === 'ok') txt.textContent = '✅ Verbunden · Supabase';
+    else if (state === 'error') txt.textContent = '❌ Offline · Lokaler Modus';
+    else txt.textContent = '🔄 Synchronisiere …';
+  }
+  document.getElementById('sync-banner').classList.toggle('show', state === 'error');
+  sbOnline = state === 'ok';
+}
+
+async function loadFromSupabase() {
+  setSyncStatus('syncing');
+  try {
+    const res = await sbReq('schaden?order=created_at.desc&limit=500&select=*');
+    if (!res.ok) throw new Error(res.status);
+    const remote = await res.json();
+    // Map Supabase records to local format
+    const remoteLocal = remote.map(r => fromSB(r));
+    // Merge: remote records replace local ones by sb_id; local-only records stay
+    const localOnlyIds = new Set(S.schaden.filter(s => !s.sb_id).map(s => s.id));
+    const localOnly = S.schaden.filter(s => localOnlyIds.has(s.id));
+    S.schaden = [...remoteLocal, ...localOnly];
+    // Update counter
+    const maxNr = S.schaden.reduce((m, s) => Math.max(m, s.nr || 0), 0);
+    if (maxNr >= S.nr) S.nr = maxNr + 1;
+    saveLocal();
+    setSyncStatus('ok');
+    lastSync = new Date().toISOString();
+    localStorage.setItem(SYNC_KEY, lastSync);
+    updateLastSyncDisplay();
+    render(curView);
+  } catch (e) {
+    console.warn('Supabase load failed:', e);
+    setSyncStatus('error');
+  }
+}
+
+async function syncNow() {
+  await loadFromSupabase();
+  // Also push local-only records to Supabase
+  const localOnly = S.schaden.filter(s => !s.sb_id);
+  for (const item of localOnly) {
+    await pushToSB(item);
+  }
+  render(curView);
+}
+
+async function pushToSB(item) {
+  try {
+    const payload = toSB(item);
+    const res = await sbReq('schaden', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) return;
+    const [created] = await res.json();
+    item.sb_id = created.id;
+    saveLocal();
+  } catch {}
+}
+
+async function updateSBStatus(item) {
+  if (!item.sb_id) return;
+  try {
+    await sbReq(`schaden?id=eq.${item.sb_id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: item.status,
+        erledigt_am: item.erledigt || null,
+        notiz: item.notiz || null,
+        prio: item.prio,
+        kosten: item.kosten != null ? item.kosten : null,
+        termin: item.termin || null,
+        rueckmeldung: item.rueckmeldung || null,
+        freigabe_by: item.freigabe_by || null
+      })
+    });
+  } catch {}
+}
+
+async function deleteSBRecord(sbId) {
+  if (!sbId) return;
+  try {
+    await sbReq(`schaden?id=eq.${sbId}`, { method: 'DELETE' });
+  } catch {}
+}
+
+function fromSB(r) {
+  return {
+    id: r.id,
+    sb_id: r.id,
+    nr: r.nr || 0,
+    datum: r.datum || '',
+    ort: r.ort || '',
+    prob: r.problem || '',
+    prio: r.prio || 'Mittel',
+    von: r.von || 'Bewohner',
+    name: r.name || null,
+    zimmer: r.zimmer || null,
+    status: r.status || 'Offen',
+    erledigt: r.erledigt_am || '',
+    notiz: r.notiz || '',
+    kosten: r.kosten != null ? r.kosten : null,
+    termin: r.termin || '',
+    rueckmeldung: r.rueckmeldung || '',
+    kategorie: r.kategorie || null,
+    freigabe_by: r.freigabe_by || null,
+    photos: r.foto ? [r.foto] : [],
+    created_at: r.created_at
+  };
+}
+
+function toSB(item) {
+  return {
+    datum: item.datum || td(),
+    ort: item.ort,
+    problem: item.prob,
+    prio: item.prio,
+    von: item.von,
+    status: item.status,
+    erledigt_am: item.erledigt || null,
+    notiz: item.notiz || null,
+    foto: (item.photos && item.photos[0]) || null,
+    kosten: item.kosten != null ? item.kosten : null,
+    termin: item.termin || null,
+    rueckmeldung: item.rueckmeldung || null,
+    kategorie: item.kategorie || null,
+    name: item.name || null,
+    zimmer: item.zimmer || null
+  };
+}
+
+function updateLastSyncDisplay() {
+  const el = document.getElementById('last-sync-text');
+  if (!el || !lastSync) return;
+  el.textContent = new Date(lastSync).toLocaleString('de-DE', {
+    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+  }) + ' Uhr';
+}
+
+// ── PFLEGEPLAN ────────────────────────────────────────────────────────────────
+const TASKS = [
+  {cat:'Rasen',name:'Rasen mähen',p:'P',m:[8,9,10,11],h:1.5,note:'Aug/Sep: 1–2×/Woche · Okt/Nov: alle 2 Wochen',occ:{8:3,9:4,10:2,11:1}},
+  {cat:'Rasen',name:'Rasenkanten trimmen',p:'P',m:[8,9,10],h:1,note:'Im Anschluss ans Mähen',occ:{8:1,9:2,10:2}},
+  {cat:'Rasen',name:'Bewässerung bei Hitze',p:'O',m:[8,9],h:1,note:'Morgens wässern',occ:{8:4,9:2}},
+  {cat:'Rasen',name:'Herbstdünger ausbringen',p:'P',m:[9],h:1,note:'Mitte September, Kalium-NPK',occ:{9:1}},
+  {cat:'Wege & Plätze',name:'Wege fegen & reinigen',p:'P',m:[8,9,10,11,12],h:1.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Wege & Plätze',name:'Abfälle aufsammeln',p:'P',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Wege & Plätze',name:'Eingangsbereich & Blumenbeete',p:'P',m:[8,9,10],h:0.5,note:'Gepflegtes Erscheinungsbild',occ:{8:4,9:4,10:2}},
+  {cat:'Wege & Plätze',name:'Unkraut in Fugen entfernen',p:'P',m:[8,9,10],h:1,note:'Gehwege und Pflaster',occ:{8:1,9:1,10:1}},
+  {cat:'Wege & Plätze',name:'Müllstandplatz kontrollieren',p:'P',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Hecken & Gehölze',name:'Heckenschnitt (letzter)',p:'P',m:[9],h:4,note:'Bis Ende September',occ:{9:1}},
+  {cat:'Hecken & Gehölze',name:'Strauchschnitt (leicht)',p:'O',m:[11],h:3,note:'Kein Starkschnitt',occ:{11:1}},
+  {cat:'Hecken & Gehölze',name:'Baumkontrolle nach Sturm',p:'P',m:[10,11,12],h:1,note:'Kranke Äste melden',occ:{10:1,11:1,12:1}},
+  {cat:'Beete',name:'Unkraut jäten',p:'P',m:[8,9,10],h:1,note:'Beete und Rahmenbepflanzung',occ:{8:2,9:2,10:2}},
+  {cat:'Beete',name:'Beete winterfest machen',p:'P',m:[10],h:3,note:'Stauden schneiden, Mulch',occ:{10:1}},
+  {cat:'Laub',name:'Laub entfernen und entsorgen',p:'P',m:[10,11,12],h:2,note:'⚠️ Nasses Laub = Rutschgefahr!',occ:{10:3,11:5,12:2}},
+  {cat:'Sitzbänke',name:'Bänke & Möbel reinigen',p:'P',m:[8,9,10,11],h:0.5,note:'Alle 2 Wochen',occ:{8:2,9:2,10:1,11:1}},
+  {cat:'Sitzbänke',name:'Bänke auf Schäden prüfen',p:'P',m:[8,9,10,11],h:0.5,note:'Risse, Schrauben, Splitter',occ:{8:1,9:1,10:1,11:1}},
+  {cat:'Sitzbänke',name:'Bänke und Möbel einlagern',p:'P',m:[11],h:1,note:'Vor Frost schützen',occ:{11:1}},
+  {cat:'Winterdienst',name:'Winterdienst vorbereiten',p:'P',m:[11],h:2,note:'Streugut und Geräte prüfen',occ:{11:1}},
+  {cat:'Winterdienst',name:'Schnee räumen & streuen',p:'P',m:[12],h:2,note:'Bis 7:00 Uhr werktags',occ:{12:4}},
+  {cat:'Kontrollen',name:'Bestandsaufnahme Parkanlage',p:'P',m:[8],h:4,note:'Erster Arbeitstag — dokumentieren & fotografieren',occ:{8:1}},
+  {cat:'Kontrollen',name:'Außenbeleuchtung kontrollieren',p:'P',m:[8,9,10,11,12],h:0.5,note:'Monatlich',occ:{8:1,9:1,10:1,11:1,12:1}},
+  {cat:'Kontrollen',name:'Spielgeräte Sichtkontrolle',p:'P',m:[8,9,10,11,12],h:1,note:'Mängel sofort melden',occ:{8:1,9:1,10:1,11:1,12:1}},
+  {cat:'Kontrollen',name:'Gartengeräte einlagern & warten',p:'P',m:[11],h:3,note:'Reinigen, ölen, trocken lagern',occ:{11:1}},
+];
+const WPM = {8:2.5,9:4,10:4,11:4,12:4};
+const MN = {8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const cm = () => new Date().getMonth() + 1;
+const td = () => new Date().toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+function wk() { const d=new Date(),dw=d.getDay()||7,m=new Date(d); m.setDate(d.getDate()-(dw-1)); return m.toISOString().slice(0,10); }
+function kw() { const d=new Date(),j4=new Date(d.getFullYear(),0,4),sw=new Date(j4); sw.setDate(j4.getDate()-(j4.getDay()||7)+1); return Math.ceil((d-sw)/(7*864e5))+1; }
+const dc = p => p==='Hoch'?'d-hoch':p==='Mittel'?'d-mittel':'d-niedrig';
+const bc = s => s==='Offen'?'b-offen':s==='Kosten geschätzt'?'b-kosten':s==='Freigegeben'?'b-freigegeben':s==='In Umsetzung'?'b-laufend':s==='Abgeschlossen'?'b-abgeschlossen':s==='In Prüfung'?'b-laufend':s==='Handwerker beauftragt'?'b-beauftragt':'b-done';
+
+
+// ── BUDGET ────────────────────────────────────────────────────────────────────
+let monatlichesBudget = 500;
+
+async function loadBudget() {
+  try {
+    const res = await sbReq('settings?key=eq.monatliches_budget&select=value');
+    if (res.ok) {
+      const data = await res.json();
+      if (data[0]) monatlichesBudget = parseFloat(data[0].value) || 500;
+    }
+  } catch {}
+  const el = document.getElementById('budget-display');
+  if (el) el.textContent = monatlichesBudget.toLocaleString('de-DE',{style:'currency',currency:'EUR'}) + ' / Monat';
+}
+
+async function setBudget() {
+  const val = prompt('Neues Monatsbudget (€):', monatlichesBudget);
+  if (!val) return;
+  const n = parseFloat(val.replace(',','.'));
+  if (isNaN(n) || n < 0) { alert('Ungültiger Betrag.'); return; }
+  monatlichesBudget = n;
+  try {
+    await sbReq('settings?key=eq.monatliches_budget', {
+      method: 'PATCH',
+      body: JSON.stringify({ value: String(n) })
+    });
+  } catch {}
+  const el = document.getElementById('budget-display');
+  if (el) el.textContent = monatlichesBudget.toLocaleString('de-DE',{style:'currency',currency:'EUR'}) + ' / Monat';
+  renderBudgetBar('ds-budget');
+  renderBudgetBar('sc-budget');
+}
+
+function renderBudgetBar(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const now = new Date(), mm = now.getMonth()+1, yyyy = now.getFullYear();
+  const MNS = {1:'Jan',2:'Feb',3:'Mär',4:'Apr',5:'Mai',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Okt',11:'Nov',12:'Dez'};
+  const spent = S.schaden
+    .filter(s => {
+      if (s.kosten == null) return false;
+      if (!['Freigegeben','In Umsetzung','Abgeschlossen','Handwerker beauftragt','Erledigt'].includes(s.status)) return false;
+      const p = (s.datum||'').split('.');
+      return p.length >= 3 && parseInt(p[1])===mm && parseInt(p[2])===yyyy;
+    })
+    .reduce((sum,s) => sum+(s.kosten||0), 0);
+  const pct = monatlichesBudget > 0 ? Math.min(100, Math.round(spent/monatlichesBudget*100)) : 0;
+  const warn = pct >= 80;
+  el.innerHTML = `<div class="budget-bar">
+    <div class="budget-row">
+      <span class="budget-lbl">💰 Budget ${MNS[mm]} ${yyyy}</span>
+      <span class="budget-val${warn?' warn':''}">
+        ${spent.toLocaleString('de-DE',{style:'currency',currency:'EUR'})} / ${monatlichesBudget.toLocaleString('de-DE',{style:'currency',currency:'EUR'})}
+      </span>
+    </div>
+    <div class="budget-prog"><div class="budget-fill${warn?' warn':''}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+let curView = 'dashboard';
+function show(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  curView = id;
+  document.getElementById('fab').style.display = (id==='schaden'||id==='dashboard'||id==='bewohner') ? 'flex' : 'none';
+  render(id);
+}
+
+function ovOpen(id) { document.getElementById(id).classList.add('open'); }
+function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(id) {
+  if (id==='dashboard') renderDash();
+  if (id==='schaden') renderSchaden();
+  if (id==='artikel') loadArtikel();
+  if (id==='pflanzen') loadPflanzenInt();
+  if (id==='baumkataster') loadBaeume();
+  if (id==='woche') renderWoche();
+  if (id==='plan') renderPlan();
+  if (id==='bewohner') renderBewohner();
+  if (id==='settings') updateLastSyncDisplay();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDash() {
+  const offen = S.schaden.filter(s => s.status==='Offen').length;
+  const kostenOffen = S.schaden.filter(s => s.status==='Kosten geschätzt').length;
+  const m = cm(), w = wk(), log = S.wlog[w] || {};
+  const mt = TASKS.filter(t => t.m.includes(m));
+  const done = mt.filter(t => log[t.name]).length;
+
+  const badge = document.getElementById('open-badge');
+  badge.textContent = offen + ' offen';
+  badge.className = 'hdr-badge' + (offen > 0 ? ' show' : '');
+
+  document.getElementById('ds-stats').innerHTML = `
+    <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Offen</div></div>
+    <div class="stat"><div class="stat-val${kostenOffen>0?' alert':''}">${kostenOffen}</div><div class="stat-lbl">Kosten prüfen</div></div>
+    <div class="stat"><div class="stat-val">${done}/${mt.length}</div><div class="stat-lbl">Aufgaben KW</div></div>`;
+  renderBudgetBar('ds-budget');
+
+  const offenList = S.schaden.filter(s => s.status !== 'Erledigt').slice(0, 4);
+  document.getElementById('ds-schaden').innerHTML = offenList.length
+    ? offenList.map(s => siHTML(s)).join('')
+    : '<div class="empty"><div class="empty-icon">✅</div><p>Keine offenen Schäden</p></div>';
+
+  const weekTasks = mt.filter(t => t.p === 'P').slice(0, 6);
+  document.getElementById('ds-tasks').innerHTML = weekTasks.map(t => `
+    <div class="ti">
+      <div class="ti-check${log[t.name] ? ' on' : ''}" onclick="toggle('${t.name}')"></div>
+      <div class="ti-info"><div class="ti-name${log[t.name] ? ' done' : ''}">${t.name}</div><div class="ti-meta">${t.note}</div></div>
+    </div>`).join('');
+}
+
+const KAT_CSS = {'Schaden':'b-kat-schaden','Möbel & Aufbau':'b-kat-moebel','Sperrmüll':'b-kat-sperr','Kleiner Auftrag':'b-kat-auftrag'};
+const KAT_ICON = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
+function siHTML(s) {
+  const bewohnerBadge = s.von === 'Bewohner' ? '<span class="badge b-bewohner">Bewohner-App</span>' : '';
+  const katBadge = s.kategorie && KAT_CSS[s.kategorie] ? `<span class="b-kat ${KAT_CSS[s.kategorie]}">${KAT_ICON[s.kategorie]} ${s.kategorie}</span>` : '';
+  const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Suite ' + s.zimmer : ''}` : '';
+  const kostenInfo = s.kosten != null ? ` · <span style="color:var(--gold);font-weight:600">${Number(s.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
+  return `<div class="si" onclick="openDetail('${s.id}')">
+    <div class="si-dot ${s.status==='Erledigt'?'d-done':dc(s.prio)}"></div>
+    <div class="si-body">
+      <div class="si-title">${s.prob}${bewohnerBadge}${katBadge}</div>
+      <div class="si-meta">${s.ort} · ${s.datum || ''}${nameInfo}${kostenInfo}</div>
+    </div>
+    ${s.photos&&s.photos[0] ? `<img class="si-thumb" src="${s.photos[0]}" alt="">` : ''}
+    <div class="si-right"><span class="badge ${bc(s.status)}">${s.status}</span><div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">#${s.nr||'–'}</div></div>
+  </div>`;
+}
+
+// ── SCHADEN ───────────────────────────────────────────────────────────────────
+let schadenFilter = 'Alle';
+let schadenKatFilter = 'Alle';
+function setFilter(f, btn) {
+  schadenFilter = f;
+  document.querySelectorAll('#sc-filter .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSchaden();
+}
+function setKatFilter(f, btn) {
+  schadenKatFilter = f;
+  document.querySelectorAll('#sc-kat-filter .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSchaden();
+}
+function renderSchaden() {
+  const offen = S.schaden.filter(s => s.status==='Offen').length;
+  const kostenAusstehend = S.schaden.filter(s => s.status==='Kosten geschätzt').length;
+  const inUmsetzung = S.schaden.filter(s => ['Freigegeben','In Umsetzung','In Bearbeitung','Handwerker beauftragt'].includes(s.status)).length;
+  document.getElementById('sc-stats').innerHTML = `
+    <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Offen</div></div>
+    <div class="stat"><div class="stat-val${kostenAusstehend>0?' alert':''}">${kostenAusstehend}</div><div class="stat-lbl">Kosten prüfen</div></div>
+    <div class="stat"><div class="stat-val">${inUmsetzung}</div><div class="stat-lbl">In Umsetzung</div></div>`;
+  renderBudgetBar('sc-budget');
+
+  const prio = {Hoch:0,Mittel:1,Niedrig:2};
+  let list = [...S.schaden].sort((a, b) => {
+    if (a.status==='Erledigt' && b.status!=='Erledigt') return 1;
+    if (b.status==='Erledigt' && a.status!=='Erledigt') return -1;
+    return (prio[a.prio]||2) - (prio[b.prio]||2);
+  });
+  if (schadenFilter === 'Bewohner') list = list.filter(s => s.von === 'Bewohner');
+  else if (schadenFilter === 'Abgeschlossen') list = list.filter(s => s.status === 'Abgeschlossen' || s.status === 'Erledigt');
+  else if (schadenFilter === 'In Umsetzung') list = list.filter(s => ['In Umsetzung','In Bearbeitung','Handwerker beauftragt'].includes(s.status));
+  else if (schadenFilter !== 'Alle') list = list.filter(s => s.status === schadenFilter);
+  if (schadenKatFilter !== 'Alle') list = list.filter(s => s.kategorie === schadenKatFilter);
+
+  document.getElementById('sc-list').innerHTML = list.length
+    ? list.map(s => siHTML(s)).join('')
+    : '<div class="empty"><div class="empty-icon">🌿</div><p>Keine Einträge</p></div>';
+}
+
+// ── WOCHENLOG ─────────────────────────────────────────────────────────────────
+function renderWoche() {
+  const m = cm(), w = wk(), log = S.wlog[w] || {};
+  const mt = TASKS.filter(t => t.m.includes(m));
+  const done = mt.filter(t => log[t.name]).length;
+  const pct = mt.length ? Math.round(done / mt.length * 100) : 0;
+  const d = new Date(), dow = d.getDay() || 7;
+  const mon = new Date(d); mon.setDate(d.getDate() - (dow - 1));
+  const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+  const fmt = x => x.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit'});
+
+  document.getElementById('wl-bar').innerHTML = `
+    <div class="week-bar">
+      <div class="week-bar-top"><h3>KW ${kw()} · ${fmt(mon)}–${fmt(fri)}</h3><span>${done}/${mt.length} erledigt</span></div>
+      <div class="week-prog"><div class="week-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  document.getElementById('wl-label').textContent = MN[m] + ' 2026';
+
+  const by = {};
+  mt.forEach(t => { if (!by[t.cat]) by[t.cat] = []; by[t.cat].push(t); });
+  document.getElementById('wl-list').innerHTML = Object.entries(by).map(([cat, items]) => `
+    <div class="cat-hdr">${cat}</div>
+    ${items.map(t => `<div class="ti">
+      <div class="ti-check${log[t.name] ? ' on' : ''}" onclick="toggle('${t.name}')"></div>
+      <div class="ti-info"><div class="ti-name${log[t.name] ? ' done' : ''}">${t.name}</div><div class="ti-meta">${t.note}</div></div>
+      <div class="ti-right"><div class="ti-h">${(t.occ[m]||0)*t.h}h</div></div>
+    </div>`).join('')}`).join('');
+}
+
+function toggle(name) {
+  const w = wk();
+  if (!S.wlog[w]) S.wlog[w] = {};
+  S.wlog[w][name] = !S.wlog[w][name];
+  saveLocal();
+  render(curView);
+}
+
+// ── PFLEGEPLAN ────────────────────────────────────────────────────────────────
+let planM = Math.min(12, Math.max(8, cm()));
+function renderPlan() {
+  document.getElementById('pl-tabs').innerHTML = [8,9,10,11,12].map(m => `
+    <button class="mtab${m===planM?' active':''}" onclick="selM(${m})">${MN[m]}</button>`).join('');
+  const mt = TASKS.filter(t => t.m.includes(planM));
+  const ph = mt.reduce((s, t) => (t.occ[planM]||0)*t.h+s, 0) / (WPM[planM] || 4);
+  const pc = Math.round(ph / 40 * 100);
+  document.getElementById('pl-stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${ph.toFixed(1)}h</div><div class="stat-lbl">Park Ø/Woche</div></div>
+    <div class="stat"><div class="stat-val">${(40-ph).toFixed(1)}h</div><div class="stat-lbl">Gebäude Ø/Woche</div></div>
+    <div class="stat"><div class="stat-val">${mt.filter(t=>t.p==='P').length}</div><div class="stat-lbl">Pflichtaufgaben</div></div>`;
+  document.getElementById('pl-prog').innerHTML = `
+    <div class="prog-row"><span>Anteil Parkpflege</span><span>${pc}%</span></div>
+    <div class="prog"><div class="prog-fill${pc>70?' warn':''}" style="width:${Math.min(100,pc)}%"></div></div>`;
+  const by = {};
+  mt.forEach(t => { if (!by[t.cat]) by[t.cat] = []; by[t.cat].push(t); });
+  document.getElementById('pl-list').innerHTML = Object.entries(by).map(([cat, items]) => `
+    <div class="cat-hdr">${cat}</div>
+    ${items.map(t => { const occ=t.occ[planM]||0,tot=+(occ*t.h).toFixed(1); return `
+      <div class="ti" style="cursor:default">
+        <div class="ti-info"><div class="ti-name">${t.name}</div><div class="ti-meta">${t.note}</div></div>
+        <div class="ti-right"><div class="ti-h">${tot>0?tot+'h':'–'}</div><div style="font-size:10.5px;color:var(--text-muted)">${occ>1?occ+'×':occ===1?'1×':'–'}</div></div>
+      </div>`; }).join('')}`).join('');
+}
+function selM(m) { planM = m; renderPlan(); }
+
+// ── BEWOHNER ──────────────────────────────────────────────────────────────────
+let bewohnerListe = [];
+let editingBwId = null;
+
+async function loadBewohnerList() {
+  try {
+    const res = await sbReq('bewohner?order=zimmer.asc&select=*');
+    if (!res.ok) throw new Error(res.status);
+    bewohnerListe = await res.json();
+  } catch {
+    bewohnerListe = JSON.parse(localStorage.getItem('hm_bewohner_cache') || '[]');
+  }
+  localStorage.setItem('hm_bewohner_cache', JSON.stringify(bewohnerListe));
+}
+
+function renderBewohner() {
+  const aktiv = bewohnerListe.filter(b => b.aktiv).length;
+  const inaktiv = bewohnerListe.length - aktiv;
+  document.getElementById('bw-stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${bewohnerListe.length}</div><div class="stat-lbl">Gesamt</div></div>
+    <div class="stat"><div class="stat-val">${aktiv}</div><div class="stat-lbl">Aktiv</div></div>
+    <div class="stat"><div class="stat-val">${inaktiv}</div><div class="stat-lbl">Inaktiv</div></div>`;
+
+  if (!bewohnerListe.length) {
+    document.getElementById('bw-list').innerHTML =
+      '<div class="empty"><div class="empty-icon">👥</div><p>Noch keine Bewohner angelegt.<br>Tippe auf + um zu beginnen.</p></div>';
+    return;
+  }
+
+  // Sort: aktive zuerst, dann nach Suite-Nummer
+  const sorted = [...bewohnerListe].sort((a, b) => {
+    if (a.aktiv !== b.aktiv) return a.aktiv ? -1 : 1;
+    return (parseInt(a.zimmer) || 0) - (parseInt(b.zimmer) || 0) || a.zimmer.localeCompare(b.zimmer);
+  });
+
+  document.getElementById('bw-list').innerHTML = sorted.map(b => `
+    <div class="bw-row" onclick="openEditBw('${b.id}')">
+      <div class="bw-zimmer">S.<br>${b.zimmer}</div>
+      <div class="bw-info">
+        <div class="bw-rname" style="${!b.aktiv ? 'color:var(--text-muted);text-decoration:line-through' : ''}">${b.name}</div>
+        <div class="bw-rmeta">Suite ${b.zimmer}${!b.aktiv ? ' · inaktiv' : ''} · ${{'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'}[b.kontakt_art||'Türzettel']} ${b.kontakt_art||'Türzettel'}</div>
+      </div>
+      <button class="bw-toggle ${b.aktiv ? 'on' : 'off'}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}')"></button>
+    </div>`).join('');
+}
+
+function toggleKontaktFelder() {
+  const art = document.getElementById('bw-kontakt').value;
+  document.getElementById('bw-email-wrap').style.display = art === 'E-Mail' ? 'block' : 'none';
+  document.getElementById('bw-telefon-wrap').style.display = art === 'Anruf' ? 'block' : 'none';
+}
+
+function openNewBw() {
+  editingBwId = null;
+  document.getElementById('bw-modal-title').textContent = 'Neue Bewohnerin';
+  document.getElementById('bw-name').value = '';
+  document.getElementById('bw-zimmer').value = '';
+  document.getElementById('bw-kontakt').value = 'Türzettel';
+  document.getElementById('bw-email').value = '';
+  document.getElementById('bw-telefon').value = '';
+  toggleKontaktFelder();
+  document.getElementById('bw-delete-btn').style.display = 'none';
+  ovOpen('ov-bewohner');
+  setTimeout(() => document.getElementById('bw-zimmer').focus(), 150);
+}
+
+function openEditBw(id) {
+  const b = bewohnerListe.find(x => x.id === id);
+  if (!b) return;
+  editingBwId = id;
+  document.getElementById('bw-modal-title').textContent = 'Bewohnerin bearbeiten';
+  document.getElementById('bw-name').value = b.name;
+  document.getElementById('bw-zimmer').value = b.zimmer;
+  document.getElementById('bw-kontakt').value = b.kontakt_art || 'Türzettel';
+  document.getElementById('bw-email').value = b.email || '';
+  document.getElementById('bw-telefon').value = b.telefon || '';
+  toggleKontaktFelder();
+  document.getElementById('bw-delete-btn').style.display = 'block';
+  ovOpen('ov-bewohner');
+}
+
+async function saveBewohner() {
+  const name = document.getElementById('bw-name').value.trim();
+  const zimmer = document.getElementById('bw-zimmer').value.trim();
+  if (!name || !zimmer) { alert('Vorname und Suite-Nummer angeben.'); return; }
+
+  const btn = document.getElementById('bw-save-btn');
+  btn.textContent = 'Speichert …'; btn.disabled = true;
+
+  const kontakt_art = document.getElementById('bw-kontakt').value;
+  const email = document.getElementById('bw-email').value.trim() || null;
+  const telefon = document.getElementById('bw-telefon').value.trim() || null;
+  try {
+    if (editingBwId) {
+      await sbReq(`bewohner?id=eq.${editingBwId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ name, zimmer, kontakt_art, email, telefon })
+      });
+    } else {
+      await sbReq('bewohner', {
+        method: 'POST',
+        body: JSON.stringify({ name, zimmer, aktiv: true, kontakt_art, email, telefon })
+      });
+    }
+    await loadBewohnerList();
+    renderBewohner();
+    ovClose('ov-bewohner');
+  } catch { alert('Fehler beim Speichern.'); }
+
+  btn.textContent = 'Speichern'; btn.disabled = false;
+}
+
+async function toggleBwAktiv(id) {
+  const b = bewohnerListe.find(x => x.id === id);
+  if (!b) return;
+  try {
+    await sbReq(`bewohner?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ aktiv: !b.aktiv })
+    });
+    await loadBewohnerList();
+    renderBewohner();
+  } catch { alert('Fehler beim Aktualisieren.'); }
+}
+
+async function deleteBewohnerRow() {
+  if (!editingBwId) return;
+  const b = bewohnerListe.find(x => x.id === editingBwId);
+  if (!confirm(`"${b?.name}" wirklich löschen?`)) return;
+  try {
+    await sbReq(`bewohner?id=eq.${editingBwId}`, { method: 'DELETE' });
+    await loadBewohnerList();
+    renderBewohner();
+    ovClose('ov-bewohner');
+  } catch { alert('Fehler beim Löschen.'); }
+}
+
+// ── NEUE MELDUNG ──────────────────────────────────────────────────────────────
+let newPhotos = [];
+let newKat = null;
+
+function openNew() {
+  if (curView === 'bewohner') { openNewBw(); return; }
+  newKat = null;
+  newPhotos = [];
+  document.getElementById('photo-previews').innerHTML = '';
+  document.getElementById('n-prio').value = 'Mittel';
+  document.getElementById('n-von').value = 'Frau Schwade';
+  ['n-s-prob','n-m-was','n-m-wo','n-m-ziel','n-sp-was','n-sp-wo','n-sp-termin','n-a-wo','n-a-details'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  resetOrtPicker();
+  // Bewohnerin-Dropdown befüllen
+  const dd = document.getElementById('n-bw');
+  dd.innerHTML = '<option value="">Keine Zuordnung</option>';
+  bewohnerListe.filter(b => b.aktiv)
+    .sort((a,b) => (parseInt(a.zimmer)||0)-(parseInt(b.zimmer)||0))
+    .forEach(b => {
+      const o = document.createElement('option');
+      o.value = b.name; o.textContent = `Suite ${b.zimmer} — ${b.name}`;
+      dd.appendChild(o);
+    });
+  document.getElementById('n-kat-picker').style.display = 'block';
+  document.getElementById('n-form').style.display = 'none';
+  document.getElementById('n-modal-title').textContent = 'Neuer Auftrag';
+  document.querySelectorAll('.n-kat-tile').forEach(t => t.classList.remove('active'));
+  ovOpen('ov-new');
+}
+
+function setNewKat(tile, kat) {
+  newKat = kat;
+  const icons = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
+  document.querySelectorAll('.n-kat-tile').forEach(t => t.classList.remove('active'));
+  tile.classList.add('active');
+  document.getElementById('n-kat-icon').textContent = icons[kat];
+  document.getElementById('n-kat-title').textContent = kat;
+  document.getElementById('n-modal-title').textContent = kat;
+  document.querySelectorAll('.nf-cat').forEach(el => el.style.display = 'none');
+  const map = {'Schaden':'nf-schaden','Möbel & Aufbau':'nf-moebel','Sperrmüll':'nf-sperr','Kleiner Auftrag':'nf-auftrag'};
+  document.getElementById(map[kat]).style.display = 'block';
+  document.getElementById('n-kat-picker').style.display = 'none';
+  document.getElementById('n-form').style.display = 'block';
+  setTimeout(() => {
+    const first = document.querySelector(`#${map[kat]} input[type=text], #${map[kat]} textarea`);
+    if (first) first.focus();
+  }, 150);
+}
+
+function backToKatPicker() {
+  newKat = null;
+  document.getElementById('n-kat-picker').style.display = 'block';
+  document.getElementById('n-form').style.display = 'none';
+  document.getElementById('n-modal-title').textContent = 'Neuer Auftrag';
+}
+
+function addPhotos(e) {
+  const files = [...e.target.files];
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = ev => { newPhotos.push(ev.target.result); renderPreviews(); };
+    r.readAsDataURL(f);
+  });
+  e.target.value = '';
+}
+function renderPreviews() {
+  document.getElementById('photo-previews').innerHTML = newPhotos.map((p, i) => `
+    <div class="photo-thumb-wrap">
+      <img src="${p}" alt="">
+      <button class="photo-rm" onclick="rmPhoto(${i})">×</button>
+    </div>`).join('');
+}
+function rmPhoto(i) { newPhotos.splice(i, 1); renderPreviews(); }
+
+const ORT_PROBLEMS = {
+  'Zimmer':           ['Heizung kalt','Rolllade/Jalousie defekt','Steckdose defekt','Licht defekt','Fenster klemmt'],
+  'Küche':            ['Wasserhahn tropft','Abfluss verstopft','Herd/Ofen defekt','Kühlschrank defekt','Abzug defekt'],
+  'Badezimmer':       ['Duschkopf tropft','Abfluss verstopft','WC-Spülung defekt','Handtuchhalter lose','Wasser läuft nicht ab'],
+  'Treppenhaus':      ['Beleuchtung defekt','Geländer locker','Tür klemmt','Stufe beschädigt'],
+  'Eingang':          ['Beleuchtung defekt','Tür klemmt','Klingel defekt','Briefkasten defekt'],
+  'Keller':           ['Beleuchtung defekt','Feuchtigkeit / Schimmel','Tür klemmt','Wasserschaden'],
+  'Außenbereich':     ['Weg beschädigt','Beleuchtung defekt','Geländer locker','Bewässerungsanlage','Vandalismusschaden'],
+  'Gemeinschaftsküche':['Herd defekt','Kühlschrank defekt','Wasserhahn','Abfluss verstopft','Beleuchtung defekt'],
+  'Waschkeller':      ['Waschmaschine defekt','Trockner defekt','Beleuchtung defekt','Feuchtigkeit'],
+};
+
+function onBwChange() {
+  const bw = document.getElementById('n-bw').value;
+  document.getElementById('ort-chips-allgemein').style.display = bw ? 'none' : 'flex';
+  document.getElementById('ort-chips-bewohner').style.display  = bw ? 'flex'  : 'none';
+  resetOrtPicker();
+}
+
+function resetOrtPicker() {
+  document.querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('n-s-ort').value = '';
+  const frei = document.getElementById('n-s-ort-frei');
+  frei.style.display = 'none'; frei.value = '';
+  document.getElementById('n-s-prob-section').style.display = 'none';
+  document.getElementById('n-s-prob').value = '';
+  document.getElementById('prob-chips').innerHTML = '';
+}
+
+function selectOrt(btn) {
+  const ort = btn.dataset.ort;
+  // Chips der aktiven Gruppe deselektieren
+  btn.closest('.ort-chips').querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+
+  const frei = document.getElementById('n-s-ort-frei');
+  if (ort === 'Sonstiges') {
+    document.getElementById('n-s-ort').value = '';
+    frei.style.display = 'block'; frei.value = '';
+    frei.oninput = () => { document.getElementById('n-s-ort').value = frei.value.trim(); };
+    setTimeout(() => frei.focus(), 50);
+  } else {
+    document.getElementById('n-s-ort').value = ort;
+    frei.style.display = 'none'; frei.value = '';
+  }
+
+  // Problem-Vorschläge
+  const probSection = document.getElementById('n-s-prob-section');
+  const probChips   = document.getElementById('prob-chips');
+  document.getElementById('n-s-prob').value = '';
+  document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
+  const suggs = ORT_PROBLEMS[ort] || [];
+  probChips.innerHTML = suggs.map(s =>
+    `<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,'${s.replace(/'/g,"\\'")}')">${s}</button>`
+  ).join('') + '<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,\'\')">✏️ Sonstiges</button>';
+  probSection.style.display = 'block';
+  setTimeout(() => probSection.scrollIntoView({behavior:'smooth',block:'nearest'}), 80);
+}
+
+function selectProb(btn, text) {
+  document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const ta = document.getElementById('n-s-prob');
+  ta.value = text;
+  if (!text) setTimeout(() => ta.focus(), 50);
+}
+
+async function saveNew() {
+  if (!newKat) { alert('Bitte zuerst eine Kategorie wählen.'); return; }
+
+  let ort = '', prob = '';
+  if (newKat === 'Schaden') {
+    ort = document.getElementById('n-s-ort').value.trim();
+    prob = document.getElementById('n-s-prob').value.trim();
+    if (!ort || !prob) { alert('Bitte Ort und Problem angeben.'); return; }
+  } else if (newKat === 'Möbel & Aufbau') {
+    const art = document.getElementById('n-m-art').value;
+    const was = document.getElementById('n-m-was').value.trim();
+    const wo  = document.getElementById('n-m-wo').value.trim();
+    const ziel = document.getElementById('n-m-ziel').value.trim();
+    if (!was || !wo) { alert('Bitte Beschreibung und Standort angeben.'); return; }
+    ort = wo; prob = `${art}: ${was}${ziel ? ' → ' + ziel : ''}`;
+  } else if (newKat === 'Sperrmüll') {
+    const was = document.getElementById('n-sp-was').value.trim();
+    const wo  = document.getElementById('n-sp-wo').value.trim();
+    const ter = document.getElementById('n-sp-termin').value.trim();
+    if (!was || !wo) { alert('Bitte Gegenstand und Standort angeben.'); return; }
+    ort = wo; prob = was + (ter ? ` · Wunschtermin: ${ter}` : '');
+  } else if (newKat === 'Kleiner Auftrag') {
+    const art = document.getElementById('n-a-art').value;
+    const wo  = document.getElementById('n-a-wo').value.trim();
+    const det = document.getElementById('n-a-details').value.trim();
+    if (!wo) { alert('Bitte Ort/Suite angeben.'); return; }
+    ort = wo; prob = art + (det ? `: ${det}` : '');
+  }
+
+  const bwName = document.getElementById('n-bw').value;
+  const bwObj  = bewohnerListe.find(b => b.name === bwName);
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Speichert …';
+  btn.disabled = true;
+
+  const item = {
+    id: Date.now().toString(),
+    nr: S.nr++,
+    datum: td(),
+    ort, prob,
+    prio: document.getElementById('n-prio').value,
+    von: document.getElementById('n-von').value,
+    status: 'Offen',
+    kategorie: newKat,
+    name: bwObj?.name || null,
+    zimmer: bwObj?.zimmer || null,
+    erledigt: '', notiz: '',
+    photos: [...newPhotos]
+  };
+
+  // Try Supabase first
+  if (sbOnline) {
+    try {
+      const payload = toSB(item);
+      const res = await sbReq('schaden', { method: 'POST', body: JSON.stringify(payload) });
+      if (res.ok) {
+        const [created] = await res.json();
+        item.id = created.id;
+        item.sb_id = created.id;
+        if (created.nr) item.nr = created.nr;
+      }
+    } catch {}
+  }
+
+  S.schaden.unshift(item);
+  saveLocal();
+  btn.textContent = 'Speichern';
+  btn.disabled = false;
+  ovClose('ov-new');
+  render(curView);
+}
+
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+function openDetail(id) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  const bewohnerInfo = s.von === 'Bewohner'
+    ? `<div style="background:var(--purple-pale);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--purple)">
+        🟣 Gemeldet über Bewohner-App${s.name ? ' von ' + s.name : ''}${s.zimmer ? ', Suite ' + s.zimmer : ''}
+      </div>` : '';
+
+  let kontaktBanner = '';
+  if (s.name) {
+    const bw = bewohnerListe.find(b => b.name === s.name);
+    if (bw) {
+      const art = bw.kontakt_art || 'Türzettel';
+      if (art === 'E-Mail' && bw.email)
+        kontaktBanner = `<div class="kontakt-banner k-email">📧 <strong>E-Mail</strong> &nbsp;·&nbsp; <a href="mailto:${bw.email}?subject=Ihre Meldung %23${s.nr||''} — ${encodeURIComponent(s.ort)}">${bw.email}</a></div>`;
+      else if (art === 'Anruf' && bw.telefon)
+        kontaktBanner = `<div class="kontakt-banner k-call">📞 <strong>Anruf</strong> &nbsp;·&nbsp; <a href="tel:${bw.telefon}">${bw.telefon}</a></div>`;
+      else if (art === 'Persönlich')
+        kontaktBanner = `<div class="kontakt-banner k-person">🤝 <strong>Persönlicher Kontakt</strong> — bitte direkt ansprechen</div>`;
+      else
+        kontaktBanner = `<div class="kontakt-banner k-zettel">🖨 <strong>Türzettel</strong> bevorzugt — Button unten</div>`;
+    }
+  }
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="modal-hdr">
+      <h2>#${s.nr||'–'} — ${s.ort}</h2>
+      <button class="modal-close" onclick="ovClose('ov-detail')">×</button>
+    </div>
+    ${bewohnerInfo}${kontaktBanner}
+    <div class="status-btns" style="grid-template-columns:1fr 1fr 1fr">
+      <button class="status-btn${s.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
+      <button class="status-btn${s.status==='Kosten geschätzt'?' active':''}" onclick="setStatus('${id}','Kosten geschätzt')">💰 Kosten geschätzt</button>
+      <button class="status-btn${s.status==='Freigegeben'?' active':''}" onclick="setStatus('${id}','Freigegeben')">✅ Freigegeben</button>
+      <button class="status-btn${s.status==='In Umsetzung'?' active':''}" onclick="setStatus('${id}','In Umsetzung')">🔨 In Umsetzung</button>
+      <button class="status-btn${s.status==='Abgeschlossen'?' active':''}" onclick="setStatus('${id}','Abgeschlossen')">✓ Abgeschlossen</button>
+    </div>
+    <div style="margin-top:14px">
+      <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right;font-weight:500">${s.prob}</span></div>
+      <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum||'–'}</span></div>
+      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + (s.zimmer ? ', Suite '+s.zimmer : '') : ''}</span></div>
+      ${s.erledigt ? `<div class="detail-row"><span class="lbl">Erledigt am</span><span>${s.erledigt}</span></div>` : ''}
+    </div>
+    <label>Priorität</label>
+    <select id="d-prio">
+      <option value="Hoch"${s.prio==='Hoch'?' selected':''}>🔴 Hoch — Sicherheitsrisiko</option>
+      <option value="Mittel"${s.prio==='Mittel'?' selected':''}>🟡 Mittel — bald erledigen</option>
+      <option value="Niedrig"${s.prio==='Niedrig'?' selected':''}>🟢 Niedrig — kann warten</option>
+    </select>
+    <label>Kosten (€)</label>
+    <input type="number" id="d-kosten" min="0" step="0.01" placeholder="0,00" value="${s.kosten!=null?s.kosten:''}">
+    <label>Voraussichtlicher Termin</label>
+    <input type="text" id="d-termin" placeholder="z. B. Ende August, KW 35, 20.08.2026 …" value="${s.termin||''}">
+    <label>Rückmeldung an Bewohnerin</label>
+    <textarea id="d-rueck" placeholder="Wird auf dem Türzettel gedruckt …">${s.rueckmeldung||''}</textarea>
+    ${s.photos&&s.photos.length ? `<label>Fotos</label><div class="detail-photos">${s.photos.map((p,i) => `<img src="${p}" onclick="viewPhoto('${id}',${i})">`).join('')}</div>` : ''}
+    <label>Fotos hinzufügen</label>
+    <div class="photo-zone">📷 Foto aufnehmen oder auswählen<input type="file" accept="image/*" multiple onchange="addDetailPhoto('${id}',event)"></div>
+    <label>Interne Notiz</label>
+    <textarea id="d-notiz">${s.notiz||''}</textarea>
+    <button class="btn btn-primary" onclick="saveDetail('${id}')">Änderungen speichern</button>
+    <button class="btn" style="background:var(--gold);color:#fff;margin-top:8px" onclick="printZettel('${id}')">🖨 Türzettel drucken</button>
+    <button class="btn btn-danger" style="margin-top:8px" onclick="delSchaden('${id}')">Meldung löschen</button>`;
+  ovOpen('ov-detail');
+}
+
+async function setStatus(id, status) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  s.status = status;
+  if (status === 'Erledigt') s.erledigt = td();
+  saveLocal();
+  if (sbOnline) updateSBStatus(s);
+  openDetail(id);
+  render(curView);
+}
+
+async function saveDetail(id) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  s.notiz = document.getElementById('d-notiz').value;
+  s.prio = document.getElementById('d-prio').value;
+  const k = parseFloat(document.getElementById('d-kosten').value);
+  s.kosten = isNaN(k) ? null : k;
+  s.termin = document.getElementById('d-termin').value.trim();
+  s.rueckmeldung = document.getElementById('d-rueck').value.trim();
+  saveLocal();
+  if (sbOnline) updateSBStatus(s);
+  ovClose('ov-detail');
+  render(curView);
+}
+
+function printZettel(id) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  const anrede = s.name ? `Sehr geehrte Frau ${s.name.split(' ').slice(-1)[0]},` : 'Liebe Bewohnerin,';
+  const statusText = {
+    'Offen': 'Ihre Meldung ist bei uns eingegangen und wird bearbeitet.',
+    'Kosten geschätzt': 'Ihre Meldung wurde geprüft. Die Kosten werden zur Freigabe vorgelegt.',
+    'Freigegeben': 'Die Durchführung wurde genehmigt. Die Umsetzung wird koordiniert.',
+    'In Umsetzung': 'Die Reparatur bzw. der Auftrag ist in Umsetzung.',
+    'Abgeschlossen': 'Das Problem wurde behoben. Wir hoffen, alles ist zu Ihrer Zufriedenheit.',
+    'In Prüfung': 'Ihre Meldung wird derzeit geprüft.',
+    'Handwerker beauftragt': 'Ein Fachbetrieb wurde beauftragt.',
+    'Erledigt': 'Das Problem wurde behoben.'
+  }[s.status] || 'Ihre Meldung ist in Bearbeitung.';
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Hausmeister-Info #${s.nr||'–'}</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,'Book Antiqua',serif;font-size:14px;color:#1A1510;padding:36px 44px;max-width:580px}
+.hdr{border-bottom:2px solid #B8892A;padding-bottom:12px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-end}
+.hdr-title{font-size:15px;font-weight:normal;color:#1C4A2E;letter-spacing:.02em}
+.hdr-nr{font-size:11.5px;color:#7A7168}
+.anrede{font-size:15px;margin-bottom:14px;line-height:1.6}
+.body{line-height:1.75;margin-bottom:14px;font-size:14px}
+.info-box{background:#F6F1E9;border-left:3px solid #1C4A2E;padding:12px 16px;margin:14px 0;line-height:1.7;font-size:13.5px}
+.termin{margin-top:8px;font-weight:bold;color:#1C4A2E}
+.rueck{margin-top:8px;color:#3A322C}
+.footer{margin-top:28px;border-top:1px solid #D4CBB8;padding-top:14px;font-size:12.5px;color:#7A7168;line-height:1.7}
+.footer strong{color:#1A1510}
+@media print{body{padding:20px}}
+</style></head><body>
+<div class="hdr">
+  <div class="hdr-title">Sidonie-Scharfe-Stiftung &nbsp;·&nbsp; Hausmeister</div>
+  <div class="hdr-nr">Meldung #${s.nr||'–'} &nbsp;·&nbsp; ${new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
+</div>
+<p class="anrede">${anrede}</p>
+<p class="body">bezüglich Ihrer Meldung vom ${s.datum||'–'} (<strong>${s.ort}</strong>):</p>
+<div class="info-box">
+  <div>${statusText}</div>
+  ${s.termin ? `<div class="termin">Voraussichtlicher Termin: ${s.termin}</div>` : ''}
+  ${s.rueckmeldung ? `<div class="rueck">${s.rueckmeldung}</div>` : ''}
+</div>
+<p class="body">Bei Fragen sprechen Sie mich gerne direkt an.</p>
+<div class="footer">Mit freundlichen Grüßen<br><br><strong>Hendrik Schneider</strong><br>Hausmeister · Sidonie-Scharfe-Stiftung<br>Scharfestraße 4–6 · 14163 Berlin-Zehlendorf</div>
+</body></html>`;
+  const w = window.open('','_blank','width=640,height=720');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+
+function addDetailPhoto(id, e) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  if (!s.photos) s.photos = [];
+  const files = [...e.target.files];
+  let done = 0;
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = ev => {
+      s.photos.push(ev.target.result);
+      done++;
+      if (done === files.length) { saveLocal(); openDetail(id); }
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+async function delSchaden(id) {
+  if (!confirm('Meldung wirklich löschen?')) return;
+  const s = S.schaden.find(x => x.id === id);
+  if (s && s.sb_id && sbOnline) await deleteSBRecord(s.sb_id);
+  S.schaden = S.schaden.filter(x => x.id !== id);
+  saveLocal();
+  ovClose('ov-detail');
+  render(curView);
+}
+
+function viewPhoto(id, i) {
+  const s = S.schaden.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('photo-fs-img').src = s.photos[i];
+  document.getElementById('photo-fs').classList.add('open');
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────────────────────────
+function exportData() {
+  const b = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'hausmeister-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+function importData(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (!d.schaden) throw 0;
+      if (!confirm(`Import: ${d.schaden.length} Meldungen. Aktuelle lokale Daten überschreiben?`)) return;
+      S = d; saveLocal(); render(curView);
+    } catch { alert('Ungültige Datei.'); }
+  };
+  r.readAsText(f);
+}
+function clearLocal() {
+  if (!confirm('Lokale Daten löschen? Supabase-Daten bleiben erhalten und werden neu geladen.')) return;
+  S = {schaden:[], wlog:{}, nr:1};
+  saveLocal();
+  loadFromSupabase();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init() {
+  renderDash();
+  loadFromSupabase();
+  loadBewohnerList();
+  loadBudget();
+}
+
+// Check auth on page load
+if (sessionStorage.getItem(AUTH_KEY) === '1') {
+  document.getElementById('pw-gate').classList.add('hidden');
+  init();
+} else {
+  // Show password gate; focus input
+  setTimeout(() => document.getElementById('pw-in').focus(), 200);
+}
+
+// ── ARTIKEL CMS ───────────────────────────────────────────────────────────────
+let _akData = [];
+let _akMonat = 0; // 0 = alle
+
+async function loadArtikel() {
+  try {
+    const r = await sbReq('artikel?order=monat.asc,reihenfolge.asc&select=*');
+    _akData = await r.json();
+    renderAkFilter();
+    renderAkList();
+  } catch(e) {
+    document.getElementById('ak-list').innerHTML = '<div class="empty"><p>Fehler beim Laden.</p></div>';
+  }
+}
+
+function renderAkFilter() {
+  const months = [...new Set(_akData.map(a => a.monat))].sort((a,b)=>a-b);
+  const MN = ['','Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  document.getElementById('ak-monat-filter').innerHTML =
+    `<button class="chip${_akMonat===0?' active':''}" onclick="setAkMonat(0,this)">Alle (${_akData.length})</button>` +
+    months.map(m => `<button class="chip${_akMonat===m?' active':''}" onclick="setAkMonat(${m},this)">${MN[m]} (${_akData.filter(a=>a.monat===m).length})</button>`).join('');
+}
+
+function setAkMonat(m, btn) {
+  _akMonat = m;
+  document.querySelectorAll('#ak-monat-filter .chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAkList();
+}
+
+function renderAkList() {
+  const MN=['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const list = _akMonat ? _akData.filter(a=>a.monat===_akMonat) : _akData;
+  const el = document.getElementById('ak-list');
+  if (!list.length) { el.innerHTML='<div class="empty"><p>Keine Artikel gefunden.</p></div>'; return; }
+  el.innerHTML = list.map(a => `
+    <div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">${a.ico||''} ${MN[a.monat]} · ${a.kat||'–'}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text)">${a.titel}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.teaser||''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+        <button onclick="openArtikelForm(${JSON.stringify(a).replace(/"/g,'&quot;')})" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
+        <button onclick="deleteArtikel('${a.id}')" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function openArtikelForm(a) {
+  document.getElementById('ak-modal').style.display='flex';
+  document.getElementById('ak-modal-title').textContent = a ? 'Artikel bearbeiten' : 'Neuer Artikel';
+  document.getElementById('ak-err').style.display='none';
+  if (a) {
+    document.getElementById('ak-id').value = a.id||'';
+    document.getElementById('ak-monat').value = a.monat||8;
+    document.getElementById('ak-kat').value = a.kat||'';
+    document.getElementById('ak-ico').value = a.ico||'';
+    document.getElementById('ak-bild').value = a.bild||'';
+    document.getElementById('ak-titel').value = a.titel||'';
+    document.getElementById('ak-teaser').value = a.teaser||'';
+    document.getElementById('ak-tipp').value = a.tipp||'';
+    document.getElementById('ak-dauer').value = a.dauer||'';
+    document.getElementById('ak-bew').value = a.fuer_bewohnerinnen||'';
+  } else {
+    ['ak-id','ak-kat','ak-ico','ak-bild','ak-titel','ak-teaser','ak-tipp','ak-dauer','ak-bew'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ak-monat').value=new Date().getMonth()+1;
+  }
+}
+
+function closeArtikelForm() {
+  document.getElementById('ak-modal').style.display='none';
+}
+
+async function saveArtikel() {
+  const titel = document.getElementById('ak-titel').value.trim();
+  if (!titel) { const e=document.getElementById('ak-err'); e.textContent='Titel ist Pflichtfeld.'; e.style.display='block'; return; }
+  const id = document.getElementById('ak-id').value;
+  const payload = {
+    monat: parseInt(document.getElementById('ak-monat').value),
+    kat:   document.getElementById('ak-kat').value.trim(),
+    ico:   document.getElementById('ak-ico').value.trim(),
+    bild:  document.getElementById('ak-bild').value.trim(),
+    titel,
+    teaser: document.getElementById('ak-teaser').value.trim(),
+    tipp:   document.getElementById('ak-tipp').value.trim(),
+    dauer:  document.getElementById('ak-dauer').value.trim(),
+    fuer_bewohnerinnen: document.getElementById('ak-bew').value.trim(),
+    aktiv: true
+  };
+  try {
+    if (id) {
+      await sbReq(`artikel?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
+    } else {
+      await sbReq('artikel', {method:'POST', body:JSON.stringify(payload)});
+    }
+    closeArtikelForm();
+    loadArtikel();
+  } catch(e) {
+    const err=document.getElementById('ak-err'); err.textContent='Fehler: '+e.message; err.style.display='block';
+  }
+}
+
+async function deleteArtikel(id) {
+  if (!confirm('Artikel wirklich löschen?')) return;
+  await sbReq(`artikel?id=eq.${id}`, {method:'DELETE'});
+  loadArtikel();
+}
+
+
+// ── BAUMKATASTER ──────────────────────────────────────────────────────────────
+let _baumData = [], _baumBereich = 'Alle', _baumPrio = 'Alle';
+
+const VITAL_COL = {1:'#2d7a3a', 2:'#B8892A', 3:'#c0522a', 4:'#7A2430'};
+const VITAL_LBL = {1:'Vital', 2:'Geschwächt', 3:'Stark geschwächt', 4:'Abgestorben'};
+const PRIO_COL  = {keine:'var(--border)', beobachten:'#B8892A', dringend:'#c0522a', sofort:'#7A2430'};
+const PRIO_TXT  = {keine:'var(--text-muted)', beobachten:'#fff', dringend:'#fff', sofort:'#fff'};
+
+async function loadBaeume() {
+  try {
+    const r = await sbReq('baeume?order=baum_nr.asc&aktiv=eq.true');
+    _baumData = await r.json();
+    renderBaumFilters();
+    renderBaumSummary();
+    renderBaumList();
+  } catch(e) {
+    document.getElementById('baum-list').innerHTML = '<div class="empty"><p>Fehler beim Laden.</p></div>';
+  }
+}
+
+function renderBaumFilters() {
+  const bereiche = ['Alle', ...new Set(_baumData.map(b => b.standort_bereich).filter(Boolean))];
+  document.getElementById('baum-bereich-filter').innerHTML = bereiche.map(b =>
+    `<button class="chip${b===_baumBereich?' active':''}" onclick="setBaumBereich('${b}',this)">${b}</button>`
+  ).join('');
+  const prios = ['Alle','beobachten','dringend','sofort'];
+  document.getElementById('baum-prio-filter').innerHTML = prios.map(p =>
+    `<button class="chip${p===_baumPrio?' active':''}" onclick="setBaumPrio('${p}',this)"
+      style="${p!=='Alle'?`background:${PRIO_COL[p]};color:#fff;border-color:${PRIO_COL[p]}`:''}">
+      ${p==='Alle'?'Alle Prioritäten':p.charAt(0).toUpperCase()+p.slice(1)}</button>`
+  ).join('');
+}
+
+function renderBaumSummary() {
+  const total = _baumData.length;
+  const warn = _baumData.filter(b => b.massnahme_prioritaet !== 'keine').length;
+  const vital = _baumData.filter(b => b.vitalitaet >= 3).length;
+  document.getElementById('baum-summary').innerHTML =
+    `<span style="color:var(--text-muted)">🌳 ${total} Bäume erfasst</span>` +
+    (warn ? `<span style="color:#B8892A">⚠️ ${warn} mit Maßnahme</span>` : '') +
+    (vital ? `<span style="color:var(--red)">🔴 ${vital} geschwächt</span>` : '');
+}
+
+function setBaumBereich(b, btn) {
+  _baumBereich = b;
+  document.querySelectorAll('#baum-bereich-filter .chip').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderBaumList();
+}
+
+function setBaumPrio(p, btn) {
+  _baumPrio = p;
+  document.querySelectorAll('#baum-prio-filter .chip').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderBaumList();
+}
+
+function renderBaumList() {
+  let list = _baumData;
+  if (_baumBereich !== 'Alle') list = list.filter(b => b.standort_bereich === _baumBereich);
+  if (_baumPrio !== 'Alle') list = list.filter(b => b.massnahme_prioritaet === _baumPrio);
+  const el = document.getElementById('baum-list');
+  if (!list.length) { el.innerHTML = '<div class="empty"><p>Keine Einträge.</p></div>'; return; }
+  el.innerHTML = list.map(b => {
+    const vCol = VITAL_COL[b.vitalitaet] || '#888';
+    const pCol = PRIO_COL[b.massnahme_prioritaet] || 'var(--border)';
+    const pTxt = PRIO_TXT[b.massnahme_prioritaet] || 'var(--text-muted)';
+    const prioShow = b.massnahme_prioritaet && b.massnahme_prioritaet !== 'keine';
+    return `<div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+      <div style="min-width:48px;padding:4px 6px;border-radius:6px;background:var(--border);text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);margin-top:2px">${b.baum_nr}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${vCol};flex-shrink:0;display:inline-block"></span>
+          <span style="font-size:14px;font-weight:600;color:var(--text)">${b.name_de}</span>
+          ${prioShow ? `<span style="font-size:11px;padding:2px 7px;border-radius:8px;background:${pCol};color:${pTxt};font-weight:600">${b.massnahme_prioritaet}</span>` : ''}
+        </div>
+        <div style="font-size:12px;color:var(--text-muted)">${b.name_lat ? '<i>'+b.name_lat+'</i> · ' : ''}${b.standort_bereich||''}</div>
+        ${b.standort_beschreibung ? `<div style="font-size:12px;color:var(--text-muted);margin-top:1px">${b.standort_beschreibung}</div>` : ''}
+        ${b.zustand_notiz ? `<div style="font-size:12px;color:#B8892A;margin-top:3px">⚠️ ${b.zustand_notiz}</div>` : ''}
+        ${b.naechste_pruefung ? `<div style="font-size:11px;color:var(--text-muted);margin-top:3px">Nächste Prüfung: ${b.naechste_pruefung}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+        <button onclick='openBaumForm(${JSON.stringify(b).replace(/'/g,"\'")})'
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
+        <button onclick="deleteBaum('${b.id}')"
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openBaumForm(b) {
+  document.getElementById('baum-modal').style.display = 'flex';
+  document.getElementById('baum-modal-title').textContent = b ? 'Baum bearbeiten' : 'Neuer Baum';
+  document.getElementById('baum-err').style.display = 'none';
+  const f = (id, val) => { const el = document.getElementById(id); if(el) el.value = val||''; };
+  if (b) {
+    f('baum-id', b.id);
+    f('baum-nr', b.baum_nr);
+    f('baum-name-de', b.name_de);
+    f('baum-name-lat', b.name_lat);
+    f('baum-bereich', b.standort_bereich || 'Park');
+    f('baum-standort', b.standort_beschreibung);
+    f('baum-hoehe', b.hoehe_m);
+    f('baum-umfang', b.stamm_umfang_cm);
+    f('baum-krone', b.krone_dm_m);
+    f('baum-alter', b.alter_jahre);
+    f('baum-vital', b.vitalitaet || 1);
+    f('baum-prio', b.massnahme_prioritaet || 'keine');
+    f('baum-zustand', b.zustand_notiz);
+    f('baum-naechste-massnahme', b.naechste_massnahme);
+    f('baum-letzte-massnahme', b.letzte_massnahme);
+    f('baum-letzte-pruefung', b.letzte_pruefung);
+    f('baum-naechste-pruefung', b.naechste_pruefung);
+    f('baum-notizen', b.notizen);
+    f('baum-bild', b.bild);
+  } else {
+    ['baum-id','baum-nr','baum-name-de','baum-name-lat','baum-standort',
+     'baum-hoehe','baum-umfang','baum-krone','baum-alter','baum-zustand',
+     'baum-naechste-massnahme','baum-letzte-massnahme','baum-notizen','baum-bild',
+     'baum-letzte-pruefung','baum-naechste-pruefung'].forEach(id => f(id,''));
+    document.getElementById('baum-vital').value = '1';
+    document.getElementById('baum-prio').value = 'keine';
+    document.getElementById('baum-bereich').value = 'Park';
+    document.getElementById('baum-letzte-pruefung').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+function closeBaumForm() { document.getElementById('baum-modal').style.display = 'none'; }
+
+async function saveBaum() {
+  const nameDE = document.getElementById('baum-name-de').value.trim();
+  const nr = document.getElementById('baum-nr').value.trim();
+  if (!nameDE || !nr) {
+    const e = document.getElementById('baum-err');
+    e.textContent = 'Baum-Nr und Name sind Pflichtfelder.';
+    e.style.display = 'block';
+    return;
+  }
+  const id = document.getElementById('baum-id').value;
+  const g = id => document.getElementById(id).value.trim();
+  const num = id => { const v = parseFloat(g(id)); return isNaN(v) ? null : v; };
+  const payload = {
+    baum_nr: nr,
+    name_de: nameDE,
+    name_lat: g('baum-name-lat') || null,
+    standort_bereich: g('baum-bereich'),
+    standort_beschreibung: g('baum-standort') || null,
+    hoehe_m: num('baum-hoehe'),
+    stamm_umfang_cm: parseInt(g('baum-umfang')) || null,
+    krone_dm_m: num('baum-krone'),
+    alter_jahre: parseInt(g('baum-alter')) || null,
+    vitalitaet: parseInt(g('baum-vital')),
+    massnahme_prioritaet: g('baum-prio'),
+    zustand_notiz: g('baum-zustand') || null,
+    naechste_massnahme: g('baum-naechste-massnahme') || null,
+    letzte_massnahme: g('baum-letzte-massnahme') || null,
+    letzte_pruefung: g('baum-letzte-pruefung') || null,
+    naechste_pruefung: g('baum-naechste-pruefung') || null,
+    notizen: g('baum-notizen') || null,
+    bild: g('baum-bild') || null,
+    aktiv: true,
+  };
+  try {
+    if (id) {
+      await sbReq(`baeume?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
+    } else {
+      await sbReq('baeume', {method:'POST', body:JSON.stringify(payload)});
+    }
+    closeBaumForm();
+    loadBaeume();
+  } catch(e) {
+    const err = document.getElementById('baum-err');
+    err.textContent = 'Fehler: ' + e.message;
+    err.style.display = 'block';
+  }
+}
+
+async function deleteBaum(id) {
+  if (!confirm('Baum aus dem Kataster löschen?')) return;
+  await sbReq(`baeume?id=eq.${id}`, {method:'DELETE'});
+  loadBaeume();
+}
+
+// ── PFLANZENDATENBANK (intern) ────────────────────────────────────
+let _pflIntData = [], _pflIntFilter = 'Alle';
+const MN_PFL = ['','Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+async function loadPflanzenInt() {
+  try {
+    const r = await sbReq('pflanzen?order=name_de.asc&aktiv=eq.true');
+    _pflIntData = await r.json();
+    renderPflIntFilter();
+    document.getElementById('pfl-int-summary').textContent = `🌱 ${_pflIntData.length} Pflanzen erfasst · ${_pflIntData.filter(p=>p.im_park).length} im Park`;
+    renderPflIntList();
+  } catch(e) {
+    document.getElementById('pfl-int-list').innerHTML = '<div class="empty"><p>Fehler beim Laden.</p></div>';
+  }
+}
+
+function renderPflIntFilter() {
+  const kats = ['Alle', ...new Set(_pflIntData.map(p=>p.kategorie).filter(Boolean)).values()].sort((a,b)=>a==='Alle'?-1:a.localeCompare(b,'de'));
+  document.getElementById('pfl-int-filter').innerHTML = kats.map(k =>
+    `<button class="chip${k===_pflIntFilter?' active':''}" onclick="setPflIntFilter('${k}',this)">${k==='Alle'?'Alle ('+_pflIntData.length+')':k+' ('+_pflIntData.filter(p=>p.kategorie===k).length+')'}</button>`
+  ).join('');
+}
+
+function setPflIntFilter(k, btn) {
+  _pflIntFilter = k;
+  document.querySelectorAll('#pfl-int-filter .chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPflIntList();
+}
+
+function renderPflIntList() {
+  const list = _pflIntFilter==='Alle' ? _pflIntData : _pflIntData.filter(p=>p.kategorie===_pflIntFilter);
+  const el = document.getElementById('pfl-int-list');
+  if (!list.length) { el.innerHTML='<div class="empty"><p>Keine Einträge.</p></div>'; return; }
+  el.innerHTML = list.map(p => {
+    const bluete = p.bluete_von ? `🌸 ${MN_PFL[p.bluete_von]}${p.bluete_bis&&p.bluete_bis!==p.bluete_von?'–'+MN_PFL[p.bluete_bis]:''}` : '';
+    const park = p.im_park ? '<span style="color:var(--green-mid);font-size:11px;font-weight:600">● IM PARK</span>' : '';
+    return `<div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <span style="font-size:14px;font-weight:600;color:var(--text)">${p.name_de}</span>
+          ${park}
+        </div>
+        <div style="font-size:12px;color:var(--text-muted)">${p.name_lat?'<i>'+p.name_lat+'</i> · ':''}${p.typ||''} · ${p.kategorie||''}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${[bluete, p.park_standort].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+        <button onclick='openPflanzForm(${JSON.stringify(p).replace(/'/g,"\'")})'
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
+        <button onclick="deletePflanz('${p.id}')"
+          style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPflanzForm(p) {
+  document.getElementById('pfl-int-modal').style.display='flex';
+  document.getElementById('pfl-int-modal-title').textContent = p ? 'Pflanze bearbeiten' : 'Neue Pflanze';
+  document.getElementById('pfl-int-err').style.display='none';
+  const f=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val??'';};
+  const cb=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=!!val;};
+  if (p) {
+    f('pfl-int-id', p.id);
+    f('pfl-int-name-de', p.name_de);
+    f('pfl-int-name-lat', p.name_lat);
+    f('pfl-int-typ', p.typ);
+    f('pfl-int-kat', p.kategorie);
+    cb('pfl-st-sonne',    (p.standort||[]).includes('Sonne'));
+    cb('pfl-st-halb',     (p.standort||[]).includes('Halbschatten'));
+    cb('pfl-st-schatten', (p.standort||[]).includes('Schatten'));
+    f('pfl-int-wasser', p.wasser);
+    f('pfl-int-bluete-von', p.bluete_von);
+    f('pfl-int-bluete-bis', p.bluete_bis);
+    f('pfl-int-bluetfarbe', p.bluetfarbe);
+    f('pfl-int-hoehe-min', p.hoehe_min);
+    f('pfl-int-hoehe-max', p.hoehe_max);
+    cb('pfl-int-winterhart', p.winterhart!==false);
+    cb('pfl-int-im-park', p.im_park);
+    f('pfl-int-park-standort', p.park_standort);
+    f('pfl-int-bild', p.bild);
+    f('pfl-int-pflege', p.pflegehinweise);
+    f('pfl-int-schnitt', (p.schnitt_monate||[]).join(', '));
+    f('pfl-int-giessen', p.giessen_hinweis);
+    f('pfl-int-tags', (p.tags||[]).join(', '));
+    f('pfl-int-bew-info', p.bewohner_info);
+  } else {
+    ['pfl-int-id','pfl-int-name-de','pfl-int-name-lat','pfl-int-kat','pfl-int-wasser',
+     'pfl-int-bluete-von','pfl-int-bluete-bis','pfl-int-bluetfarbe','pfl-int-hoehe-min',
+     'pfl-int-hoehe-max','pfl-int-park-standort','pfl-int-bild','pfl-int-pflege',
+     'pfl-int-schnitt','pfl-int-giessen','pfl-int-tags','pfl-int-bew-info'].forEach(id=>f(id,''));
+    document.getElementById('pfl-int-typ').value='';
+    cb('pfl-st-sonne',false); cb('pfl-st-halb',false); cb('pfl-st-schatten',false);
+    cb('pfl-int-winterhart',true); cb('pfl-int-im-park',true);
+  }
+}
+
+function closePflanzForm() { document.getElementById('pfl-int-modal').style.display='none'; }
+
+async function savePflanz() {
+  const nameDE = document.getElementById('pfl-int-name-de').value.trim();
+  if (!nameDE) {
+    const e=document.getElementById('pfl-int-err'); e.textContent='Name ist Pflichtfeld.'; e.style.display='block'; return;
+  }
+  const g = id => document.getElementById(id).value.trim();
+  const standort = [
+    document.getElementById('pfl-st-sonne').checked    ? 'Sonne'       : null,
+    document.getElementById('pfl-st-halb').checked     ? 'Halbschatten': null,
+    document.getElementById('pfl-st-schatten').checked ? 'Schatten'    : null,
+  ].filter(Boolean);
+  const schnitt = g('pfl-int-schnitt').split(',').map(s=>parseInt(s.trim())).filter(n=>!isNaN(n)&&n>0);
+  const tags = g('pfl-int-tags').split(',').map(s=>s.trim()).filter(Boolean);
+  const id = g('pfl-int-id');
+  const payload = {
+    name_de:          nameDE,
+    name_lat:         g('pfl-int-name-lat') || null,
+    typ:              g('pfl-int-typ') || null,
+    kategorie:        g('pfl-int-kat') || null,
+    standort:         standort.length ? standort : null,
+    wasser:           g('pfl-int-wasser') || null,
+    bluete_von:       parseInt(g('pfl-int-bluete-von')) || null,
+    bluete_bis:       parseInt(g('pfl-int-bluete-bis')) || null,
+    bluetfarbe:       g('pfl-int-bluetfarbe') || null,
+    hoehe_min:        parseInt(g('pfl-int-hoehe-min')) || null,
+    hoehe_max:        parseInt(g('pfl-int-hoehe-max')) || null,
+    winterhart:       document.getElementById('pfl-int-winterhart').checked,
+    im_park:          document.getElementById('pfl-int-im-park').checked,
+    park_standort:    g('pfl-int-park-standort') || null,
+    bild:             g('pfl-int-bild') || null,
+    pflegehinweise:   g('pfl-int-pflege') || null,
+    schnitt_monate:   schnitt.length ? schnitt : null,
+    giessen_hinweis:  g('pfl-int-giessen') || null,
+    tags:             tags.length ? tags : null,
+    bewohner_info:    g('pfl-int-bew-info') || null,
+    aktiv:            true,
+  };
+  try {
+    if (id) {
+      await sbReq(`pflanzen?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(payload)});
+    } else {
+      await sbReq('pflanzen', {method:'POST', body:JSON.stringify(payload)});
+    }
+    closePflanzForm();
+    loadPflanzenInt();
+  } catch(e) {
+    const err=document.getElementById('pfl-int-err'); err.textContent='Fehler: '+e.message; err.style.display='block';
+  }
+}
+
+async function deletePflanz(id) {
+  if (!confirm('Pflanze wirklich löschen?')) return;
+  await sbReq(`pflanzen?id=eq.${id}`, {method:'DELETE'});
+  loadPflanzenInt();
+}
+</script>
+</body>
+</html>
