@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1C4A2E">
+<title>Serviceportal Intern — Frau Schwade</title>
+<style>
+:root{
+  --green:#1C4A2E;--green-d:#132E1C;--green-mid:#2d6a4f;--green-light:#40916c;
+  --green-pale:#d8f3dc;--burg:#7A2430;--gold:#B8892A;--red:#c1121f;--red-pale:#ffe5e5;
+  --yellow:#e9a720;--yellow-pale:#fff3cd;--orange:#d97706;--orange-pale:#fef3c7;
+  --blue-pale:#dbeafe;--blue:#1d4ed8;
+  --bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;
+  --radius:12px;--shadow:0 1px 3px rgba(26,21,16,.06),0 4px 16px rgba(26,21,16,.04)
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;
+  --green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--orange-pale:#2e1a00;
+  --blue-pale:#1e2a4a;--shadow:0 1px 4px rgba(0,0,0,.4)
+}}
+:root[data-theme="dark"]{--bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;--green-pale:#1a3c2e;--red-pale:#3a0f0f;--yellow-pale:#2e2000;--orange-pale:#2e1a00;--blue-pale:#1e2a4a;}
+:root[data-theme="light"]{--bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
+
+/* PW GATE */
+.pw-gate{position:fixed;inset:0;background:var(--green);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.pw-gate.hidden{display:none}
+.pw-box{background:var(--card);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.pw-box h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.pw-box p{font-size:13px;color:var(--text-muted);margin-bottom:18px}
+.pw-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:17px;background:var(--bg);color:var(--text);font-family:inherit}
+.pw-input:focus{outline:none;border-color:var(--green-mid)}
+.pw-btn{display:block;width:100%;padding:13px;background:var(--green-mid);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px;font-family:inherit}
+.pw-err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.pw-err.show{display:block}
+
+/* HEADER */
+.hdr{background:var(--green);color:#fff;padding:13px 16px 11px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-left h1{font-size:16px;font-weight:700}
+.hdr-sub{font-size:11px;opacity:.65;margin-top:1px}
+.hdr-badge{background:var(--orange);color:#fff;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700;opacity:0;transition:opacity .2s}
+.hdr-badge.show{opacity:1}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#52b788;flex-shrink:0}
+.sync-dot.syncing{background:var(--yellow);animation:pulse .8s infinite}
+.sync-dot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hdr-right{display:flex;align-items:center;gap:8px}
+
+/* NAV */
+nav{background:var(--card);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1;min-width:72px;padding:11px 6px;border:none;background:none;color:var(--text-muted);font-size:13px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;font-family:inherit}
+nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);font-weight:600}
+
+/* VIEWS */
+.view{display:none;padding:12px 12px 88px;max-width:680px;margin:0 auto}
+.view.active{display:block}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow)}
+.stat-val{font-size:22px;font-weight:700;color:var(--green-mid)}
+.stat-val.warn{color:var(--red)}
+.stat-val.alert{color:var(--orange)}
+.stat-val.alert{color:var(--orange)}
+.stat-lbl{font-size:11px;color:var(--text-muted);margin-top:1px}
+
+/* SECTION */
+.sec{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px}
+
+/* NEU AUFTRAG KACHELN */
+.kat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kat-tile{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:13px 11px;cursor:pointer;text-align:left;transition:all .15s;display:flex;flex-direction:column;gap:3px;width:100%;font-family:inherit}
+.kat-tile:hover{border-color:var(--green-mid);transform:translateY(-1px);box-shadow:0 4px 12px rgba(28,74,46,.1)}
+.kat-schaden{border-top:3px solid var(--burg)}
+.kat-moebel{border-top:3px solid var(--blue)}
+.kat-sperr{border-top:3px solid var(--green-mid)}
+.kat-auftrag{border-top:3px solid var(--gold)}
+.kt-icon{font-size:20px;line-height:1}
+.kt-name{font-size:13px;font-weight:600;color:var(--text)}
+.kt-desc{font-size:11px;color:var(--text-muted);line-height:1.3}
+
+/* HANDLUNGSBEDARF BANNER */
+.hb-banner{background:var(--orange-pale);border:1px solid rgba(217,119,6,.3);border-left:3px solid var(--orange);border-radius:9px;padding:10px 13px;font-size:13px;color:var(--orange);margin-bottom:14px;display:none}
+.hb-banner.show{display:block}
+.hb-banner strong{font-weight:600}
+
+/* FILTER CHIPS */
+.chips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:5px 13px;border-radius:20px;border:1px solid var(--border);font-size:12.5px;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--text-muted);transition:all .15s;font-family:inherit}
+.chip.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:500}
+
+/* AUFTRAG ITEM */
+.ai{padding:12px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.ai:last-child{border:none}
+.ai:active{background:var(--bg)}
+.ai-top{display:flex;align-items:flex-start;gap:10px}
+.ai-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.d-hoch{background:var(--red)}.d-mittel{background:var(--yellow)}.d-niedrig{background:var(--green-light)}.d-done{background:var(--border)}
+.ai-body{flex:1;min-width:0}
+.ai-title{font-size:14px;font-weight:500;line-height:1.3;margin-bottom:2px}
+.ai-meta{font-size:12px;color:var(--text-muted);line-height:1.5}
+.ai-right{text-align:right;flex-shrink:0}
+.ai-thumb{width:40px;height:40px;border-radius:7px;object-fit:cover;flex-shrink:0}
+.hb-flag{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--orange);font-weight:600;margin-top:5px}
+
+/* BADGES */
+.badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.b-offen{background:var(--red-pale);color:var(--red)}
+.b-laufend{background:var(--yellow-pale);color:var(--yellow)}
+.b-beauftragt{background:var(--blue-pale);color:var(--blue)}
+.b-done{background:var(--green-pale);color:var(--green-mid)}
+.b-kat{font-size:9.5px;padding:1px 6px;border-radius:20px;font-weight:600;margin-left:4px}
+.b-kat-schaden{background:var(--red-pale);color:var(--red)}
+.b-kat-moebel{background:var(--blue-pale);color:var(--blue)}
+.b-kat-sperr{background:var(--green-pale);color:var(--green-mid)}
+.b-kat-auftrag{background:var(--yellow-pale);color:#92400e}
+.b-kosten{background:#fef3c7;color:#d97706;font-weight:600}
+.b-freigegeben{background:#dcfce7;color:#166534;font-weight:600}
+.b-abgeschlossen{background:var(--green-pale);color:var(--green-mid);font-weight:600}
+/* BUDGET BAR */
+.budget-bar{background:var(--card);border-radius:var(--radius);padding:11px 13px;box-shadow:var(--shadow);margin-bottom:12px}
+.budget-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:5px}
+.budget-lbl{color:var(--text-muted)}
+.budget-val{font-weight:700;color:var(--gold)}
+.budget-val.warn{color:var(--red)}
+.budget-prog{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.budget-fill{height:100%;border-radius:4px;transition:width .4s;background:var(--gold)}
+.budget-fill.warn{background:var(--red)}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+
+/* EMPTY */
+.empty{text-align:center;padding:36px 20px;color:var(--text-muted)}
+.empty-icon{font-size:38px;margin-bottom:8px}
+.empty p{font-size:13.5px}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:16px;width:54px;height:54px;border-radius:50%;background:var(--green-mid);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:200;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+/* BEWOHNER LIST */
+.bw-row{display:flex;align-items:center;gap:11px;padding:10px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.bw-row:last-child{border:none}
+.bw-row:active{background:var(--bg)}
+.bw-zimmer{width:44px;height:44px;border-radius:10px;background:var(--green-pale);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--green-mid);line-height:1.2;text-align:center}
+.bw-info{flex:1;min-width:0}
+.bw-rname{font-size:14px;font-weight:500}
+.bw-rmeta{font-size:12px;color:var(--text-muted);margin-top:1px}
+.bw-toggle{padding:5px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0}
+.bw-toggle.aktiv{background:var(--green-pale);border-color:var(--green-mid);color:var(--green-mid)}
+
+
+/* OVERLAY / MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:680px;padding:20px 16px 40px;max-height:92vh;overflow-y:auto}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-hdr h2{font-size:17px;font-weight:700}
+.modal-close{background:var(--bg);border:none;width:30px;height:30px;border-radius:50%;font-size:18px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* FORM */
+label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.3px}
+input[type=text],input[type=email],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:15px;background:var(--bg);color:var(--text);font-family:inherit;transition:border-color .15s}
+textarea{min-height:80px;resize:vertical}
+input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outline:none;border-color:var(--green-mid)}
+.btn{display:block;width:100%;padding:13px;border-radius:11px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px;transition:opacity .15s;font-family:inherit}
+.btn:active{opacity:.85}
+.btn-primary{background:var(--green-mid);color:#fff}
+.btn-ghost{background:var(--bg);color:var(--text-muted);border:1.5px solid var(--border)}
+
+/* KATEGORIE PICKER IM MODAL */
+.n-kat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.n-kat-tile{padding:11px 10px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:left;transition:all .15s;display:flex;flex-direction:column;gap:3px;width:100%;font-family:inherit}
+.n-kat-tile:hover,.n-kat-tile.active{border-color:var(--green-mid);background:var(--green-pale)}
+.nt-icon{font-size:20px;line-height:1}.nt-name{font-size:13px;font-weight:600;color:var(--text)}.nt-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+.n-kat-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.n-kat-hdr-icon{font-size:22px}.n-kat-hdr-title{font-size:15px;font-weight:600;color:var(--green-mid)}
+.n-back{background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:14px;text-decoration:underline;text-underline-offset:2px;font-family:inherit}
+
+/* WOCHENPLAN */
+.wp-week{background:var(--card);border-radius:var(--radius);padding:13px 14px;box-shadow:var(--shadow);margin-bottom:12px}
+.wp-week-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.wp-week-top h3{font-size:14px;font-weight:600}
+.wp-week-top span{font-size:13px;color:var(--green-mid);font-weight:700}
+.wp-prog{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.wp-prog-fill{height:100%;background:var(--green-light);border-radius:3px}
+.wp-cat{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;padding:7px 13px 5px;background:var(--bg);border-bottom:1px solid var(--border)}
+.wp-task{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 13px;border-bottom:1px solid var(--border);gap:10px}
+.wp-task:last-child{border:none}
+.wp-task-name{font-size:14px;line-height:1.3}
+.wp-task-note{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.wp-task-h{font-size:13px;font-weight:600;color:var(--text-muted);flex-shrink:0}
+
+/* KOSTEN BADGE */
+.kosten-badge{font-size:11px;font-weight:600;color:var(--gold);margin-left:4px}
+
+/* PHOTO */
+.photo-zone{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:13px;margin-top:4px;transition:border-color .15s;position:relative;overflow:hidden}
+.photo-zone:hover{border-color:var(--green-mid)}
+.photo-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.photo-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photo-thumb-wrap{position:relative;width:72px;height:72px}
+.photo-thumb-wrap img{width:72px;height:72px;border-radius:8px;object-fit:cover}
+.photo-rm{position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* DETAIL */
+.detail-section{margin-bottom:14px}
+.detail-lbl{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px}
+.detail-val{font-size:15px;color:var(--text);line-height:1.55}
+.hb-detail{background:var(--orange-pale);border:1px solid rgba(217,119,6,.3);border-left:3px solid var(--orange);border-radius:9px;padding:12px 14px;font-size:14px;color:var(--orange);line-height:1.6}
+.hb-detail strong{font-weight:700;display:block;margin-bottom:4px}
+.detail-photo{width:100%;max-height:200px;object-fit:cover;border-radius:9px;cursor:pointer;margin-top:4px}
+
+/* PHOTO FS */
+.photo-fs{display:none;position:fixed;inset:0;background:#000;z-index:400;align-items:center;justify-content:center;cursor:pointer}
+.photo-fs.open{display:flex}
+.photo-fs img{max-width:100%;max-height:100%;object-fit:contain}
+
+/* SETTINGS */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid var(--border)}
+.set-row:last-child{border:none}
+.set-row .lbl{font-size:14px}
+.set-row .sub{font-size:12px;color:var(--text-muted)}
+.set-btn{padding:7px 15px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text);font-family:inherit}
+</style>
+</head>
+<body>
+
+<!-- PW GATE -->
+<div class="pw-gate" id="pw-gate">
+  <div class="pw-box">
+    <h2>🌿 Serviceportal Intern</h2>
+    <p>Sidonie-Scharfe-Stiftung · Zehlendorf</p>
+    <label for="pw-in" style="text-transform:none;font-size:14px;color:var(--text);margin:0">Passwort</label>
+    <input type="password" class="pw-input" id="pw-in" placeholder="Passwort eingeben …" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Anmelden</button>
+    <div class="pw-err" id="pw-err">Falsches Passwort.</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <h1>🌿 Serviceportal</h1>
+    <div class="hdr-sub">Sidonie-Scharfe-Stiftung · Zehlendorf</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-badge" id="hb-badge">0 offen</div>
+    <div class="sync-dot" id="sync-dot"></div>
+  </div>
+</div>
+
+<nav>
+  <button class="active" onclick="show('auftraege',this)">Aufträge</button>
+  <button onclick="show('wochenplan',this)">Wochenplan</button>
+  <button onclick="show('bewohner',this)">Bewohner</button>
+  <button onclick="show('settings',this)">Einstellungen</button>
+</nav>
+
+<!-- AUFTRÄGE -->
+<div class="view active" id="view-auftraege">
+  <div class="stat-row" id="au-stats"></div>
+  <div id="au-budget"></div>
+
+  <div class="hb-banner" id="hb-banner">
+    <strong>⚠️ Handlungsbedarf</strong>
+    Es gibt Aufträge mit einer Rückmeldung von Herrn Schneider, die Sie bitte an die Bewohnerin weitergeben.
+  </div>
+
+  <div class="sec">Neuen Auftrag anlegen</div>
+  <div class="kat-grid">
+    <button class="kat-tile kat-schaden" onclick="openNew('Schaden')">
+      <span class="kt-icon">🔧</span><span class="kt-name">Schaden melden</span>
+      <span class="kt-desc">Defekt, kaputt, nicht funktionierend</span>
+    </button>
+    <button class="kat-tile kat-moebel" onclick="openNew('Möbel & Aufbau')">
+      <span class="kt-icon">🛋️</span><span class="kt-name">Möbel & Aufbau</span>
+      <span class="kt-desc">Aufbauen, abbauen, umstellen</span>
+    </button>
+    <button class="kat-tile kat-sperr" onclick="openNew('Sperrmüll')">
+      <span class="kt-icon">🗑️</span><span class="kt-name">Sperrmüll</span>
+      <span class="kt-desc">Sperrige Gegenstände entsorgen</span>
+    </button>
+    <button class="kat-tile kat-auftrag" onclick="openNew('Kleiner Auftrag')">
+      <span class="kt-icon">🔨</span><span class="kt-name">Kleiner Auftrag</span>
+      <span class="kt-desc">Bild, Regal, Glühbirne …</span>
+    </button>
+  </div>
+
+  <div class="sec">Laufende Aufträge</div>
+  <div class="chips" id="au-filter">
+    <button class="chip active" onclick="setFilter('Alle',this)">Alle</button>
+    <button class="chip" onclick="setFilter('Offen',this)">Offen</button>
+    <button class="chip" onclick="setFilter('Kosten geschätzt',this)">💰 Freigabe?</button>
+    <button class="chip" onclick="setFilter('Freigegeben',this)">✅ Freigegeben</button>
+    <button class="chip" onclick="setFilter('In Umsetzung',this)">🔨 In Umsetzung</button>
+    <button class="chip" onclick="setFilter('Abgeschlossen',this)">✓ Abgeschlossen</button>
+    <button class="chip" onclick="setFilter('Handlungsbedarf',this)">⚠️ Handlungsbedarf</button>
+  </div>
+  <div class="card" id="au-list">
+    <div class="empty"><div class="empty-icon">⏳</div><p>Wird geladen …</p></div>
+  </div>
+</div>
+
+<!-- WOCHENPLAN -->
+<div class="view" id="view-wochenplan">
+  <div id="wp-week-bar"></div>
+  <div class="sec" id="wp-month-lbl"></div>
+  <div class="card" id="wp-list"></div>
+</div>
+
+
+<!-- BEWOHNER -->
+<div class="view" id="view-bewohner">
+  <div class="stat-row" id="bw-stats"></div>
+  <div class="sec">Bewohnerinnen</div>
+  <div class="card" id="bw-list">
+    <div class="empty"><div class="empty-icon">⏳</div><p>Wird geladen …</p></div>
+  </div>
+</div>
+
+<!-- EINSTELLUNGEN -->
+<div class="view" id="view-settings">
+  <div class="sec">Konto</div>
+  <div class="card">
+    <div class="set-row"><div><div class="lbl">Angemeldet als</div><div class="sub">Frau Schwade</div></div></div>
+    <div class="set-row"><div><div class="lbl">Passwort ändern</div></div><button class="set-btn" onclick="changePw()">Ändern</button></div>
+    <div class="set-row"><div class="lbl">Abmelden</div><button class="set-btn" style="color:var(--red)" onclick="logout()">Abmelden</button></div>
+  </div>
+  <div class="sec">Info</div>
+  <div class="card">
+    <div class="set-row"><div class="lbl">Hausmeister</div><span style="color:var(--text-muted);font-size:13px">Hendrik Schneider</span></div>
+    <div class="set-row"><div class="lbl">Objekt</div><span style="color:var(--text-muted);font-size:13px">Scharfestraße 4–6, 14163 Berlin</span></div>
+    <div class="set-row"><div class="lbl">Version</div><span style="color:var(--text-muted);font-size:13px">1.0 · Aug 2026</span></div>
+  </div>
+</div>
+
+<!-- NEUER AUFTRAG MODAL -->
+<div class="overlay" id="ov-new" onclick="ovClose('ov-new',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="n-modal-title">Neuer Auftrag</h2>
+      <button class="modal-close" onclick="ovClose('ov-new')">×</button>
+    </div>
+    <div class="n-kat-hdr">
+      <span class="n-kat-hdr-icon" id="n-kat-icon"></span>
+      <span class="n-kat-hdr-title" id="n-kat-title"></span>
+    </div>
+
+    <label>Bewohnerin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <select id="n-bw"><option value="">Keine Zuordnung</option></select>
+
+    <!-- Schaden -->
+    <div id="nf-schaden" class="nf-cat" style="display:none">
+      <label>Wo ist das Problem?</label>
+      <input type="text" id="n-s-ort" placeholder="z. B. Treppenhaus, Eingang, Keller …">
+      <label>Was ist das Problem?</label>
+      <textarea id="n-s-prob" placeholder="So genau wie möglich beschreiben …"></textarea>
+    </div>
+    <!-- Möbel -->
+    <div id="nf-moebel" class="nf-cat" style="display:none">
+      <label>Was soll gemacht werden?</label>
+      <select id="n-m-art"><option>Möbel aufbauen</option><option>Möbel abbauen</option><option>Möbel umstellen</option><option>Sonstiges</option></select>
+      <label>Was genau?</label>
+      <textarea id="n-m-was" placeholder="z. B. Kleiderschrank 2-türig …"></textarea>
+      <label>Aktueller Standort</label>
+      <input type="text" id="n-m-wo" placeholder="z. B. Suite 3, Flur …">
+      <label>Neuer Standort <span style="text-transform:none;font-weight:400;font-size:11px">— falls umstellen</span></label>
+      <input type="text" id="n-m-ziel" placeholder="optional">
+    </div>
+    <!-- Sperrmüll -->
+    <div id="nf-sperr" class="nf-cat" style="display:none">
+      <label>Was soll entsorgt werden?</label>
+      <textarea id="n-sp-was" placeholder="z. B. alter Sessel, ca. 80 cm breit …"></textarea>
+      <label>Wo steht es?</label>
+      <input type="text" id="n-sp-wo" placeholder="z. B. Suite 3, Keller …">
+      <label>Wunschtermin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+      <input type="text" id="n-sp-termin" placeholder="z. B. Ende August …">
+    </div>
+    <!-- Kleiner Auftrag -->
+    <div id="nf-auftrag" class="nf-cat" style="display:none">
+      <label>Was soll gemacht werden?</label>
+      <select id="n-a-art"><option>Bild aufhängen</option><option>Regal montieren</option><option>Glühbirne wechseln</option><option>Gardine aufhängen</option><option>Sonstiges</option></select>
+      <label>Wo? (Zimmer / Bereich)</label>
+      <input type="text" id="n-a-wo" placeholder="z. B. Suite 3 …">
+      <label>Details <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+      <textarea id="n-a-details" placeholder="z. B. 3 Bilder, Haken vorhanden …"></textarea>
+    </div>
+
+    <label>Priorität</label>
+    <select id="n-prio">
+      <option value="Hoch">🔴 Hoch — sofort erledigen</option>
+      <option value="Mittel" selected>🟡 Mittel — bald erledigen</option>
+      <option value="Niedrig">🟢 Niedrig — kann warten</option>
+    </select>
+    <label>Foto <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <div class="photo-zone">📷 Foto aufnehmen oder auswählen
+      <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
+    </div>
+    <div class="photo-previews" id="photo-previews"></div>
+    <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Auftrag speichern</button>
+    <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="ov-detail" onclick="ovClose('ov-detail',event)">
+  <div class="modal" id="detail-body"></div>
+</div>
+
+
+<!-- BEWOHNER MODAL -->
+<div class="overlay" id="ov-bw" onclick="ovClose('ov-bw',event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2 id="bw-modal-title">Bewohnerin</h2>
+      <button class="modal-close" onclick="ovClose('ov-bw')">×</button>
+    </div>
+    <label>Suite-Nummer</label>
+    <input type="text" id="bw-zimmer" placeholder="z. B. 7">
+    <label>Vorname</label>
+    <input type="text" id="bw-name" placeholder="z. B. Maria">
+    <label>Kontaktpräferenz</label>
+    <select id="bw-kontakt" onchange="toggleKontaktFelder()">
+      <option>Türzettel</option><option>E-Mail</option><option>Anruf</option><option>Persönlich</option>
+    </select>
+    <div id="bw-email-row" style="display:none">
+      <label>E-Mail-Adresse</label>
+      <input type="email" id="bw-email" placeholder="z. B. maria@email.de">
+    </div>
+    <div id="bw-tel-row" style="display:none">
+      <label>Telefonnummer</label>
+      <input type="text" id="bw-tel" placeholder="z. B. 030 123456">
+    </div>
+    <input type="hidden" id="bw-edit-id">
+    <button class="btn btn-primary" onclick="saveBewohner()" id="bw-save-btn">Speichern</button>
+    <button class="btn btn-ghost" id="bw-del-btn" style="display:none;color:var(--red)" onclick="deleteBewohnerRow()">Bewohnerin löschen</button>
+    <button class="btn btn-ghost" onclick="ovClose('ov-bw')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- FOTO FULLSCREEN -->
+<div class="photo-fs" id="photo-fs" onclick="this.classList.remove('open')">
+  <img id="photo-fs-img" src="" alt="">
+</div>
+
+<button class="fab" id="fab" onclick="openFab()">+</button>
+
+<script>
+const SB = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
+const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+const AUTH_KEY = 'sw_auth';
+let PW = localStorage.getItem('sw_pw') || 'Schwade26';
+let auftraege = [];
+let bewohnerListe = [];
+let curFilter = 'Alle';
+let curNewKat = null;
+let newPhotos = [];
+let curView = 'auftraege';
+let allBewohner = [];
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function checkPw() {
+  if (document.getElementById('pw-in').value === PW) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('pw-gate').classList.add('hidden');
+    init();
+  } else {
+    document.getElementById('pw-err').classList.add('show');
+    document.getElementById('pw-in').value = '';
+    document.getElementById('pw-in').focus();
+  }
+}
+function logout() { sessionStorage.removeItem(AUTH_KEY); location.reload(); }
+function changePw() {
+  const np = prompt('Neues Passwort (mind. 4 Zeichen):');
+  if (!np || np.length < 4) { alert('Zu kurz.'); return; }
+  PW = np; localStorage.setItem('sw_pw', np);
+  alert('Passwort geändert.');
+}
+if (sessionStorage.getItem(AUTH_KEY)) {
+  document.getElementById('pw-gate').classList.add('hidden');
+  document.addEventListener('DOMContentLoaded', init);
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function show(id, btn) {
+  curView = id;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'wochenplan') renderWochenplan();
+  if (id === 'bewohner') loadBewohnerList();
+}
+function ovOpen(id) { document.getElementById(id).classList.add('open'); }
+function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); }
+
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+async function sbReq(path, opts = {}) {
+  return fetch(`${SB}/rest/v1/${path}`, {
+    headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation', ...opts.headers },
+    ...opts
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  setSyncDot('syncing');
+  try {
+    const [r1, r2] = await Promise.all([
+      sbReq('schaden?order=created_at.desc&limit=500&select=*'),
+      sbReq('bewohner?aktiv=eq.true&order=zimmer.asc&select=id,name,zimmer')
+    ]);
+    auftraege = (await r1.json()).map(fromSB);
+    bewohnerListe = r2.ok ? await r2.json() : [];
+    setSyncDot('ok');
+  } catch {
+    setSyncDot('error');
+    auftraege = [];
+  }
+  render();
+  loadBudget();
+}
+
+function setSyncDot(state) {
+  const d = document.getElementById('sync-dot');
+  d.className = 'sync-dot' + (state==='syncing'?' syncing':state==='error'?' error':'');
+}
+
+function fromSB(r) {
+  return {
+    id: r.id, sb_id: r.id,
+    datum: r.datum || '',
+    ort: r.ort || '',
+    prob: r.problem || '',
+    prio: r.prio || 'Mittel',
+    von: r.von || '',
+    name: r.name || null,
+    zimmer: r.zimmer || null,
+    status: r.status || 'Offen',
+    kategorie: r.kategorie || null,
+    freigabe_by: r.freigabe_by || null,
+    rueckmeldung: r.rueckmeldung || '',
+    kosten: r.kosten != null ? r.kosten : null,
+    photos: r.foto ? [r.foto] : [],
+    created_at: r.created_at
+  };
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render() {
+  const offen = auftraege.filter(a => a.status === 'Offen').length;
+  const kostenAusstehend = auftraege.filter(a => a.status === 'Kosten geschätzt').length;
+  const hb = auftraege.filter(a => a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status)).length;
+
+  document.getElementById('au-stats').innerHTML = `
+    <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Offen</div></div>
+    <div class="stat"><div class="stat-val${kostenAusstehend>0?' alert':''}">${kostenAusstehend}</div><div class="stat-lbl">Freigabe nötig</div></div>
+    <div class="stat"><div class="stat-val${hb>0?' alert':''}">${hb}</div><div class="stat-lbl">Handlungsbedarf</div></div>`;
+  renderBudgetBar();
+
+  document.getElementById('hb-banner').classList.toggle('show', hb > 0);
+  const badge = document.getElementById('hb-badge');
+  badge.textContent = hb + ' Handlungsbedarf';
+  badge.className = 'hdr-badge' + (hb > 0 ? ' show' : '');
+
+  let list = [...auftraege];
+  if (curFilter === 'Handlungsbedarf') list = list.filter(a => a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status));
+  else if (curFilter === 'Abgeschlossen') list = list.filter(a => ['Abgeschlossen','Erledigt'].includes(a.status));
+  else if (curFilter !== 'Alle') list = list.filter(a => a.status === curFilter);
+
+  document.getElementById('au-list').innerHTML = list.length
+    ? list.map(aiHTML).join('')
+    : '<div class="empty"><div class="empty-icon">🌿</div><p>Keine Aufträge</p></div>';
+}
+
+const KAT_CSS = {'Schaden':'b-kat-schaden','Möbel & Aufbau':'b-kat-moebel','Sperrmüll':'b-kat-sperr','Kleiner Auftrag':'b-kat-auftrag'};
+const KAT_ICON = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
+const bc = s => s==='Offen'?'b-offen':s==='Kosten geschätzt'?'b-kosten':s==='Freigegeben'?'b-freigegeben':s==='In Umsetzung'?'b-laufend':s==='Abgeschlossen'?'b-abgeschlossen':s==='Erledigt'?'b-done':'b-laufend';
+const dc = p => p==='Hoch'?'d-hoch':p==='Mittel'?'d-mittel':'d-niedrig';
+
+function aiHTML(a) {
+  const katBadge = a.kategorie && KAT_CSS[a.kategorie]
+    ? `<span class="b-kat ${KAT_CSS[a.kategorie]}">${KAT_ICON[a.kategorie]} ${a.kategorie}</span>` : '';
+  const nameInfo = a.name ? ` · ${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}` : '';
+  const kostenBadge = a.kosten != null ? `<span class="kosten-badge">· ${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
+  const hbFlag = (a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status))
+    ? `<div class="hb-flag">⚠️ Rückmeldung von Herrn Schneider — bitte weitergeben</div>` : '';
+  return `<div class="ai" onclick="openDetail('${a.id}')">
+    <div class="ai-top">
+      <div class="ai-dot ${a.status==='Erledigt'?'d-done':dc(a.prio)}"></div>
+      <div class="ai-body">
+        <div class="ai-title">${a.prob}${katBadge}</div>
+        <div class="ai-meta">${a.ort}${nameInfo} · ${a.datum}${kostenBadge}</div>
+        ${hbFlag}
+      </div>
+      ${a.photos&&a.photos[0]?`<img class="ai-thumb" src="${a.photos[0]}" alt="">` : ''}
+      <div class="ai-right"><span class="badge ${bc(a.status)}">${a.status}</span></div>
+    </div>
+  </div>`;
+}
+
+function setFilter(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('#au-filter .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+function openDetail(id) {
+  const a = auftraege.find(x => x.id === id);
+  if (!a) return;
+  const katBadge = a.kategorie && KAT_CSS[a.kategorie]
+    ? `<span class="b-kat ${KAT_CSS[a.kategorie]}" style="font-size:12px;padding:3px 9px">${KAT_ICON[a.kategorie]} ${a.kategorie}</span>` : '';
+  const hbSection = (a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status)) ? `
+    <div class="detail-section">
+      <div class="hb-detail">
+        <strong>⚠️ Rückmeldung von Herrn Schneider — bitte an Bewohnerin weitergeben:</strong>
+        ${a.rueckmeldung}
+      </div>
+    </div>` : '';
+  const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}</div></div>` : '';
+  const freigabeSection = (a.status === 'Kosten geschätzt' && a.kosten != null) ? `
+    <div class="detail-section" style="background:var(--yellow-pale);border-radius:9px;padding:12px 14px;border:1px solid rgba(233,167,32,.3)">
+      <div style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:6px">💰 Kosten: ${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</div>
+      <div style="font-size:12.5px;color:#92400e;margin-bottom:10px">Bitte prüfen und freigeben, damit die Umsetzung starten kann.</div>
+      <button onclick="genehmigenFreigabe('${a.id}')" style="display:block;width:100%;padding:11px;background:#166534;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer">✅ Freigabe erteilen</button>
+    </div>` : '';
+  const photoSection = a.photos && a.photos[0] ? `
+    <div class="detail-section">
+      <div class="detail-lbl">Foto</div>
+      <img class="detail-photo" src="${a.photos[0]}" alt="" onclick="document.getElementById('photo-fs-img').src=this.src;document.getElementById('photo-fs').classList.add('open')">
+    </div>` : '';
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="modal-hdr">
+      <div>${katBadge} <span class="badge ${bc(a.status)}" style="margin-left:4px">${a.status}</span></div>
+      <button class="modal-close" onclick="ovClose('ov-detail')">×</button>
+    </div>
+    ${hbSection}
+    ${freigabeSection}
+    <div class="detail-section">
+      <div class="detail-lbl">Beschreibung</div>
+      <div class="detail-val">${a.prob}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-lbl">Ort</div>
+      <div class="detail-val">${a.ort}</div>
+    </div>
+    ${nameSection}
+    <div class="detail-section">
+      <div class="detail-lbl">Gemeldet</div>
+      <div class="detail-val">${a.datum}${a.von ? ' · von ' + a.von : ''}</div>
+    </div>
+    ${a.kosten != null ? `<div class="detail-section"><div class="detail-lbl">Kosten (Schätzung)</div><div class="detail-val" style="color:var(--gold);font-weight:600">${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</div></div>` : ''}
+    ${photoSection}`;
+  ovOpen('ov-detail');
+}
+
+// ── NEUER AUFTRAG ─────────────────────────────────────────────────────────────
+const ICONS = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
+const KAT_MAP = {'Schaden':'nf-schaden','Möbel & Aufbau':'nf-moebel','Sperrmüll':'nf-sperr','Kleiner Auftrag':'nf-auftrag'};
+
+function openNew(kat) {
+  curNewKat = kat;
+  newPhotos = [];
+  document.getElementById('photo-previews').innerHTML = '';
+  document.getElementById('n-prio').value = 'Mittel';
+  ['n-s-ort','n-s-prob','n-m-was','n-m-wo','n-m-ziel','n-sp-was','n-sp-wo','n-sp-termin','n-a-wo','n-a-details'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  // Bewohnerin dropdown
+  const dd = document.getElementById('n-bw');
+  dd.innerHTML = '<option value="">Keine Zuordnung</option>';
+  bewohnerListe.sort((a,b) => (parseInt(a.zimmer)||0)-(parseInt(b.zimmer)||0)).forEach(b => {
+    const o = document.createElement('option'); o.value = b.name;
+    o.textContent = `Suite ${b.zimmer} — ${b.name}`; dd.appendChild(o);
+  });
+  // Show right category fields
+  document.querySelectorAll('.nf-cat').forEach(el => el.style.display = 'none');
+  document.getElementById(KAT_MAP[kat]).style.display = 'block';
+  document.getElementById('n-kat-icon').textContent = ICONS[kat];
+  document.getElementById('n-kat-title').textContent = kat;
+  document.getElementById('n-modal-title').textContent = kat;
+  ovOpen('ov-new');
+  setTimeout(() => {
+    const first = document.querySelector(`#${KAT_MAP[kat]} input[type=text], #${KAT_MAP[kat]} textarea`);
+    if (first) first.focus();
+  }, 200);
+}
+
+function addPhotos(e) {
+  [...e.target.files].forEach(f => {
+    const r = new FileReader();
+    r.onload = ev => { newPhotos.push(ev.target.result); renderPreviews(); };
+    r.readAsDataURL(f);
+  });
+  e.target.value = '';
+}
+function renderPreviews() {
+  document.getElementById('photo-previews').innerHTML = newPhotos.map((p,i) =>
+    `<div class="photo-thumb-wrap"><img src="${p}" alt=""><button class="photo-rm" onclick="rmPhoto(${i})">×</button></div>`).join('');
+}
+function rmPhoto(i) { newPhotos.splice(i,1); renderPreviews(); }
+
+// ── WOCHENPLAN ────────────────────────────────────────────────────────────────
+const TASKS = [
+  {cat:'Rasen',name:'Rasen mähen',m:[8,9,10,11],h:1.5,note:'Aug/Sep: 1–2×/Woche · Okt/Nov: alle 2 Wochen',occ:{8:3,9:4,10:2,11:1}},
+  {cat:'Rasen',name:'Rasenkanten trimmen',m:[8,9,10],h:1,note:'Im Anschluss ans Mähen',occ:{8:1,9:2,10:2}},
+  {cat:'Rasen',name:'Bewässerung bei Hitze',m:[8,9],h:1,note:'Morgens wässern',occ:{8:4,9:2}},
+  {cat:'Rasen',name:'Herbstdünger ausbringen',m:[9],h:1,note:'Mitte September',occ:{9:1}},
+  {cat:'Wege & Plätze',name:'Wege fegen & reinigen',m:[8,9,10,11,12],h:1.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Wege & Plätze',name:'Abfälle aufsammeln',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Wege & Plätze',name:'Eingangsbereich & Blumenbeete',m:[8,9,10],h:0.5,note:'Gepflegtes Erscheinungsbild',occ:{8:4,9:4,10:2}},
+  {cat:'Wege & Plätze',name:'Unkraut in Fugen entfernen',m:[8,9,10],h:1,note:'Gehwege und Pflaster',occ:{8:1,9:1,10:1}},
+  {cat:'Wege & Plätze',name:'Müllstandplatz kontrollieren',m:[8,9,10,11,12],h:0.5,note:'Wöchentlich',occ:{8:3,9:4,10:4,11:4,12:4}},
+  {cat:'Hecken & Gehölze',name:'Heckenschnitt (letzter)',m:[9],h:4,note:'Bis Ende September',occ:{9:1}},
+  {cat:'Hecken & Gehölze',name:'Strauchschnitt (leicht)',m:[11],h:3,note:'Kein Starkschnitt',occ:{11:1}},
+  {cat:'Hecken & Gehölze',name:'Baumkontrolle nach Sturm',m:[10,11,12],h:1,note:'Kranke Äste melden',occ:{10:1,11:1,12:1}},
+  {cat:'Beete',name:'Unkraut jäten',m:[8,9,10],h:1,note:'Beete und Rahmenbepflanzung',occ:{8:2,9:2,10:2}},
+  {cat:'Beete',name:'Beete winterfest machen',m:[10],h:3,note:'Stauden schneiden, Mulch',occ:{10:1}},
+  {cat:'Laub',name:'Laub entfernen und entsorgen',m:[10,11,12],h:2,note:'⚠️ Nasses Laub = Rutschgefahr!',occ:{10:3,11:5,12:2}},
+  {cat:'Sitzbänke',name:'Bänke & Möbel reinigen',m:[8,9,10,11],h:0.5,note:'Alle 2 Wochen',occ:{8:2,9:2,10:1,11:1}},
+  {cat:'Sitzbänke',name:'Bänke auf Schäden prüfen',m:[8,9,10,11],h:0.5,note:'Risse, Schrauben, Splitter',occ:{8:1,9:1,10:1,11:1}},
+  {cat:'Sitzbänke',name:'Bänke und Möbel einlagern',m:[11],h:1,note:'Vor Frost schützen',occ:{11:1}},
+  {cat:'Winterdienst',name:'Winterdienst vorbereiten',m:[11],h:2,note:'Streugut und Geräte prüfen',occ:{11:1}},
+  {cat:'Winterdienst',name:'Schnee räumen & streuen',m:[12],h:2,note:'Bis 7:00 Uhr werktags',occ:{12:4}},
+  {cat:'Kontrollen',name:'Außenbeleuchtung kontrollieren',m:[8,9,10,11,12],h:0.5,note:'Monatlich',occ:{8:1,9:1,10:1,11:1,12:1}},
+  {cat:'Kontrollen',name:'Spielgeräte Sichtkontrolle',m:[8,9,10,11,12],h:1,note:'Mängel sofort melden',occ:{8:1,9:1,10:1,11:1,12:1}},
+];
+const MN = {8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
+const WPM = {8:2.5,9:4,10:4,11:4,12:4};
+const cm = () => new Date().getMonth() + 1;
+function kw() { const d=new Date(),j4=new Date(d.getFullYear(),0,4),sw=new Date(j4); sw.setDate(j4.getDate()-(j4.getDay()||7)+1); return Math.ceil((d-sw)/(7*864e5))+1; }
+function wkMon() { const d=new Date(),dw=d.getDay()||7,m=new Date(d); m.setDate(d.getDate()-(dw-1)); return m; }
+
+function renderWochenplan() {
+  const m = Math.min(12, Math.max(8, cm()));
+  const mt = TASKS.filter(t => t.m.includes(m));
+  const ph = mt.reduce((s,t) => s + (t.occ[m]||0)*t.h, 0) / (WPM[m]||4);
+  const pc = Math.min(100, Math.round(ph / 40 * 100));
+  const mon = wkMon();
+  const fri = new Date(mon); fri.setDate(mon.getDate()+4);
+  const fmt = x => x.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+
+  document.getElementById('wp-month-lbl').textContent = MN[m] + ' 2026 — Außenanlage';
+  document.getElementById('wp-week-bar').innerHTML = `
+    <div class="wp-week">
+      <div class="wp-week-top">
+        <h3>KW ${kw()} · ${fmt(mon)}–${fmt(fri)}</h3>
+        <span>~${ph.toFixed(1)}h/Woche Außenanlage</span>
+      </div>
+      <div class="wp-prog"><div class="wp-prog-fill" style="width:${pc}%"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:5px">Restzeit für Gebäude & Aufträge: ~${(40-ph).toFixed(1)}h/Woche</div>
+    </div>`;
+
+  const by = {};
+  mt.forEach(t => { if (!by[t.cat]) by[t.cat]=[]; by[t.cat].push(t); });
+  document.getElementById('wp-list').innerHTML = Object.entries(by).map(([cat, items]) => `
+    <div class="wp-cat">${cat}</div>
+    ${items.map(t => {
+      const occ = t.occ[m]||0, tot = +(occ*t.h).toFixed(1);
+      return `<div class="wp-task">
+        <div><div class="wp-task-name">${t.name}</div><div class="wp-task-note">${t.note}</div></div>
+        <div class="wp-task-h">${tot>0?tot+'h':'–'}<div style="font-size:10px;color:var(--text-muted)">${occ>1?occ+'×':occ===1?'1×':'–'}</div></div>
+      </div>`;
+    }).join('')}`).join('');
+}
+
+async function saveNew() {
+  let ort = '', prob = '';
+  if (curNewKat === 'Schaden') {
+    ort = document.getElementById('n-s-ort').value.trim();
+    prob = document.getElementById('n-s-prob').value.trim();
+    if (!ort || !prob) { alert('Bitte Ort und Problem angeben.'); return; }
+  } else if (curNewKat === 'Möbel & Aufbau') {
+    const art = document.getElementById('n-m-art').value;
+    const was = document.getElementById('n-m-was').value.trim();
+    const wo  = document.getElementById('n-m-wo').value.trim();
+    const ziel = document.getElementById('n-m-ziel').value.trim();
+    if (!was || !wo) { alert('Bitte Beschreibung und Standort angeben.'); return; }
+    ort = wo; prob = `${art}: ${was}${ziel ? ' → ' + ziel : ''}`;
+  } else if (curNewKat === 'Sperrmüll') {
+    const was = document.getElementById('n-sp-was').value.trim();
+    const wo  = document.getElementById('n-sp-wo').value.trim();
+    const ter = document.getElementById('n-sp-termin').value.trim();
+    if (!was || !wo) { alert('Bitte Gegenstand und Standort angeben.'); return; }
+    ort = wo; prob = was + (ter ? ` · Wunschtermin: ${ter}` : '');
+  } else if (curNewKat === 'Kleiner Auftrag') {
+    const art = document.getElementById('n-a-art').value;
+    const wo  = document.getElementById('n-a-wo').value.trim();
+    const det = document.getElementById('n-a-details').value.trim();
+    if (!wo) { alert('Bitte Ort/Zimmer angeben.'); return; }
+    ort = wo; prob = art + (det ? `: ${det}` : '');
+  }
+
+  const bwName = document.getElementById('n-bw').value;
+  const bwObj  = bewohnerListe.find(b => b.name === bwName);
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Speichert …'; btn.disabled = true;
+
+  const now = new Date();
+  const datum = now.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+  const payload = {
+    datum, ort, problem: prob,
+    prio: document.getElementById('n-prio').value,
+    von: 'Frau Schwade', status: 'Offen',
+    kategorie: curNewKat,
+    name: bwObj?.name || null,
+    zimmer: bwObj?.zimmer || null,
+    foto: newPhotos[0] || null
+  };
+
+  try {
+    const res = await sbReq('schaden', { method: 'POST', body: JSON.stringify(payload) });
+    if (!res.ok) throw 0;
+    const [created] = await res.json();
+    auftraege.unshift(fromSB({...payload, id: created.id, created_at: now.toISOString()}));
+    render();
+    ovClose('ov-new');
+  } catch {
+    alert('Fehler beim Speichern. Bitte erneut versuchen.');
+  }
+  btn.textContent = 'Auftrag speichern'; btn.disabled = false;
+}
+// ── BEWOHNER ──────────────────────────────────────────────────────────────────
+async function loadBewohnerList() {
+  setSyncDot('syncing');
+  try {
+    const r = await sbReq('bewohner?order=zimmer.asc&select=*');
+    allBewohner = r.ok ? await r.json() : [];
+    setSyncDot('ok');
+  } catch { setSyncDot('error'); allBewohner = []; }
+  renderBewohner();
+  renderBwStats();
+}
+
+function renderBwStats() {
+  const aktiv = allBewohner.filter(b => b.aktiv !== false).length;
+  const inaktiv = allBewohner.length - aktiv;
+  document.getElementById('bw-stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${allBewohner.length}</div><div class="stat-lbl">Gesamt</div></div>
+    <div class="stat"><div class="stat-val">${aktiv}</div><div class="stat-lbl">Aktiv</div></div>
+    <div class="stat"><div class="stat-val">${inaktiv}</div><div class="stat-lbl">Inaktiv</div></div>`;
+}
+
+const KONTAKT_ICON = {'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'};
+
+function renderBewohner() {
+  const el = document.getElementById('bw-list');
+  if (!allBewohner.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Noch keine Bewohnerinnen</p></div>';
+    return;
+  }
+  el.innerHTML = allBewohner.map(b => `
+    <div class="bw-row" onclick="openEditBw('${b.id}')">
+      <div class="bw-zimmer">S.<br>${b.zimmer||'?'}</div>
+      <div class="bw-info">
+        <div class="bw-rname">${b.name||'—'}</div>
+        <div class="bw-rmeta">Suite ${b.zimmer||'?'} · ${KONTAKT_ICON[b.kontakt_art]||'🖨'} ${b.kontakt_art||'Türzettel'}</div>
+      </div>
+      <button class="bw-toggle ${b.aktiv!==false?'aktiv':''}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}',${b.aktiv!==false})">${b.aktiv!==false?'Aktiv':'Inaktiv'}</button>
+    </div>`).join('');
+}
+
+function openNewBw() {
+  document.getElementById('bw-modal-title').textContent = 'Neue Bewohnerin';
+  document.getElementById('bw-zimmer').value = '';
+  document.getElementById('bw-name').value = '';
+  document.getElementById('bw-kontakt').value = 'Türzettel';
+  document.getElementById('bw-email').value = '';
+  document.getElementById('bw-tel').value = '';
+  document.getElementById('bw-edit-id').value = '';
+  document.getElementById('bw-del-btn').style.display = 'none';
+  toggleKontaktFelder();
+  ovOpen('ov-bw');
+}
+
+function openEditBw(id) {
+  const b = allBewohner.find(x => String(x.id) === String(id));
+  if (!b) return;
+  document.getElementById('bw-modal-title').textContent = 'Bewohnerin bearbeiten';
+  document.getElementById('bw-zimmer').value = b.zimmer || '';
+  document.getElementById('bw-name').value = b.name || '';
+  document.getElementById('bw-kontakt').value = b.kontakt_art || 'Türzettel';
+  document.getElementById('bw-email').value = b.email || '';
+  document.getElementById('bw-tel').value = b.telefon || '';
+  document.getElementById('bw-edit-id').value = b.id;
+  document.getElementById('bw-del-btn').style.display = 'block';
+  toggleKontaktFelder();
+  ovOpen('ov-bw');
+}
+
+function toggleKontaktFelder() {
+  const k = document.getElementById('bw-kontakt').value;
+  document.getElementById('bw-email-row').style.display = k === 'E-Mail' ? 'block' : 'none';
+  document.getElementById('bw-tel-row').style.display = k === 'Anruf' ? 'block' : 'none';
+}
+
+async function saveBewohner() {
+  const zimmer = document.getElementById('bw-zimmer').value.trim();
+  const name   = document.getElementById('bw-name').value.trim();
+  if (!zimmer || !name) { alert('Bitte Suite-Nummer und Vorname eingeben.'); return; }
+  const editId = document.getElementById('bw-edit-id').value;
+  const payload = {
+    zimmer, name,
+    kontakt_art: document.getElementById('bw-kontakt').value,
+    email: document.getElementById('bw-email').value.trim() || null,
+    telefon: document.getElementById('bw-tel').value.trim() || null,
+    aktiv: true
+  };
+  const btn = document.getElementById('bw-save-btn');
+  btn.textContent = 'Speichert …'; btn.disabled = true;
+  try {
+    const res = editId
+      ? await sbReq(`bewohner?id=eq.${editId}`, { method: 'PATCH', body: JSON.stringify(payload) })
+      : await sbReq('bewohner', { method: 'POST', body: JSON.stringify(payload) });
+    if (!res.ok) throw 0;
+    ovClose('ov-bw');
+    await Promise.all([loadBewohnerList(), init()]);
+  } catch { alert('Fehler beim Speichern.'); }
+  btn.textContent = 'Speichern'; btn.disabled = false;
+}
+
+async function toggleBwAktiv(id, isAktiv) {
+  await sbReq(`bewohner?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ aktiv: !isAktiv }) });
+  loadBewohnerList();
+}
+
+async function deleteBewohnerRow() {
+  const id = document.getElementById('bw-edit-id').value;
+  if (!id || !confirm('Bewohnerin wirklich löschen?')) return;
+  await sbReq(`bewohner?id=eq.${id}`, { method: 'DELETE' });
+  ovClose('ov-bw');
+  loadBewohnerList();
+}
+
+function openFab() {
+  if (curView === 'bewohner') openNewBw();
+  else {
+    const firstNavBtn = document.querySelector('nav button');
+    show('auftraege', firstNavBtn);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ── FREIGABE ──────────────────────────────────────────────────────────────────
+async function genehmigenFreigabe(id) {
+  if (!confirm('Freigabe erteilen? Die Kosten werden genehmigt und die Umsetzung kann starten.')) return;
+  try {
+    const res = await sbReq(`schaden?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'Freigegeben', freigabe_by: 'Frau Schwade' })
+    });
+    if (!res.ok) throw 0;
+    const a = auftraege.find(x => x.id === id);
+    if (a) { a.status = 'Freigegeben'; a.freigabe_by = 'Frau Schwade'; }
+    render();
+    ovClose('ov-detail');
+  } catch { alert('Fehler beim Speichern der Freigabe.'); }
+}
+
+// ── BUDGET ────────────────────────────────────────────────────────────────────
+let monatlichesBudget = 500;
+
+async function loadBudget() {
+  try {
+    const res = await sbReq('settings?key=eq.monatliches_budget&select=value');
+    if (res.ok) {
+      const data = await res.json();
+      if (data[0]) monatlichesBudget = parseFloat(data[0].value) || 500;
+    }
+  } catch {}
+  renderBudgetBar();
+}
+
+function renderBudgetBar() {
+  const el = document.getElementById('au-budget');
+  if (!el) return;
+  const now = new Date(), mm = now.getMonth()+1, yyyy = now.getFullYear();
+  const MNS = {1:'Jan',2:'Feb',3:'Mär',4:'Apr',5:'Mai',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Okt',11:'Nov',12:'Dez'};
+  const spent = auftraege
+    .filter(a => {
+      if (a.kosten == null) return false;
+      if (!['Freigegeben','In Umsetzung','Abgeschlossen','Handwerker beauftragt','Erledigt'].includes(a.status)) return false;
+      const p = (a.datum||'').split('.');
+      return p.length >= 3 && parseInt(p[1])===mm && parseInt(p[2])===yyyy;
+    })
+    .reduce((sum,a) => sum+(a.kosten||0), 0);
+  const pct = monatlichesBudget > 0 ? Math.min(100, Math.round(spent/monatlichesBudget*100)) : 0;
+  const warn = pct >= 80;
+  el.innerHTML = `<div class="budget-bar">
+    <div class="budget-row">
+      <span class="budget-lbl">💰 Budget ${MNS[mm]} ${yyyy}</span>
+      <span class="budget-val${warn?' warn':''}">
+        ${spent.toLocaleString('de-DE',{style:'currency',currency:'EUR'})} / ${monatlichesBudget.toLocaleString('de-DE',{style:'currency',currency:'EUR'})}
+      </span>
+    </div>
+    <div class="budget-prog"><div class="budget-fill${warn?' warn':''}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+</script>
+</body>
+</html>
