@@ -113,6 +113,12 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .b-laufend{background:var(--yellow-pale);color:var(--yellow)}
 .b-beauftragt{background:var(--blue-pale);color:var(--blue)}
 .b-done{background:var(--green-pale);color:var(--green-mid)}
+/* ORT-PICKER */
+.ort-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.ort-chip{background:var(--card);border:1.5px solid var(--border);color:var(--text);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit}
+.ort-chip:hover{border-color:var(--green-mid);color:var(--green-mid)}
+.ort-chip.active{background:var(--green-mid);border-color:var(--green-mid);color:#fff;font-weight:600}
+.prob-chip{font-size:12px;padding:5px 11px}
 .b-kat{font-size:9.5px;padding:1px 6px;border-radius:20px;font-weight:600;margin-left:4px}
 .b-kat-schaden{background:var(--red-pale);color:var(--red)}
 .b-kat-moebel{background:var(--blue-pale);color:var(--blue)}
@@ -352,14 +358,33 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
     </div>
 
     <label>Bewohnerin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
-    <select id="n-bw"><option value="">Keine Zuordnung</option></select>
+    <select id="n-bw" onchange="onBwChange()"><option value="">Keine Zuordnung</option></select>
 
     <!-- Schaden -->
     <div id="nf-schaden" class="nf-cat" style="display:none">
       <label>Wo ist das Problem?</label>
-      <input type="text" id="n-s-ort" placeholder="z. B. Treppenhaus, Eingang, Keller …">
-      <label>Was ist das Problem?</label>
-      <textarea id="n-s-prob" placeholder="So genau wie möglich beschreiben …"></textarea>
+      <div class="ort-chips" id="ort-chips-allgemein">
+        <button type="button" class="ort-chip" data-ort="Treppenhaus" onclick="selectOrt(this)">🏛 Treppenhaus</button>
+        <button type="button" class="ort-chip" data-ort="Eingang" onclick="selectOrt(this)">🚪 Eingang</button>
+        <button type="button" class="ort-chip" data-ort="Keller" onclick="selectOrt(this)">📦 Keller</button>
+        <button type="button" class="ort-chip" data-ort="Außenbereich" onclick="selectOrt(this)">🌿 Außen</button>
+        <button type="button" class="ort-chip" data-ort="Gemeinschaftsküche" onclick="selectOrt(this)">🍴 Gemeinschaftsküche</button>
+        <button type="button" class="ort-chip" data-ort="Waschkeller" onclick="selectOrt(this)">🫧 Waschkeller</button>
+        <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+      </div>
+      <div class="ort-chips" id="ort-chips-bewohner" style="display:none">
+        <button type="button" class="ort-chip" data-ort="Zimmer" onclick="selectOrt(this)">🛏 Zimmer</button>
+        <button type="button" class="ort-chip" data-ort="Küche" onclick="selectOrt(this)">🍳 Küche</button>
+        <button type="button" class="ort-chip" data-ort="Badezimmer" onclick="selectOrt(this)">🚿 Bad</button>
+        <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+      </div>
+      <input type="text" id="n-s-ort-frei" placeholder="Genauer Ort …" style="display:none;margin-top:8px">
+      <input type="hidden" id="n-s-ort">
+      <div id="n-s-prob-section" style="display:none">
+        <label style="margin-top:16px">Was ist das Problem?</label>
+        <div class="ort-chips" id="prob-chips" style="margin-bottom:8px"></div>
+        <textarea id="n-s-prob" placeholder="So genau wie möglich beschreiben …"></textarea>
+      </div>
     </div>
     <!-- Möbel -->
     <div id="nf-moebel" class="nf-cat" style="display:none">
@@ -672,9 +697,10 @@ function openNew(kat) {
   newPhotos = [];
   document.getElementById('photo-previews').innerHTML = '';
   document.getElementById('n-prio').value = 'Mittel';
-  ['n-s-ort','n-s-prob','n-m-was','n-m-wo','n-m-ziel','n-sp-was','n-sp-wo','n-sp-termin','n-a-wo','n-a-details'].forEach(id => {
+  ['n-s-prob','n-m-was','n-m-wo','n-m-ziel','n-sp-was','n-sp-wo','n-sp-termin','n-a-wo','n-a-details'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
+  resetOrtPicker();
   // Bewohnerin dropdown
   const dd = document.getElementById('n-bw');
   dd.innerHTML = '<option value="">Keine Zuordnung</option>';
@@ -771,6 +797,69 @@ function renderWochenplan() {
         <div class="wp-task-h">${tot>0?tot+'h':'–'}<div style="font-size:10px;color:var(--text-muted)">${occ>1?occ+'×':occ===1?'1×':'–'}</div></div>
       </div>`;
     }).join('')}`).join('');
+}
+
+const ORT_PROBLEMS = {
+  'Zimmer':           ['Heizung kalt','Rolllade/Jalousie defekt','Steckdose defekt','Licht defekt','Fenster klemmt'],
+  'Küche':            ['Wasserhahn tropft','Abfluss verstopft','Herd/Ofen defekt','Kühlschrank defekt','Abzug defekt'],
+  'Badezimmer':       ['Duschkopf tropft','Abfluss verstopft','WC-Spülung defekt','Handtuchhalter lose','Wasser läuft nicht ab'],
+  'Treppenhaus':      ['Beleuchtung defekt','Geländer locker','Tür klemmt','Stufe beschädigt'],
+  'Eingang':          ['Beleuchtung defekt','Tür klemmt','Klingel defekt','Briefkasten defekt'],
+  'Keller':           ['Beleuchtung defekt','Feuchtigkeit / Schimmel','Tür klemmt','Wasserschaden'],
+  'Außenbereich':     ['Weg beschädigt','Beleuchtung defekt','Geländer locker','Bewässerungsanlage','Vandalismusschaden'],
+  'Gemeinschaftsküche':['Herd defekt','Kühlschrank defekt','Wasserhahn','Abfluss verstopft','Beleuchtung defekt'],
+  'Waschkeller':      ['Waschmaschine defekt','Trockner defekt','Beleuchtung defekt','Feuchtigkeit'],
+};
+
+function onBwChange() {
+  const bw = document.getElementById('n-bw').value;
+  document.getElementById('ort-chips-allgemein').style.display = bw ? 'none' : 'flex';
+  document.getElementById('ort-chips-bewohner').style.display  = bw ? 'flex'  : 'none';
+  resetOrtPicker();
+}
+
+function resetOrtPicker() {
+  document.querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('n-s-ort').value = '';
+  const frei = document.getElementById('n-s-ort-frei');
+  frei.style.display = 'none'; frei.value = '';
+  document.getElementById('n-s-prob-section').style.display = 'none';
+  document.getElementById('n-s-prob').value = '';
+  document.getElementById('prob-chips').innerHTML = '';
+}
+
+function selectOrt(btn) {
+  const ort = btn.dataset.ort;
+  btn.closest('.ort-chips').querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const frei = document.getElementById('n-s-ort-frei');
+  if (ort === 'Sonstiges') {
+    document.getElementById('n-s-ort').value = '';
+    frei.style.display = 'block'; frei.value = '';
+    frei.oninput = () => { document.getElementById('n-s-ort').value = frei.value.trim(); };
+    setTimeout(() => frei.focus(), 50);
+  } else {
+    document.getElementById('n-s-ort').value = ort;
+    frei.style.display = 'none'; frei.value = '';
+  }
+  const probSection = document.getElementById('n-s-prob-section');
+  const probChips   = document.getElementById('prob-chips');
+  document.getElementById('n-s-prob').value = '';
+  document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
+  const suggs = ORT_PROBLEMS[ort] || [];
+  probChips.innerHTML = suggs.map(s =>
+    `<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,'${s.replace(/'/g,"\\'")}')">${s}</button>`
+  ).join('') + '<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,\'\')">✏️ Sonstiges</button>';
+  probSection.style.display = 'block';
+  setTimeout(() => probSection.scrollIntoView({behavior:'smooth',block:'nearest'}), 80);
+}
+
+function selectProb(btn, text) {
+  document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const ta = document.getElementById('n-s-prob');
+  ta.value = text;
+  if (!text) setTimeout(() => ta.focus(), 50);
 }
 
 async function saveNew() {
