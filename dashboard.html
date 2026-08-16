@@ -1275,9 +1275,9 @@ function initApp(){
   const tabs = role==='hm'
     ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},
        {id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},
-       {id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'park',lbl:'🌿 Park'},{id:'zeit',lbl:'⏱️ Zeit'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
+       {id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'pflegeplan',lbl:'Pflegeplan'},{id:'park',lbl:'📋 Projekte'},{id:'zeit',lbl:'⏱️ Zeit'},{id:'log',lbl:'Log'},{id:'einkauf',lbl:'🛒 Einkauf'},{id:'settings',lbl:'⚙️'}]
     : role==='sw'
-    ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'}]
+    ? [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'Schäden'},{id:'buchungen',lbl:'📋 Buchungen'},{id:'termine',lbl:'📅 Termine'},{id:'services',lbl:'🛎️ Services'},{id:'kasse',lbl:'💶 Kasse'},{id:'bewohner',lbl:'👥 Bewohner'},{id:'park',lbl:'📋 Projekte'}]
     : [{id:'uebersicht',lbl:'Übersicht'},{id:'schaeden',lbl:'📋 Schäden'},{id:'kasse',lbl:'💶 Kasse'}];
   const nav=document.getElementById('main-nav');
   nav.innerHTML=tabs.map(t=>`<button onclick="showTab('${t.id}')" id="tab-${t.id}">${t.lbl}</button>`).join('');
@@ -3633,35 +3633,57 @@ async function loadPark(){
   }
 }
 
+let parkFilter = 'Alle';
+
+function parkBereich(p){
+  if(p.bereich) return p.bereich;
+  const m = (p.beschreibung||'').match(/^\[([^\]]+)\]/);
+  return m ? m[1] : 'Park';
+}
+
+function setParkFilter(f){
+  parkFilter = f;
+  renderPark();
+}
+
 function renderPark(){
   const el = document.getElementById('park-content');
   if(!el) return;
 
-  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <div class="sec" style="margin:0">Projekte & Tätigkeiten</div>
-    <button class="set-btn" onclick="openParkProjModal()">+ Neues Projekt</button>
-  </div>`;
+  const aktive  = parkProjekte.filter(p=>p.status!=='Abgeschlossen');
+  const archiv  = parkProjekte.filter(p=>p.status==='Abgeschlossen');
 
-  if(!parkProjekte.length){
-    html += `<div class="park-empty">Noch keine Projekte.<br>Mit „+ Neues Projekt" starten.</div>`;
+  const bereiche = ['Alle', ...new Set(aktive.map(p=>parkBereich(p)).filter(Boolean)).values()].sort();
+  const filterHtml = bereiche.map(b=>`<button class="chip${parkFilter===b?' active':''}" onclick="setParkFilter('${b}')">${b==='Park'?'🌿 Park':b==='Gebäude'?'🏠 Gebäude':b}</button>`).join('');
+
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div class="sec" style="margin:0">Alle Projekte</div>
+    <button class="set-btn" onclick="openParkProjModal()">+ Neues Projekt</button>
+  </div>
+  <div class="chips" style="margin-bottom:12px">${filterHtml}</div>`;
+
+  const visible = parkFilter==='Alle' ? aktive : aktive.filter(p=>parkBereich(p)===parkFilter);
+
+  if(!visible.length){
+    html += `<div class="park-empty">Keine aktiven Projekte${parkFilter!=='Alle'?' in diesem Bereich':''}.</div>`;
   }
 
-  // Render each project
-  parkProjekte.forEach(p => {
+  // Render active projects
+  visible.forEach(p => {
     const aufgaben = parkAufgaben.filter(a=>a.projekt_id===p.id);
     const done = aufgaben.filter(a=>a.status==='Erledigt').length;
     const total = aufgaben.length;
     const openState = localStorage.getItem('park_open_'+p.id)==='1';
-
-    const badgeClass = p.status==='Aktiv' ? 'badge-aktiv' : p.status==='Abgeschlossen' ? 'badge-abgeschlossen' : 'badge-planung';
+    const badgeClass = p.status==='Aktiv' ? 'badge-aktiv' : 'badge-planung';
+    const isGeb = parkBereich(p)==='Gebäude';
 
     html += `<div class="park-proj-card">
       <div class="park-proj-hdr" onclick="parkToggle('${p.id}')">
         <div class="park-proj-left">
-          <div class="park-proj-icon">${p.status==='Aktiv'?'🔨':p.status==='Abgeschlossen'?'✅':'📋'}</div>
+          <div class="park-proj-icon">${isGeb?'🏠':'🌿'}</div>
           <div>
             <div class="park-proj-name">${esc(p.titel)}</div>
-            <div class="park-proj-meta">${total ? done+'/'+total+' Aufgaben erledigt' : 'Keine Aufgaben'}</div>
+            <div class="park-proj-meta">${total ? done+'/'+total+' Aufgaben erledigt' : 'Keine Aufgaben'} · <span style="opacity:.6">${parkBereich(p)}</span></div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -3676,19 +3698,53 @@ function renderPark(){
           <input class="park-add-h" id="pa-h-${p.id}" type="number" placeholder="h" min="0.5" max="20" step="0.5" value="1">
           <button class="set-btn" onclick="parkSaveAufgabe('${p.id}')">+ Add</button>
         </div>
-        ${p.beschreibung ? `<div style="padding:8px 14px 12px;font-size:12px;color:var(--text-muted)">${esc(p.beschreibung)}</div>` : ''}
+        ${p.beschreibung ? `<div style="padding:8px 14px 12px;font-size:12px;color:var(--text-muted)">${esc((p.beschreibung||'').replace(/^\[[^\]]+\]\s*/,''))}</div>` : ''}
         <div style="display:flex;gap:8px;padding:8px 14px 12px;border-top:1px solid var(--border)">
           <button class="set-btn" onclick="parkStatusToggle('${p.id}')">Status ändern</button>
+          <button class="set-btn" style="background:var(--green-pale);color:var(--green)" onclick="parkAbschliessen('${p.id}')">✓ Abschließen</button>
           <button class="set-btn" style="color:var(--red);margin-left:auto" onclick="parkDeleteProjekt('${p.id}')">Löschen</button>
         </div>
       </div>
     </div>`;
   });
 
+  // Archive section
+  if(archiv.length){
+    const archivOpen = localStorage.getItem('park_archiv_open')==='1';
+    html += `<div style="margin-top:20px">
+      <button onclick="parkToggleArchiv()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:7px;color:var(--text-muted);font-size:13px;font-weight:600;padding:6px 0;font-family:inherit">
+        <span>${archivOpen?'▼':'▶'}</span>
+        <span>📦 Archiv — ${archiv.length} Projekt${archiv.length!==1?'e':''} abgeschlossen</span>
+      </button>`;
+    if(archivOpen){
+      archiv.forEach(p=>{
+        const aufgaben = parkAufgaben.filter(a=>a.projekt_id===p.id);
+        const done = aufgaben.filter(a=>a.status==='Erledigt').length;
+        const total = aufgaben.length;
+        html += `<div class="park-proj-card" style="opacity:.55">
+          <div class="park-proj-hdr" style="cursor:default">
+            <div class="park-proj-left">
+              <div class="park-proj-icon">✅</div>
+              <div>
+                <div class="park-proj-name" style="text-decoration:line-through">${esc(p.titel)}</div>
+                <div class="park-proj-meta">${total ? done+'/'+total+' erledigt' : ''} · <span style="opacity:.6">${parkBereich(p)}</span></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="park-proj-badge badge-abgeschlossen">Abgeschlossen</span>
+              <button class="set-btn" style="font-size:11px" onclick="parkReaktivieren('${p.id}')">Reaktivieren</button>
+            </div>
+          </div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+  }
+
   // Standalone tasks (no projekt_id)
   const solo = parkAufgaben.filter(a=>!a.projekt_id);
-  if(solo.length || parkProjekte.length){
-    html += `<div class="sec">Einzeltätigkeiten</div>`;
+  if(solo.length || visible.length){
+    html += `<div class="sec" style="margin-top:20px">Einzeltätigkeiten</div>`;
     html += `<div class="park-proj-card">
       ${solo.length ? solo.map(a=>parkTaskRow(a)).join('') : '<div style="padding:12px 14px;font-size:13px;color:var(--text-muted)">Noch keine Einzeleinträge.</div>'}
       <div class="park-add-row">
@@ -3700,6 +3756,29 @@ function renderPark(){
   }
 
   el.innerHTML = html;
+}
+
+function parkToggleArchiv(){
+  const cur = localStorage.getItem('park_archiv_open')==='1';
+  localStorage.setItem('park_archiv_open', cur?'0':'1');
+  renderPark();
+}
+
+async function parkAbschliessen(id){
+  const p = parkProjekte.find(x=>x.id===id);
+  if(!p) return;
+  await sbReq('park_projekte?id=eq.'+id,{method:'PATCH',headers:{Prefer:'return=representation','Content-Type':'application/json'},body:JSON.stringify({status:'Abgeschlossen'})});
+  p.status = 'Abgeschlossen';
+  localStorage.setItem('park_archiv_open','1');
+  renderPark();
+}
+
+async function parkReaktivieren(id){
+  const p = parkProjekte.find(x=>x.id===id);
+  if(!p) return;
+  await sbReq('park_projekte?id=eq.'+id,{method:'PATCH',headers:{Prefer:'return=representation','Content-Type':'application/json'},body:JSON.stringify({status:'Aktiv'})});
+  p.status = 'Aktiv';
+  renderPark();
 }
 
 function parkTaskRow(a){
