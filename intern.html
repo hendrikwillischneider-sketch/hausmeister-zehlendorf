@@ -936,6 +936,8 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
         <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
       </div>
       <div class="photo-previews" id="photo-previews"></div>
+      <label>Foto-Link <span style="text-transform:none;font-weight:400;font-size:11px">— Google Fotos, iCloud o.ä.</span></label>
+      <input type="url" id="n-foto-link" class="inp" placeholder="https://photos.google.com/…" style="margin-top:4px">
       <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Auftrag speichern</button>
       <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
     </div>
@@ -1274,7 +1276,7 @@ function renderBudgetBar(containerId) {
   const warn = pct >= 80;
   el.innerHTML = `<div class="budget-bar">
     <div class="budget-row">
-      <span class="budget-lbl">💰 Budget ${MNS[mm]} ${yyyy}</span>
+      <span class="budget-lbl">💵 Bargeldvorschuss ${MNS[mm]} ${yyyy}</span>
       <span class="budget-val${warn?' warn':''}">
         ${spent.toLocaleString('de-DE',{style:'currency',currency:'EUR'})} / ${monatlichesBudget.toLocaleString('de-DE',{style:'currency',currency:'EUR'})}
       </span>
@@ -1794,7 +1796,7 @@ async function saveNew() {
     name: bwObj?.name || null,
     zimmer: bwObj?.zimmer || null,
     erledigt: '', notiz: '',
-    photos: [...newPhotos]
+    photos: [...newPhotos, ...(document.getElementById('n-foto-link')?.value.trim() ? [document.getElementById('n-foto-link').value.trim()] : [])]
   };
 
   // Try Supabase first
@@ -1875,7 +1877,7 @@ function openDetail(id) {
     <input type="text" id="d-termin" placeholder="z. B. Ende August, KW 35, 20.08.2026 …" value="${s.termin||''}">
     <label>Rückmeldung an Bewohnerin</label>
     <textarea id="d-rueck" placeholder="Wird auf dem Türzettel gedruckt …">${s.rueckmeldung||''}</textarea>
-    ${s.photos&&s.photos.length ? `<label>Fotos</label><div class="detail-photos">${s.photos.map((p,i) => `<img src="${p}" onclick="viewPhoto('${id}',${i})">`).join('')}</div>` : ''}
+    ${s.photos&&s.photos.length ? `<label>Fotos</label><div class="detail-photos">${s.photos.map((p,i) => p.startsWith('http') ? `<a href="${p}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;color:var(--accent);text-decoration:none;background:var(--card)">📷 Foto öffnen →</a>` : `<img src="${p}" onclick="viewPhoto('${id}',${i})">`).join('')}</div>` : ''}
     <label>Fotos hinzufügen</label>
     <div class="photo-zone">📷 Foto aufnehmen oder auswählen<input type="file" accept="image/*" multiple onchange="addDetailPhoto('${id}',event)"></div>
     <label>Interne Notiz</label>
@@ -2045,10 +2047,22 @@ if (sessionStorage.getItem(AUTH_KEY) === '1') {
 let _akData = [];
 let _akMonat = 0; // 0 = alle
 
+function akJahr(m) { return m >= 8 ? 2026 : 2027; }
+
+const AK_MONTH_ORDER = [8,9,10,11,12,1,2,3,4,5,6,7];
+function akSortCmp(a,b) {
+  const ya=akJahr(a.monat), yb=akJahr(b.monat);
+  if(ya!==yb) return ya-yb;
+  const ia=AK_MONTH_ORDER.indexOf(a.monat), ib=AK_MONTH_ORDER.indexOf(b.monat);
+  if(ia!==ib) return ia-ib;
+  return (a.reihenfolge||0)-(b.reihenfolge||0);
+}
+
 async function loadArtikel() {
   try {
     const r = await sbReq('artikel?order=monat.asc,reihenfolge.asc&select=*');
     _akData = await r.json();
+    _akData.sort(akSortCmp);
     renderAkFilter();
     renderAkList();
   } catch(e) {
@@ -2057,11 +2071,14 @@ async function loadArtikel() {
 }
 
 function renderAkFilter() {
-  const months = [...new Set(_akData.map(a => a.monat))].sort((a,b)=>a-b);
   const MN = ['','Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const months = [...new Set(_akData.map(a => a.monat))].sort((a,b)=>AK_MONTH_ORDER.indexOf(a)-AK_MONTH_ORDER.indexOf(b));
   document.getElementById('ak-monat-filter').innerHTML =
     `<button class="chip${_akMonat===0?' active':''}" onclick="setAkMonat(0,this)">Alle (${_akData.length})</button>` +
-    months.map(m => `<button class="chip${_akMonat===m?' active':''}" onclick="setAkMonat(${m},this)">${MN[m]} (${_akData.filter(a=>a.monat===m).length})</button>`).join('');
+    months.map(m => {
+      const yr = akJahr(m);
+      return `<button class="chip${_akMonat===m?' active':''}" onclick="setAkMonat(${m},this)">${MN[m]} ${yr} (${_akData.filter(a=>a.monat===m).length})</button>`;
+    }).join('');
 }
 
 function setAkMonat(m, btn) {
@@ -2071,15 +2088,19 @@ function setAkMonat(m, btn) {
   renderAkList();
 }
 
-function renderAkList() {
-  const MN=['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  const list = _akMonat ? _akData.filter(a=>a.monat===_akMonat) : _akData;
-  const el = document.getElementById('ak-list');
-  if (!list.length) { el.innerHTML='<div class="empty"><p>Keine Artikel gefunden.</p></div>'; return; }
-  el.innerHTML = list.map(a => `
-    <div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border)">
+function fmtDatum(d) {
+  if (!d) return '';
+  const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[3]}.${m[2]}.` : d;
+}
+
+function renderArtikelRow(a) {
+  const dateStr = fmtDatum(a.dauer);
+  return `
+    <div class="list-item" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)">
+      <div style="flex-shrink:0;width:40px;padding-top:2px;text-align:right;font-size:12px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums">${dateStr}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">${a.ico||''} ${MN[a.monat]} · ${a.kat||'–'}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:1px">${a.ico||''} ${a.kat||'–'}</div>
         <div style="font-size:14px;font-weight:600;color:var(--text)">${a.titel}</div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.teaser||''}</div>
       </div>
@@ -2087,7 +2108,32 @@ function renderAkList() {
         <button onclick="openArtikelForm(${JSON.stringify(a).replace(/"/g,'&quot;')})" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--text-muted)">✏️</button>
         <button onclick="deleteArtikel('${a.id}')" style="font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;color:var(--red)">✕</button>
       </div>
-    </div>`).join('');
+    </div>`;
+}
+
+function renderAkList() {
+  const MN=['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const list = _akMonat ? _akData.filter(a=>a.monat===_akMonat) : _akData;
+  const el = document.getElementById('ak-list');
+  if (!list.length) { el.innerHTML='<div class="empty"><p>Keine Artikel gefunden.</p></div>'; return; }
+
+  if (!_akMonat) {
+    // Group: Jahr → Monat → Artikel
+    const years = [...new Set(list.map(a=>akJahr(a.monat)))].sort();
+    el.innerHTML = years.map(yr => {
+      const yList = list.filter(a=>akJahr(a.monat)===yr);
+      const months = [...new Set(yList.map(a=>a.monat))].sort((a,b)=>AK_MONTH_ORDER.indexOf(a)-AK_MONTH_ORDER.indexOf(b));
+      const monthsHtml = months.map(m => {
+        const mList = yList.filter(a=>a.monat===m);
+        return `<div style="padding:6px 12px 2px;font-size:12px;font-weight:700;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--bg2)">${MN[m]}</div>`
+          + mList.map(a=>renderArtikelRow(a)).join('');
+      }).join('');
+      return `<div style="padding:8px 12px 4px;font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg2)">${yr}</div>`
+        + monthsHtml;
+    }).join('');
+  } else {
+    el.innerHTML = list.map(a=>renderArtikelRow(a)).join('');
+  }
 }
 
 function openArtikelForm(a) {
