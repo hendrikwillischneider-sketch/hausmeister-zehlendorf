@@ -445,22 +445,25 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
       <h2 id="bw-modal-title">Bewohnerin</h2>
       <button class="modal-close" onclick="ovClose('ov-bw')">×</button>
     </div>
-    <label>Suite-Nummer</label>
-    <input type="text" id="bw-zimmer" placeholder="z. B. 7">
     <label>Vorname</label>
     <input type="text" id="bw-name" placeholder="z. B. Maria">
-    <label>Kontaktpräferenz</label>
+    <label>Suite-Nummer</label>
+    <input type="text" id="bw-zimmer" placeholder="z. B. 7">
+    <label>Bevorzugte Kontaktmöglichkeit</label>
     <select id="bw-kontakt" onchange="toggleKontaktFelder()">
-      <option>Türzettel</option><option>E-Mail</option><option>Anruf</option><option>Persönlich</option>
+      <option value="Türzettel">🖨 Türzettel (Standard)</option>
+      <option value="E-Mail">📧 E-Mail</option>
+      <option value="Anruf">📞 Telefonanruf</option>
+      <option value="Persönlich">🤝 Persönlicher Kontakt</option>
     </select>
-    <div id="bw-email-row" style="display:none">
+    <div id="bw-email-wrap" style="display:none">
       <label>E-Mail-Adresse</label>
       <input type="email" id="bw-email" placeholder="z. B. maria@email.de">
     </div>
-    <div id="bw-tel-row" style="display:none">
-      <label>Telefonnummer</label>
-      <input type="text" id="bw-tel" placeholder="z. B. 030 123456">
-    </div>
+    <label>Telefon <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
+    <label>Handy <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-handy" placeholder="z. B. 0170 / 123 456">
     <input type="hidden" id="bw-edit-id">
     <button class="btn btn-primary" onclick="saveBewohner()" id="bw-save-btn">Speichern</button>
     <button class="btn btn-ghost" id="bw-del-btn" style="display:none;color:var(--red)" onclick="deleteBewohnerRow()">Bewohnerin löschen</button>
@@ -981,7 +984,8 @@ function openNewBw() {
   document.getElementById('bw-name').value = '';
   document.getElementById('bw-kontakt').value = 'Türzettel';
   document.getElementById('bw-email').value = '';
-  document.getElementById('bw-tel').value = '';
+  document.getElementById('bw-telefon').value = '';
+  document.getElementById('bw-handy').value = '';
   document.getElementById('bw-edit-id').value = '';
   document.getElementById('bw-del-btn').style.display = 'none';
   toggleKontaktFelder();
@@ -996,7 +1000,8 @@ function openEditBw(id) {
   document.getElementById('bw-name').value = b.name || '';
   document.getElementById('bw-kontakt').value = b.kontakt_art || 'Türzettel';
   document.getElementById('bw-email').value = b.email || '';
-  document.getElementById('bw-tel').value = b.telefon || '';
+  document.getElementById('bw-telefon').value = b.telefon || '';
+  document.getElementById('bw-handy').value = b.handy || '';
   document.getElementById('bw-edit-id').value = b.id;
   document.getElementById('bw-del-btn').style.display = 'block';
   toggleKontaktFelder();
@@ -1005,8 +1010,7 @@ function openEditBw(id) {
 
 function toggleKontaktFelder() {
   const k = document.getElementById('bw-kontakt').value;
-  document.getElementById('bw-email-row').style.display = k === 'E-Mail' ? 'block' : 'none';
-  document.getElementById('bw-tel-row').style.display = k === 'Anruf' ? 'block' : 'none';
+  document.getElementById('bw-email-wrap').style.display = k === 'E-Mail' ? 'block' : 'none';
 }
 
 async function saveBewohner() {
@@ -1018,7 +1022,8 @@ async function saveBewohner() {
     zimmer, name,
     kontakt_art: document.getElementById('bw-kontakt').value,
     email: document.getElementById('bw-email').value.trim() || null,
-    telefon: document.getElementById('bw-tel').value.trim() || null,
+    telefon: document.getElementById('bw-telefon').value.trim() || null,
+    handy: document.getElementById('bw-handy').value.trim() || null,
     aktiv: true
   };
   const btn = document.getElementById('bw-save-btn');
