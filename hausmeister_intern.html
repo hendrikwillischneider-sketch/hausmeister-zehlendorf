@@ -1043,7 +1043,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
     <input type="text" id="bw-name" placeholder="z. B. Maria">
     <label>Suite-Nummer</label>
     <input type="text" id="bw-zimmer" placeholder="z. B. 7">
-    <label>Kontaktweg für Rückmeldungen</label>
+    <label>Bevorzugte Kontaktmöglichkeit</label>
     <select id="bw-kontakt" onchange="toggleKontaktFelder()">
       <option value="Türzettel">🖨 Türzettel (Standard)</option>
       <option value="E-Mail">📧 E-Mail</option>
@@ -1054,10 +1054,10 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
       <label>E-Mail-Adresse</label>
       <input type="email" id="bw-email" placeholder="name@beispiel.de">
     </div>
-    <div id="bw-telefon-wrap" style="display:none">
-      <label>Telefonnummer</label>
-      <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
-    </div>
+    <label>Telefon <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
+    <label>Handy <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-handy" placeholder="z. B. 0170 / 123 456">
     <button class="btn btn-primary" id="bw-save-btn" onclick="saveBewohner()">Speichern</button>
     <button class="btn btn-ghost" onclick="ovClose('ov-bewohner')">Abbrechen</button>
     <button class="btn btn-danger" id="bw-delete-btn" onclick="deleteBewohnerRow()" style="margin-top:8px;display:none">Bewohnerin löschen</button>
@@ -1606,7 +1606,6 @@ function renderBewohner() {
 function toggleKontaktFelder() {
   const art = document.getElementById('bw-kontakt').value;
   document.getElementById('bw-email-wrap').style.display = art === 'E-Mail' ? 'block' : 'none';
-  document.getElementById('bw-telefon-wrap').style.display = art === 'Anruf' ? 'block' : 'none';
 }
 
 function openNewBw() {
@@ -1617,6 +1616,7 @@ function openNewBw() {
   document.getElementById('bw-kontakt').value = 'Türzettel';
   document.getElementById('bw-email').value = '';
   document.getElementById('bw-telefon').value = '';
+  document.getElementById('bw-handy').value = '';
   toggleKontaktFelder();
   document.getElementById('bw-delete-btn').style.display = 'none';
   ovOpen('ov-bewohner');
@@ -1633,6 +1633,7 @@ function openEditBw(id) {
   document.getElementById('bw-kontakt').value = b.kontakt_art || 'Türzettel';
   document.getElementById('bw-email').value = b.email || '';
   document.getElementById('bw-telefon').value = b.telefon || '';
+  document.getElementById('bw-handy').value = b.handy || '';
   toggleKontaktFelder();
   document.getElementById('bw-delete-btn').style.display = 'block';
   ovOpen('ov-bewohner');
@@ -1649,16 +1650,17 @@ async function saveBewohner() {
   const kontakt_art = document.getElementById('bw-kontakt').value;
   const email = document.getElementById('bw-email').value.trim() || null;
   const telefon = document.getElementById('bw-telefon').value.trim() || null;
+  const handy = document.getElementById('bw-handy').value.trim() || null;
   try {
     if (editingBwId) {
       await sbReq(`bewohner?id=eq.${editingBwId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ name, zimmer, kontakt_art, email, telefon })
+        body: JSON.stringify({ name, zimmer, kontakt_art, email, telefon, handy })
       });
     } else {
       await sbReq('bewohner', {
         method: 'POST',
-        body: JSON.stringify({ name, zimmer, aktiv: true, kontakt_art, email, telefon })
+        body: JSON.stringify({ name, zimmer, aktiv: true, kontakt_art, email, telefon, handy })
       });
     }
     await loadBewohnerList();
