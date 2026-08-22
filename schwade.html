@@ -157,6 +157,7 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .bw-card-meta{font-size:11.5px;color:var(--text-muted);line-height:1.5}
 .bw-card-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);position:absolute;top:10px;right:10px}
 .bw-card-dot.off{background:var(--border)}
+.bw-card-btn{margin-top:8px;padding-top:7px;border-top:1px solid var(--border);width:100%;padding:6px 4px;background:var(--green-pale);color:var(--green-mid);border:none;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px}
 .bw-row{display:flex;align-items:center;gap:11px;padding:10px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
 .bw-row:last-child{border:none}
 .bw-row:active{background:var(--bg)}
@@ -327,6 +328,15 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 <!-- BEWOHNER -->
 <div class="view" id="view-bewohner">
   <div class="stat-row" id="bw-stats"></div>
+
+  <div style="background:var(--green-pale);border:1.5px solid var(--accent);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+    <span style="font-size:22px">🏡</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;font-weight:700;color:var(--green-mid);margin-bottom:2px">Bewohner-Portal</div>
+      <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">hendrikwillischneider-sketch.github.io/…/portal.html</div>
+    </div>
+    <button onclick="navigator.clipboard.writeText('https://hendrikwillischneider-sketch.github.io/hausmeister-zehlendorf/portal.html').then(()=>this.textContent='✓ Kopiert').catch(()=>{})" style="flex-shrink:0;padding:7px 12px;background:var(--green-mid);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">Link kopieren</button>
+  </div>
 
   <div style="position:relative;margin-bottom:8px">
     <input type="search" id="bw-search" placeholder="Name suchen …"
@@ -1043,6 +1053,7 @@ function renderBewohner() {
           ${b.email ? `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.email}</div>` : ''}
           <div style="margin-top:3px">${KONTAKT_ICON[b.kontakt_art]||'🖨'} ${b.kontakt_art||'Türzettel'}</div>
         </div>
+        ${aktiv ? `<button class="bw-card-btn" onclick="event.stopPropagation();window.open('https://hendrikwillischneider-sketch.github.io/hausmeister-zehlendorf/portal.html?name='+encodeURIComponent('${b.name||''}'),'_blank')">🔧 Schaden melden</button>` : ''}
       </div>`;
     });
     html += '</div>';
