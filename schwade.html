@@ -225,6 +225,23 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 .hb-detail{background:var(--orange-pale);border:1px solid rgba(217,119,6,.3);border-left:3px solid var(--orange);border-radius:9px;padding:12px 14px;font-size:14px;color:var(--orange);line-height:1.6}
 .hb-detail strong{font-weight:700;display:block;margin-bottom:4px}
 .detail-photo{width:100%;max-height:200px;object-fit:cover;border-radius:9px;cursor:pointer;margin-top:4px}
+/* STATUS BUTTONS */
+.status-btns{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.status-btn{padding:7px 14px;border-radius:20px;border:2px solid transparent;font-size:13px;cursor:pointer;text-align:center;transition:all .15s;font-weight:500;white-space:nowrap;opacity:.45;font-family:inherit}
+.status-btn:hover{opacity:.75}
+.status-btn.active{opacity:1;font-weight:700}
+.status-btn.s-red{background:var(--red-pale);color:var(--red)}.status-btn.s-red.active{border-color:var(--red)}
+.status-btn.s-gold{background:var(--yellow-pale);color:var(--gold)}.status-btn.s-gold.active{border-color:var(--gold)}
+.status-btn.s-teal{background:var(--green-pale);color:var(--accent)}.status-btn.s-teal.active{border-color:var(--accent)}
+.status-btn.s-green{background:var(--green-pale);color:var(--green-mid)}.status-btn.s-green.active{border-color:var(--green-mid)}
+/* DET TABS */
+.det-tabs{display:flex;border-bottom:1.5px solid var(--border);margin:12px -16px 0;padding:0 16px}
+.det-tab{background:none;border:none;padding:9px 16px;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:color .15s,border-color .15s}
+.det-tab.active{color:var(--green-mid);border-bottom-color:var(--green-mid)}
+/* WORKFLOW */
+.wf-step{background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:13px 14px;margin:10px 0}
+.wf-step-hdr{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.wf-abschluss{background:var(--green-pale);border:1.5px solid var(--accent);border-radius:11px;padding:13px 14px;margin:10px 0;text-align:center}
 
 /* PHOTO FS */
 .photo-fs{display:none;position:fixed;inset:0;background:#000;z-index:400;align-items:center;justify-content:center;cursor:pointer}
@@ -616,6 +633,7 @@ function setSyncDot(state) {
 function fromSB(r) {
   return {
     id: r.id, sb_id: r.id,
+    nr: r.nr || null,
     datum: r.datum || '',
     ort: r.ort || '',
     prob: r.problem || '',
@@ -627,7 +645,11 @@ function fromSB(r) {
     kategorie: r.kategorie || null,
     freigabe_by: r.freigabe_by || null,
     rueckmeldung: r.rueckmeldung || '',
+    notiz: r.notiz || '',
     kosten: r.kosten != null ? r.kosten : null,
+    quittung: r.quittung || '',
+    termin: r.termin || '',
+    erledigt_am: r.erledigt_am || null,
     photos: r.foto ? [r.foto] : [],
     created_at: r.created_at
   };
@@ -700,44 +722,117 @@ function openDetail(id) {
   if (!a) return;
   const katBadge = a.kategorie && KAT_CSS[a.kategorie]
     ? `<span class="b-kat ${KAT_CSS[a.kategorie]}" style="font-size:12px;padding:3px 9px">${KAT_ICON[a.kategorie]} ${a.kategorie}</span>` : '';
-  const hbSection = (a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status)) ? `
-    <div class="detail-section">
-      <div class="hb-detail">
-        <strong>⚠️ Rückmeldung von Herrn Schneider — bitte an Bewohnerin weitergeben:</strong>
-        ${a.rueckmeldung}
-      </div>
-    </div>` : '';
-  const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Suite ' + a.zimmer : (a.haus ? ', ' + a.haus + ' ' + a.etage : '')}</div></div>` : '';
-  const freigabeSection = '';
-  const photoSection = a.photos && a.photos[0] ? `
-    <div class="detail-section">
-      <div class="detail-lbl">Foto</div>
-      <img class="detail-photo" src="${a.photos[0]}" alt="" onclick="document.getElementById('photo-fs-img').src=this.src;document.getElementById('photo-fs').classList.add('open')">
-    </div>` : '';
+  const bw = bewohnerListe.find(b => b.name === a.name);
+  const bwLoc = a.zimmer ? `, Suite ${a.zimmer}` : (bw ? `, ${bw.haus} · ${bw.etage}` : '');
+  const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${bwLoc}</div></div>` : '';
+  const photoSection = a.photos && a.photos[0]
+    ? `<div class="detail-section"><div class="detail-lbl">Foto</div>${a.photos[0].startsWith('http') ? `<a href="${a.photos[0]}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;color:var(--accent);text-decoration:none;background:var(--card)">📷 Foto öffnen →</a>` : `<img class="detail-photo" src="${a.photos[0]}">`}</div>` : '';
 
   document.getElementById('detail-body').innerHTML = `
     <div class="modal-hdr">
       <div>${katBadge} <span class="badge ${bc(a.status)}" style="margin-left:4px">${a.status}</span></div>
       <button class="modal-close" onclick="ovClose('ov-detail')">×</button>
     </div>
-    ${hbSection}
-    ${freigabeSection}
-    <div class="detail-section">
-      <div class="detail-lbl">Beschreibung</div>
-      <div class="detail-val">${a.prob}</div>
+    <h3 style="font-size:16px;font-weight:600;margin:6px 0 0;color:var(--text)">#${a.nr||'–'} — ${a.ort}</h3>
+    <div class="status-btns">
+      <button class="status-btn s-red${a.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
+      <button class="status-btn s-gold${a.status==='Kosten geschätzt'?' active':''}" onclick="setStatus('${id}','Kosten geschätzt')">💰 Kosten</button>
+      <button class="status-btn s-teal${a.status==='In Umsetzung'?' active':''}" onclick="setStatus('${id}','In Umsetzung')">🔨 Umsetzung</button>
+      <button class="status-btn s-green${a.status==='Abgeschlossen'?' active':''}" onclick="setStatus('${id}','Abgeschlossen')">✓ Abgeschlossen</button>
     </div>
-    <div class="detail-section">
-      <div class="detail-lbl">Ort</div>
-      <div class="detail-val">${a.ort}</div>
+    <div class="det-tabs">
+      <button class="det-tab active" onclick="switchDetTab('meldung',this)">Meldung</button>
+      <button class="det-tab" onclick="switchDetTab('behebung',this)">Behebung</button>
     </div>
-    ${nameSection}
-    <div class="detail-section">
-      <div class="detail-lbl">Gemeldet</div>
-      <div class="detail-val">${a.datum}${a.von ? ' · von ' + a.von : ''}</div>
+    <div id="dt-meldung" class="det-pane">
+      <div style="margin-top:12px">
+        <div class="detail-section"><div class="detail-lbl">Problem</div><div class="detail-val">${a.prob}</div></div>
+        <div class="detail-section"><div class="detail-lbl">Ort</div><div class="detail-val">${a.ort}</div></div>
+        ${nameSection}
+        <div class="detail-section"><div class="detail-lbl">Gemeldet</div><div class="detail-val">${a.datum}${a.von ? ' · ' + a.von : ''}</div></div>
+        ${a.prio ? `<div class="detail-section"><div class="detail-lbl">Priorität</div><div class="detail-val">${a.prio==='Hoch'?'🔴':a.prio==='Mittel'?'🟡':'🟢'} ${a.prio}</div></div>` : ''}
+        ${photoSection}
+      </div>
     </div>
-    ${a.kosten != null ? `<div class="detail-section"><div class="detail-lbl">Kosten (Schätzung)</div><div class="detail-val" style="color:var(--gold);font-weight:600">${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</div></div>` : ''}
-    ${photoSection}`;
+    <div id="dt-behebung" class="det-pane" style="display:none">
+      <div style="margin-top:10px">
+        <div class="wf-step">
+          <div class="wf-step-hdr">1 · Befund &amp; Notizen</div>
+          <textarea id="d-notiz" rows="4" placeholder="Befund, Beobachtungen, Materialien, nächste Schritte …" style="margin-top:0">${a.notiz||''}</textarea>
+        </div>
+        <div class="wf-step">
+          <div class="wf-step-hdr">2 · Kosten &amp; Beleg</div>
+          <label style="font-size:13px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Betrag (€)</label>
+          <input type="number" id="d-kosten" min="0" step="0.01" placeholder="0,00" value="${a.kosten!=null?a.kosten:''}">
+          <label style="font-size:13px;font-weight:600;color:var(--text-muted);display:block;margin:8px 0 4px">Quittung / Beleg</label>
+          <input type="text" id="d-quittung" placeholder="Link, Rechnungsnummer oder Notiz" value="${a.quittung||''}">
+        </div>
+        <div class="wf-step">
+          <div class="wf-step-hdr">3 · Termin</div>
+          <input type="text" id="d-termin" placeholder="z. B. KW 35 · 20.08.2026 …" value="${a.termin||''}">
+        </div>
+        <div class="wf-step">
+          <div class="wf-step-hdr">4 · Rückmeldung an Bewohnerin</div>
+          <textarea id="d-rueck" rows="3" placeholder="Was soll die Bewohnerin wissen?">${a.rueckmeldung||''}</textarea>
+        </div>
+        <div class="wf-abschluss">
+          <div style="font-size:13px;font-weight:700;color:var(--green-mid);margin-bottom:8px">5 · Abschluss</div>
+          ${a.erledigt_am ? `<div style="font-size:13px;color:var(--green-mid)">✓ Erledigt am ${a.erledigt_am}</div>` : `<button class="btn btn-primary" onclick="setStatus('${id}','Abgeschlossen')" style="margin:0">✓ Als abgeschlossen markieren</button>`}
+        </div>
+        <button class="btn btn-primary" onclick="saveDetail('${id}')">Speichern</button>
+        <button class="btn btn-ghost" style="margin-top:6px;color:var(--red);border-color:var(--red)" onclick="delAuftrag('${id}')">Meldung löschen</button>
+      </div>
+    </div>`;
   ovOpen('ov-detail');
+}
+
+function switchDetTab(name, btn) {
+  document.querySelectorAll('.det-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.det-pane').forEach(p => p.style.display = 'none');
+  btn.classList.add('active');
+  document.getElementById('dt-' + name).style.display = 'block';
+}
+
+async function setStatus(id, status) {
+  const a = auftraege.find(x => x.id === id);
+  if (!a) return;
+  const upd = { status };
+  if (status === 'Abgeschlossen') upd.erledigt_am = new Date().toISOString().slice(0,10);
+  try {
+    await sbReq(`schaden?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(upd) });
+    Object.assign(a, upd);
+  } catch(e) { alert('Fehler beim Speichern'); return; }
+  openDetail(id);
+  render();
+}
+
+async function saveDetail(id) {
+  const a = auftraege.find(x => x.id === id);
+  if (!a) return;
+  const kv = parseFloat(document.getElementById('d-kosten').value);
+  const upd = {
+    notiz: document.getElementById('d-notiz').value.trim() || null,
+    kosten: isNaN(kv) ? null : kv,
+    quittung: document.getElementById('d-quittung').value.trim() || null,
+    termin: document.getElementById('d-termin').value.trim() || null,
+    rueckmeldung: document.getElementById('d-rueck').value.trim() || null,
+  };
+  try {
+    await sbReq(`schaden?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(upd) });
+    Object.assign(a, upd);
+  } catch(e) { alert('Fehler beim Speichern'); return; }
+  openDetail(id);
+  render();
+}
+
+async function delAuftrag(id) {
+  if (!confirm('Meldung wirklich löschen?')) return;
+  try {
+    await sbReq(`schaden?id=eq.${id}`, { method: 'DELETE' });
+    auftraege = auftraege.filter(x => x.id !== id);
+    ovClose('ov-detail');
+    render();
+  } catch(e) { alert('Fehler beim Löschen'); }
 }
 
 // ── NEUER AUFTRAG ─────────────────────────────────────────────────────────────
