@@ -148,14 +148,18 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 /* FAB */
 .fab{position:fixed;bottom:22px;right:16px;width:54px;height:54px;border-radius:50%;background:var(--green-mid);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:200;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .fab:active{transform:scale(.92)}
-/* BEWOHNER LIST */
+/* BEWOHNER */
+.bw-section-hdr{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);padding:14px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}
+.bw-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 11px;cursor:pointer;transition:box-shadow .15s;position:relative}
+.bw-card:active{box-shadow:0 0 0 2px var(--accent)}
+.bw-card-name{font-size:13.5px;font-weight:600;line-height:1.3;margin-bottom:5px;word-break:break-word}
+.bw-card-meta{font-size:11.5px;color:var(--text-muted);line-height:1.5}
+.bw-card-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);position:absolute;top:10px;right:10px}
+.bw-card-dot.off{background:var(--border)}
 .bw-row{display:flex;align-items:center;gap:11px;padding:10px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
 .bw-row:last-child{border:none}
 .bw-row:active{background:var(--bg)}
-.bw-zimmer{width:44px;height:44px;border-radius:10px;background:var(--green-pale);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--green-mid);line-height:1.2;text-align:center}
-.bw-info{flex:1;min-width:0}
-.bw-rname{font-size:14px;font-weight:500}
-.bw-rmeta{font-size:12px;color:var(--text-muted);margin-top:1px}
 .bw-toggle{padding:5px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0}
 .bw-toggle.aktiv{background:var(--green-pale);border-color:var(--green-mid);color:var(--green-mid)}
 
@@ -323,8 +327,29 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 <!-- BEWOHNER -->
 <div class="view" id="view-bewohner">
   <div class="stat-row" id="bw-stats"></div>
-  <div class="sec">Bewohnerinnen</div>
-  <div class="card" id="bw-list">
+
+  <div style="position:relative;margin-bottom:8px">
+    <input type="search" id="bw-search" placeholder="Name suchen …"
+      oninput="renderBewohner()"
+      style="width:100%;padding:10px 12px 10px 36px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--card);color:var(--text);font-family:inherit">
+    <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.5">🔍</span>
+  </div>
+
+  <div class="chips" id="bw-haus-filter" style="margin-bottom:6px">
+    <button class="chip active" onclick="setBwFilter('haus','Alle',this)">Alle Häuser</button>
+    <button class="chip" onclick="setBwFilter('haus','H4-6',this)">Haus 4–6</button>
+    <button class="chip" onclick="setBwFilter('haus','H8-10',this)">Haus 8–10</button>
+  </div>
+
+  <div class="chips" id="bw-etage-filter" style="margin-bottom:12px">
+    <button class="chip active" onclick="setBwFilter('etage','Alle',this)">Alle Etagen</button>
+    <button class="chip" onclick="setBwFilter('etage','EG',this)">EG</button>
+    <button class="chip" onclick="setBwFilter('etage','1.OG',this)">1. Etage</button>
+    <button class="chip" onclick="setBwFilter('etage','2.OG',this)">2. Etage</button>
+    <button class="chip" onclick="setBwFilter('etage','3.OG',this)">3. Etage</button>
+  </div>
+
+  <div id="bw-list">
     <div class="empty"><div class="empty-icon">⏳</div><p>Wird geladen …</p></div>
   </div>
 </div>
@@ -941,10 +966,16 @@ async function saveNew() {
   btn.textContent = 'Auftrag speichern'; btn.disabled = false;
 }
 // ── BEWOHNER ──────────────────────────────────────────────────────────────────
+let bwHausFilter = 'Alle';
+let bwEtageFilter = 'Alle';
+const ETAGE_ORDER = {EG:0,'1.OG':1,'2.OG':2,'3.OG':3};
+const ETAGE_LABEL = {EG:'Erdgeschoss','1.OG':'1. Etage','2.OG':'2. Etage','3.OG':'3. Etage'};
+const KONTAKT_ICON = {'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'};
+
 async function loadBewohnerList() {
   setSyncDot('syncing');
   try {
-    const r = await sbReq('bewohner?order=zimmer.asc&select=*');
+    const r = await sbReq('bewohner?order=haus.asc,etage.asc,name.asc&select=*');
     allBewohner = r.ok ? await r.json() : [];
     setSyncDot('ok');
   } catch { setSyncDot('error'); allBewohner = []; }
@@ -954,14 +985,23 @@ async function loadBewohnerList() {
 
 function renderBwStats() {
   const aktiv = allBewohner.filter(b => b.aktiv !== false).length;
-  const inaktiv = allBewohner.length - aktiv;
   document.getElementById('bw-stats').innerHTML = `
     <div class="stat"><div class="stat-val">${allBewohner.length}</div><div class="stat-lbl">Gesamt</div></div>
     <div class="stat"><div class="stat-val">${aktiv}</div><div class="stat-lbl">Aktiv</div></div>
-    <div class="stat"><div class="stat-val">${inaktiv}</div><div class="stat-lbl">Inaktiv</div></div>`;
+    <div class="stat"><div class="stat-val">${allBewohner.length - aktiv}</div><div class="stat-lbl">Inaktiv</div></div>`;
 }
 
-const KONTAKT_ICON = {'Türzettel':'🖨','E-Mail':'📧','Anruf':'📞','Persönlich':'🤝'};
+function setBwFilter(type, val, el) {
+  if (type === 'haus') {
+    bwHausFilter = val;
+    document.querySelectorAll('#bw-haus-filter .chip').forEach(b => b.classList.remove('active'));
+  } else {
+    bwEtageFilter = val;
+    document.querySelectorAll('#bw-etage-filter .chip').forEach(b => b.classList.remove('active'));
+  }
+  el.classList.add('active');
+  renderBewohner();
+}
 
 function renderBewohner() {
   const el = document.getElementById('bw-list');
@@ -969,15 +1009,48 @@ function renderBewohner() {
     el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Noch keine Bewohnerinnen</p></div>';
     return;
   }
-  el.innerHTML = allBewohner.map(b => `
-    <div class="bw-row" onclick="openEditBw('${b.id}')">
-      <div class="bw-zimmer">S.<br>${b.zimmer||'?'}</div>
-      <div class="bw-info">
-        <div class="bw-rname">${b.name||'—'}</div>
-        <div class="bw-rmeta">Suite ${b.zimmer||'?'} · ${KONTAKT_ICON[b.kontakt_art]||'🖨'} ${b.kontakt_art||'Türzettel'}</div>
-      </div>
-      <button class="bw-toggle ${b.aktiv!==false?'aktiv':''}" onclick="event.stopPropagation();toggleBwAktiv('${b.id}',${b.aktiv!==false})">${b.aktiv!==false?'Aktiv':'Inaktiv'}</button>
-    </div>`).join('');
+  const q = (document.getElementById('bw-search')?.value || '').toLowerCase().trim();
+  let list = [...allBewohner].sort((a,b) => {
+    if (a.haus !== b.haus) return (a.haus||'').localeCompare(b.haus||'');
+    if (a.etage !== b.etage) return (ETAGE_ORDER[a.etage]??9) - (ETAGE_ORDER[b.etage]??9);
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  if (bwHausFilter !== 'Alle') list = list.filter(b => b.haus === bwHausFilter);
+  if (bwEtageFilter !== 'Alle') list = list.filter(b => b.etage === bwEtageFilter);
+  if (q) list = list.filter(b => (b.name||'').toLowerCase().includes(q));
+
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><p>Keine Bewohnerin gefunden.</p></div>';
+    return;
+  }
+
+  const groups = {};
+  list.forEach(b => {
+    const key = `${b.haus}||${b.etage}`;
+    if (!groups[key]) groups[key] = {haus: b.haus, etage: b.etage, items: []};
+    groups[key].items.push(b);
+  });
+
+  let html = '';
+  Object.values(groups).forEach(({haus, etage, items}) => {
+    html += `<div class="bw-section-hdr">${haus} · ${ETAGE_LABEL[etage]||etage} <span style="font-weight:400;opacity:.7">(${items.length})</span></div>`;
+    html += '<div class="bw-grid">';
+    items.forEach(b => {
+      const aktiv = b.aktiv !== false;
+      const tel = b.handy || b.telefon || '';
+      html += `<div class="bw-card" onclick="openEditBw('${b.id}')">
+        <div class="bw-card-dot ${aktiv ? '' : 'off'}"></div>
+        <div class="bw-card-name" style="${!aktiv ? 'opacity:.45;text-decoration:line-through' : ''}">${b.name||'—'}</div>
+        <div class="bw-card-meta">
+          ${tel ? `<div>${tel}</div>` : ''}
+          ${b.email ? `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.email}</div>` : ''}
+          <div style="margin-top:3px">${KONTAKT_ICON[b.kontakt_art]||'🖨'} ${b.kontakt_art||'Türzettel'}</div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
 }
 
 function openNewBw() {
