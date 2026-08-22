@@ -1482,7 +1482,7 @@ const KAT_ICON = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'�
 function siHTML(s) {
   const bewohnerBadge = s.von === 'Bewohner' ? '<span class="badge b-bewohner">Bewohner-App</span>' : '';
   const katBadge = s.kategorie && KAT_CSS[s.kategorie] ? `<span class="b-kat ${KAT_CSS[s.kategorie]}">${KAT_ICON[s.kategorie]} ${s.kategorie}</span>` : '';
-  const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Suite ' + s.zimmer : ''}` : '';
+  const nameInfo = s.name ? ` · ${s.name}${s.zimmer ? ', Suite ' + s.zimmer : (s.haus ? ', ' + s.haus + ' ' + s.etage : '')}` : '';
   const kostenInfo = s.kosten != null ? ` · <span style="color:var(--gold);font-weight:600">${Number(s.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
   return `<div class="si" onclick="openDetail('${s.id}')">
     <div class="si-dot ${s.status==='Erledigt'?'d-done':dc(s.prio)}"></div>
@@ -1810,10 +1810,10 @@ function openNew() {
   const dd = document.getElementById('n-bw');
   dd.innerHTML = '<option value="">Keine Zuordnung</option>';
   bewohnerListe.filter(b => b.aktiv)
-    .sort((a,b) => (parseInt(a.zimmer)||0)-(parseInt(b.zimmer)||0))
     .forEach(b => {
       const o = document.createElement('option');
-      o.value = b.name; o.textContent = `Suite ${b.zimmer} — ${b.name}`;
+      const loc = b.zimmer ? `Suite ${b.zimmer}` : `${b.haus} · ${b.etage}`;
+      o.value = b.name; o.textContent = `${loc} — ${b.name}`;
       dd.appendChild(o);
     });
   document.getElementById('n-kat-picker').style.display = 'block';
@@ -2013,7 +2013,7 @@ function openDetail(id) {
   if (!s) return;
   const bewohnerInfo = s.von === 'Bewohner'
     ? `<div style="background:var(--purple-pale);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--purple)">
-        🟣 Gemeldet über Bewohner-App${s.name ? ' von ' + s.name : ''}${s.zimmer ? ', Suite ' + s.zimmer : ''}
+        🟣 Gemeldet über Bewohner-App${s.name ? ' von ' + s.name : ''}${s.zimmer ? ', Suite ' + s.zimmer : (s.haus ? ', ' + s.haus + ' ' + s.etage : '')}
       </div>` : '';
 
   let kontaktBanner = '';
@@ -2048,7 +2048,7 @@ function openDetail(id) {
     <div style="margin-top:14px">
       <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right;font-weight:500">${s.prob}</span></div>
       <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum||'–'}</span></div>
-      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + (s.zimmer ? ', Suite '+s.zimmer : '') : ''}</span></div>
+      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + (s.zimmer ? ', Suite '+s.zimmer : (s.haus ? ', '+s.haus+' '+s.etage : '')) : ''}</span></div>
       ${s.erledigt ? `<div class="detail-row"><span class="lbl">Erledigt am</span><span>${s.erledigt}</span></div>` : ''}
     </div>
     <label>Priorität</label>
