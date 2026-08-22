@@ -204,6 +204,14 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 .status-btn.s-teal.active{border-color:var(--accent)}
 .status-btn.s-green{background:var(--green-pale);color:var(--green-mid)}
 .status-btn.s-green.active{border-color:var(--green-mid)}
+/* DET TABS */
+.det-tabs{display:flex;border-bottom:1.5px solid var(--border);margin:12px -16px 0;padding:0 16px}
+.det-tab{background:none;border:none;padding:9px 16px;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:color .15s,border-color .15s}
+.det-tab.active{color:var(--green-mid);border-bottom-color:var(--green-mid)}
+/* WORKFLOW */
+.wf-step{background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:13px 14px;margin:10px 0}
+.wf-step-hdr{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.wf-abschluss{background:var(--green-pale);border:1.5px solid var(--accent);border-radius:11px;padding:13px 14px;margin:10px 0;text-align:center}
 .detail-photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .detail-photos img{width:80px;height:80px;border-radius:9px;object-fit:cover;cursor:pointer}
 
@@ -1251,6 +1259,7 @@ async function updateSBStatus(item) {
         notiz: item.notiz || null,
         prio: item.prio,
         kosten: item.kosten != null ? item.kosten : null,
+        quittung: item.quittung || null,
         termin: item.termin || null,
         rueckmeldung: item.rueckmeldung || null,
         freigabe_by: item.freigabe_by || null
@@ -1286,6 +1295,7 @@ function fromSB(r) {
     rueckmeldung: r.rueckmeldung || '',
     kategorie: r.kategorie || null,
     freigabe_by: r.freigabe_by || null,
+    quittung: r.quittung || '',
     photos: r.foto ? [r.foto] : [],
     created_at: r.created_at
   };
@@ -1303,6 +1313,7 @@ function toSB(item) {
     notiz: item.notiz || null,
     foto: (item.photos && item.photos[0]) || null,
     kosten: item.kosten != null ? item.kosten : null,
+    quittung: item.quittung || null,
     termin: item.termin || null,
     rueckmeldung: item.rueckmeldung || null,
     kategorie: item.kategorie || null,
@@ -2032,6 +2043,13 @@ function openDetail(id) {
     }
   }
 
+  const bw = bewohnerListe.find(b => b.name === s.name);
+  const bwLoc = s.zimmer ? `, Suite ${s.zimmer}` : (bw ? `, ${bw.haus} · ${bw.etage}` : '');
+  const photoHTML = s.photos && s.photos.length
+    ? s.photos.map((p,i) => p.startsWith('http')
+        ? `<a href="${p}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;color:var(--accent);text-decoration:none;background:var(--card)">📷 Foto öffnen →</a>`
+        : `<img src="${p}" onclick="viewPhoto('${id}',${i})" style="width:100%;max-height:200px;object-fit:cover;border-radius:9px;cursor:pointer">`).join('') : '';
+
   document.getElementById('detail-body').innerHTML = `
     <div class="modal-hdr">
       <h2>#${s.nr||'–'} — ${s.ort}</h2>
@@ -2040,38 +2058,69 @@ function openDetail(id) {
     ${bewohnerInfo}${kontaktBanner}
     <div class="status-btns">
       <button class="status-btn s-red${s.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
-      <button class="status-btn s-gold${s.status==='Kosten geschätzt'?' active':''}" onclick="setStatus('${id}','Kosten geschätzt')">💰 Kosten geschätzt</button>
-      <button class="status-btn s-purple${s.status==='Freigegeben'?' active':''}" onclick="setStatus('${id}','Freigegeben')">✅ Freigegeben</button>
-      <button class="status-btn s-teal${s.status==='In Umsetzung'?' active':''}" onclick="setStatus('${id}','In Umsetzung')">🔨 In Umsetzung</button>
+      <button class="status-btn s-gold${s.status==='Kosten geschätzt'?' active':''}" onclick="setStatus('${id}','Kosten geschätzt')">💰 Kosten</button>
+      <button class="status-btn s-teal${s.status==='In Umsetzung'?' active':''}" onclick="setStatus('${id}','In Umsetzung')">🔨 Umsetzung</button>
       <button class="status-btn s-green${s.status==='Abgeschlossen'?' active':''}" onclick="setStatus('${id}','Abgeschlossen')">✓ Abgeschlossen</button>
     </div>
-    <div style="margin-top:14px">
-      <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right;font-weight:500">${s.prob}</span></div>
-      <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum||'–'}</span></div>
-      <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + (s.zimmer ? ', Suite '+s.zimmer : (s.haus ? ', '+s.haus+' '+s.etage : '')) : ''}</span></div>
-      ${s.erledigt ? `<div class="detail-row"><span class="lbl">Erledigt am</span><span>${s.erledigt}</span></div>` : ''}
+    <div class="det-tabs">
+      <button class="det-tab active" onclick="switchDetTab('meldung',this)">Meldung</button>
+      <button class="det-tab" onclick="switchDetTab('behebung',this)">Behebung</button>
     </div>
-    <label>Priorität</label>
-    <select id="d-prio">
-      <option value="Hoch"${s.prio==='Hoch'?' selected':''}>🔴 Hoch — Sicherheitsrisiko</option>
-      <option value="Mittel"${s.prio==='Mittel'?' selected':''}>🟡 Mittel — bald erledigen</option>
-      <option value="Niedrig"${s.prio==='Niedrig'?' selected':''}>🟢 Niedrig — kann warten</option>
-    </select>
-    <label>Kosten (€)</label>
-    <input type="number" id="d-kosten" min="0" step="0.01" placeholder="0,00" value="${s.kosten!=null?s.kosten:''}">
-    <label>Voraussichtlicher Termin</label>
-    <input type="text" id="d-termin" placeholder="z. B. Ende August, KW 35, 20.08.2026 …" value="${s.termin||''}">
-    <label>Rückmeldung an Bewohnerin</label>
-    <textarea id="d-rueck" placeholder="Wird auf dem Türzettel gedruckt …">${s.rueckmeldung||''}</textarea>
-    ${s.photos&&s.photos.length ? `<label>Fotos</label><div class="detail-photos">${s.photos.map((p,i) => p.startsWith('http') ? `<a href="${p}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;color:var(--accent);text-decoration:none;background:var(--card)">📷 Foto öffnen →</a>` : `<img src="${p}" onclick="viewPhoto('${id}',${i})">`).join('')}</div>` : ''}
-    <label>Fotos hinzufügen</label>
-    <div class="photo-zone">📷 Foto aufnehmen oder auswählen<input type="file" accept="image/*" multiple onchange="addDetailPhoto('${id}',event)"></div>
-    <label>Interne Notiz</label>
-    <textarea id="d-notiz">${s.notiz||''}</textarea>
-    <button class="btn btn-primary" onclick="saveDetail('${id}')">Änderungen speichern</button>
-    <button class="btn" style="background:var(--gold);color:#fff;margin-top:8px" onclick="printZettel('${id}')">🖨 Türzettel drucken</button>
-    <button class="btn btn-danger" style="margin-top:8px" onclick="delSchaden('${id}')">Meldung löschen</button>`;
+    <div id="dt-meldung" class="det-pane">
+      <div style="margin-top:12px">
+        <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right;font-weight:500">${s.prob}</span></div>
+        <div class="detail-row"><span class="lbl">Datum</span><span>${s.datum||'–'}</span></div>
+        <div class="detail-row"><span class="lbl">Gemeldet von</span><span>${s.von}${s.name ? ' · ' + s.name + bwLoc : ''}</span></div>
+        <div class="detail-row"><span class="lbl">Priorität</span>
+          <select id="d-prio" style="font-size:13px;padding:4px 8px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;max-width:200px">
+            <option value="Hoch"${s.prio==='Hoch'?' selected':''}>🔴 Hoch</option>
+            <option value="Mittel"${s.prio==='Mittel'?' selected':''}>🟡 Mittel</option>
+            <option value="Niedrig"${s.prio==='Niedrig'?' selected':''}>🟢 Niedrig</option>
+          </select>
+        </div>
+        ${s.erledigt ? `<div class="detail-row"><span class="lbl">Erledigt am</span><span>${s.erledigt}</span></div>` : ''}
+        ${photoHTML ? `<div style="margin-top:10px">${photoHTML}</div>` : ''}
+        <div class="photo-zone" style="margin-top:10px">📷 Foto hinzufügen<input type="file" accept="image/*" multiple onchange="addDetailPhoto('${id}',event)"></div>
+        <button class="btn" style="background:var(--gold);color:#fff;margin-top:10px" onclick="printZettel('${id}')">🖨 Türzettel drucken</button>
+      </div>
+    </div>
+    <div id="dt-behebung" class="det-pane" style="display:none">
+      <div style="margin-top:10px">
+        <div class="wf-step">
+          <div class="wf-step-hdr">1 · Befund &amp; Notizen</div>
+          <textarea id="d-notiz" rows="4" placeholder="Befund, Beobachtungen, Materialien, nächste Schritte …" style="margin-top:0">${s.notiz||''}</textarea>
+        </div>
+        <div class="wf-step">
+          <div class="wf-step-hdr">2 · Kosten &amp; Beleg</div>
+          <label style="font-size:13px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Betrag (€)</label>
+          <input type="number" id="d-kosten" min="0" step="0.01" placeholder="0,00" value="${s.kosten!=null?s.kosten:''}">
+          <label style="font-size:13px;font-weight:600;color:var(--text-muted);display:block;margin:8px 0 4px">Quittung / Beleg</label>
+          <input type="text" id="d-quittung" placeholder="Link, Rechnungsnummer oder Notiz" value="${s.quittung||''}">
+        </div>
+        <div class="wf-step">
+          <div class="wf-step-hdr">3 · Termin</div>
+          <input type="text" id="d-termin" placeholder="z. B. KW 35 · 20.08.2026 …" value="${s.termin||''}">
+        </div>
+        <div class="wf-step">
+          <div class="wf-step-hdr">4 · Rückmeldung an Bewohnerin</div>
+          <textarea id="d-rueck" rows="3" placeholder="Was soll die Bewohnerin wissen? (erscheint auch auf dem Türzettel)">${s.rueckmeldung||''}</textarea>
+        </div>
+        <div class="wf-abschluss">
+          <div style="font-size:13px;font-weight:700;color:var(--green-mid);margin-bottom:8px">5 · Abschluss</div>
+          ${s.erledigt ? `<div style="font-size:13px;color:var(--green-mid)">✓ Erledigt am ${s.erledigt}</div>` : `<button class="btn btn-primary" onclick="setStatus('${id}','Abgeschlossen')" style="margin:0">✓ Als abgeschlossen markieren</button>`}
+        </div>
+        <button class="btn btn-primary" onclick="saveDetail('${id}')">Speichern</button>
+        <button class="btn btn-danger" style="margin-top:6px" onclick="delSchaden('${id}')">Meldung löschen</button>
+      </div>
+    </div>`;
   ovOpen('ov-detail');
+}
+
+function switchDetTab(name, btn) {
+  document.querySelectorAll('.det-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.det-pane').forEach(p => p.style.display = 'none');
+  btn.classList.add('active');
+  document.getElementById('dt-' + name).style.display = 'block';
 }
 
 async function setStatus(id, status) {
@@ -2088,15 +2137,17 @@ async function setStatus(id, status) {
 async function saveDetail(id) {
   const s = S.schaden.find(x => x.id === id);
   if (!s) return;
-  s.notiz = document.getElementById('d-notiz').value;
-  s.prio = document.getElementById('d-prio').value;
-  const k = parseFloat(document.getElementById('d-kosten').value);
+  const prioEl = document.getElementById('d-prio');
+  if (prioEl) s.prio = prioEl.value;
+  s.notiz = (document.getElementById('d-notiz')?.value || '').trim();
+  const k = parseFloat(document.getElementById('d-kosten')?.value);
   s.kosten = isNaN(k) ? null : k;
-  s.termin = document.getElementById('d-termin').value.trim();
-  s.rueckmeldung = document.getElementById('d-rueck').value.trim();
+  s.quittung = (document.getElementById('d-quittung')?.value || '').trim();
+  s.termin = (document.getElementById('d-termin')?.value || '').trim();
+  s.rueckmeldung = (document.getElementById('d-rueck')?.value || '').trim();
   saveLocal();
   if (sbOnline) updateSBStatus(s);
-  ovClose('ov-detail');
+  openDetail(id);
   render(curView);
 }
 
