@@ -464,6 +464,8 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
     <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
     <label>Handy <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
     <input type="text" id="bw-handy" placeholder="z. B. 0170 / 123 456">
+    <label>Fax <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-fax" placeholder="z. B. 030 / 123 456">
     <input type="hidden" id="bw-edit-id">
     <button class="btn btn-primary" onclick="saveBewohner()" id="bw-save-btn">Speichern</button>
     <button class="btn btn-ghost" id="bw-del-btn" style="display:none;color:var(--red)" onclick="deleteBewohnerRow()">Bewohnerin löschen</button>
@@ -986,6 +988,7 @@ function openNewBw() {
   document.getElementById('bw-email').value = '';
   document.getElementById('bw-telefon').value = '';
   document.getElementById('bw-handy').value = '';
+  document.getElementById('bw-fax').value = '';
   document.getElementById('bw-edit-id').value = '';
   document.getElementById('bw-del-btn').style.display = 'none';
   toggleKontaktFelder();
@@ -1002,6 +1005,7 @@ function openEditBw(id) {
   document.getElementById('bw-email').value = b.email || '';
   document.getElementById('bw-telefon').value = b.telefon || '';
   document.getElementById('bw-handy').value = b.handy || '';
+  document.getElementById('bw-fax').value = b.fax || '';
   document.getElementById('bw-edit-id').value = b.id;
   document.getElementById('bw-del-btn').style.display = 'block';
   toggleKontaktFelder();
@@ -1024,6 +1028,7 @@ async function saveBewohner() {
     email: document.getElementById('bw-email').value.trim() || null,
     telefon: document.getElementById('bw-telefon').value.trim() || null,
     handy: document.getElementById('bw-handy').value.trim() || null,
+    fax: document.getElementById('bw-fax').value.trim() || null,
     aktiv: true
   };
   const btn = document.getElementById('bw-save-btn');
