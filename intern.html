@@ -190,9 +190,20 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
 .detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;align-items:center}
 .detail-row:last-child{border:none}
 .detail-row .lbl{font-size:12.5px;color:var(--text-muted)}
-.status-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;margin-bottom:4px}
-.status-btn{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12.5px;cursor:pointer;text-align:center;transition:all .15s}
-.status-btn.active{border-color:var(--green-mid);background:var(--green-pale);color:var(--green-mid);font-weight:600}
+.status-btns{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 10px}
+.status-btn{padding:7px 14px;border-radius:20px;border:2px solid transparent;font-size:13px;cursor:pointer;text-align:center;transition:all .15s;font-weight:500;white-space:nowrap;opacity:.45}
+.status-btn:hover{opacity:.75}
+.status-btn.active{opacity:1;font-weight:700}
+.status-btn.s-red{background:var(--red-pale);color:var(--red)}
+.status-btn.s-red.active{border-color:var(--red)}
+.status-btn.s-gold{background:var(--yellow-pale);color:var(--gold)}
+.status-btn.s-gold.active{border-color:var(--gold)}
+.status-btn.s-purple{background:var(--purple-pale);color:var(--purple)}
+.status-btn.s-purple.active{border-color:var(--purple)}
+.status-btn.s-teal{background:var(--green-pale);color:var(--accent)}
+.status-btn.s-teal.active{border-color:var(--accent)}
+.status-btn.s-green{background:var(--green-pale);color:var(--green-mid)}
+.status-btn.s-green.active{border-color:var(--green-mid)}
 .detail-photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .detail-photos img{width:80px;height:80px;border-radius:9px;object-fit:cover;cursor:pointer}
 
@@ -2027,12 +2038,12 @@ function openDetail(id) {
       <button class="modal-close" onclick="ovClose('ov-detail')">×</button>
     </div>
     ${bewohnerInfo}${kontaktBanner}
-    <div class="status-btns" style="grid-template-columns:1fr 1fr 1fr">
-      <button class="status-btn${s.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
-      <button class="status-btn${s.status==='Kosten geschätzt'?' active':''}" onclick="setStatus('${id}','Kosten geschätzt')">💰 Kosten geschätzt</button>
-      <button class="status-btn${s.status==='Freigegeben'?' active':''}" onclick="setStatus('${id}','Freigegeben')">✅ Freigegeben</button>
-      <button class="status-btn${s.status==='In Umsetzung'?' active':''}" onclick="setStatus('${id}','In Umsetzung')">🔨 In Umsetzung</button>
-      <button class="status-btn${s.status==='Abgeschlossen'?' active':''}" onclick="setStatus('${id}','Abgeschlossen')">✓ Abgeschlossen</button>
+    <div class="status-btns">
+      <button class="status-btn s-red${s.status==='Offen'?' active':''}" onclick="setStatus('${id}','Offen')">Offen</button>
+      <button class="status-btn s-gold${s.status==='Kosten geschätzt'?' active':''}" onclick="setStatus('${id}','Kosten geschätzt')">💰 Kosten geschätzt</button>
+      <button class="status-btn s-purple${s.status==='Freigegeben'?' active':''}" onclick="setStatus('${id}','Freigegeben')">✅ Freigegeben</button>
+      <button class="status-btn s-teal${s.status==='In Umsetzung'?' active':''}" onclick="setStatus('${id}','In Umsetzung')">🔨 In Umsetzung</button>
+      <button class="status-btn s-green${s.status==='Abgeschlossen'?' active':''}" onclick="setStatus('${id}','Abgeschlossen')">✓ Abgeschlossen</button>
     </div>
     <div style="margin-top:14px">
       <div class="detail-row"><span class="lbl">Problem</span><span style="max-width:65%;text-align:right;font-weight:500">${s.prob}</span></div>
