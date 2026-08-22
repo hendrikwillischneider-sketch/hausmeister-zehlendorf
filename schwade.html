@@ -305,7 +305,7 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
   <div class="chips" id="au-filter">
     <button class="chip active" onclick="setFilter('Alle',this)">Alle</button>
     <button class="chip" onclick="setFilter('Offen',this)">Offen</button>
-    <button class="chip" onclick="setFilter('Kosten geschätzt',this)">💰 Freigabe?</button>
+    <button class="chip" onclick="setFilter('Kosten geschätzt',this)">💰 Kosten geschätzt</button>
     <button class="chip" onclick="setFilter('Freigegeben',this)">✅ Freigegeben</button>
     <button class="chip" onclick="setFilter('In Umsetzung',this)">🔨 In Umsetzung</button>
     <button class="chip" onclick="setFilter('Abgeschlossen',this)">✓ Abgeschlossen</button>
@@ -627,12 +627,13 @@ function fromSB(r) {
 function render() {
   const offen = auftraege.filter(a => a.status === 'Offen').length;
   const kostenAusstehend = auftraege.filter(a => a.status === 'Kosten geschätzt').length;
+  const inUmsetzung = auftraege.filter(a => ['Freigegeben','In Umsetzung','Handwerker beauftragt'].includes(a.status)).length;
   const hb = auftraege.filter(a => a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status)).length;
 
   document.getElementById('au-stats').innerHTML = `
     <div class="stat"><div class="stat-val${offen>0?' warn':''}">${offen}</div><div class="stat-lbl">Offen</div></div>
-    <div class="stat"><div class="stat-val${kostenAusstehend>0?' alert':''}">${kostenAusstehend}</div><div class="stat-lbl">Freigabe nötig</div></div>
-    <div class="stat"><div class="stat-val${hb>0?' alert':''}">${hb}</div><div class="stat-lbl">Handlungsbedarf</div></div>`;
+    <div class="stat"><div class="stat-val${kostenAusstehend>0?' alert':''}">${kostenAusstehend}</div><div class="stat-lbl">Kosten prüfen</div></div>
+    <div class="stat"><div class="stat-val">${inUmsetzung}</div><div class="stat-lbl">In Umsetzung</div></div>`;
   renderBudgetBar();
 
   document.getElementById('hb-banner').classList.toggle('show', hb > 0);
