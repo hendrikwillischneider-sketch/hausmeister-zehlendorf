@@ -103,7 +103,8 @@ const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
 
 let step = 1;
 const STEPS = 3;
-let state = { name: '', raum: '', problem: '', fotos: [] };
+const _urlName = new URLSearchParams(location.search).get('name') || '';
+let state = { name: _urlName, raum: '', problem: '', fotos: [] };
 
 const RAEUME = [
   {v:'Küche',           icon:'🍳'},
