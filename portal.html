@@ -3,15 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#1a3c2e">
+<meta name="theme-color" content="#1C4A2E">
 <title>Schaden melden — Sidonie-Scharfe-Stiftung</title>
 <style>
 :root{
-  --green:#1C4A2E;--green-d:#132E1C;--green-mid:#2d6a4f;--green-light:#40916c;
-  --accent:#52b788;--green-pale:#d8f3dc;
+  --green:#1C4A2E;--green-mid:#2d6a4f;--accent:#52b788;--green-pale:#d8f3dc;
   --red:#c1121f;--red-pale:#ffe5e5;
   --bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;
-  --radius:14px;--shadow:0 2px 12px rgba(26,21,16,.08)
 }
 @media(prefers-color-scheme:dark){:root{
   --bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;
@@ -20,78 +18,62 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto}
 
-/* HEADER */
-.hdr{background:var(--green);color:#fff;padding:16px 18px 14px;text-align:center}
-.hdr-logo{font-size:28px;margin-bottom:6px}
-.hdr-title{font-size:17px;font-weight:700;letter-spacing:-.2px}
-.hdr-sub{font-size:12px;opacity:.65;margin-top:3px}
+.hdr{background:var(--green);color:#fff;padding:18px 18px 0;text-align:center}
+.hdr-logo{font-size:30px;margin-bottom:6px}
+.hdr-title{font-size:18px;font-weight:700}
+.hdr-sub{font-size:12px;opacity:.6;margin-top:2px;padding-bottom:16px}
 
-/* PROGRESS */
 .progress{display:flex;gap:6px;padding:14px 18px 0;background:var(--green)}
-.prog-dot{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.3);transition:background .3s}
-.prog-dot.done{background:#52b788}
+.prog-dot{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.25);transition:background .3s}
+.prog-dot.done{background:var(--accent)}
 .prog-dot.active{background:#fff}
 
-/* CONTENT */
-.content{padding:20px 18px 100px}
+.content{padding:22px 18px 110px}
 
-/* STEP HEADER */
-.step-num{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.step-title{font-size:22px;font-weight:700;margin-bottom:6px;line-height:1.2}
-.step-sub{font-size:14px;color:var(--text-muted);margin-bottom:22px;line-height:1.5}
+.step-num{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.step-title{font-size:23px;font-weight:700;margin-bottom:6px;line-height:1.2}
+.step-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.5}
 
-/* FIELDS */
-.field{margin-bottom:16px}
-.field-lbl{font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:6px}
-.field-in{width:100%;padding:14px 14px;border:2px solid var(--border);border-radius:12px;font-size:16px;background:var(--card);color:var(--text);font-family:inherit;transition:border-color .15s;-webkit-appearance:none}
+.field{margin-bottom:18px}
+.field-lbl{font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:7px}
+.field-in{width:100%;padding:15px 14px;border:2px solid var(--border);border-radius:12px;font-size:17px;background:var(--card);color:var(--text);font-family:inherit;transition:border-color .15s;-webkit-appearance:none}
 .field-in:focus{outline:none;border-color:var(--accent)}
-textarea.field-in{resize:none;height:100px;line-height:1.5}
-select.field-in{cursor:pointer}
+textarea.field-in{resize:none;height:110px;line-height:1.5;font-size:16px}
 
-/* RAUM GRID */
-.raum-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
-.raum-btn{padding:14px 10px;border:2px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit;line-height:1.3}
+.raum-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.raum-btn{padding:15px 10px;border:2px solid var(--border);border-radius:13px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit;line-height:1.3}
 .raum-btn:active{transform:scale(.97)}
 .raum-btn.sel{border-color:var(--accent);background:var(--green-pale);color:var(--green-mid);font-weight:600}
-.raum-icon{font-size:22px;display:block;margin-bottom:4px}
+.raum-icon{font-size:24px;display:block;margin-bottom:5px}
 
-/* BEWOHNERIN CONFIRM */
-.bew-confirm{background:var(--green-pale);border:1.5px solid var(--accent);border-radius:12px;padding:14px 16px;margin-top:10px;display:none}
-.bew-confirm.show{display:flex;align-items:center;gap:12px}
-.bew-confirm-icon{font-size:24px}
-.bew-confirm-name{font-size:15px;font-weight:600;color:var(--green-mid)}
-.bew-confirm-suite{font-size:13px;color:var(--text-muted);margin-top:1px}
-
-/* FOTO */
-.foto-prompt{border:2px dashed var(--border);border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:10px;background:var(--card)}
+.foto-prompt{border:2px dashed var(--border);border-radius:13px;padding:26px 16px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:10px;background:var(--card)}
 .foto-prompt:active{border-color:var(--accent)}
-.foto-prompt-icon{font-size:36px;margin-bottom:8px}
+.foto-prompt-icon{font-size:38px;margin-bottom:8px}
 .foto-prompt-lbl{font-size:14px;font-weight:600;margin-bottom:4px}
 .foto-prompt-sub{font-size:12px;color:var(--text-muted)}
 .foto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-.foto-thumb{aspect-ratio:1;border-radius:10px;object-fit:cover;width:100%;background:var(--border)}
+.foto-thumb{aspect-ratio:1;border-radius:10px;object-fit:cover;width:100%}
 .foto-thumb-wrap{position:relative}
-.foto-rm{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.foto-rm{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:none;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:14px 18px 28px;background:var(--card);border-top:1px solid var(--border);display:flex;gap:10px}
-.btn-back{flex:0 0 auto;padding:14px 20px;border:2px solid var(--border);border-radius:12px;background:none;font-size:15px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit}
-.btn-next{flex:1;padding:14px;border:none;border-radius:12px;background:var(--green-mid);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:14px 18px 32px;background:var(--card);border-top:1px solid var(--border);display:flex;gap:10px}
+.btn-back{flex:0 0 auto;padding:15px 20px;border:2px solid var(--border);border-radius:12px;background:none;font-size:15px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit}
+.btn-next{flex:1;padding:15px;border:none;border-radius:12px;background:var(--green-mid);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
 .btn-next:active{opacity:.85}
 .btn-next:disabled{opacity:.4;cursor:default}
 
-/* SUCCESS */
-.success{text-align:center;padding:48px 24px}
-.success-icon{font-size:64px;margin-bottom:16px}
-.success-title{font-size:24px;font-weight:700;margin-bottom:10px;color:var(--green-mid)}
+.success{text-align:center;padding:52px 24px}
+.success-icon{font-size:68px;margin-bottom:18px}
+.success-title{font-size:25px;font-weight:700;margin-bottom:10px;color:var(--green-mid)}
 .success-text{font-size:15px;color:var(--text-muted);line-height:1.6;margin-bottom:28px}
-.success-ref{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:13px;color:var(--text-muted);margin-bottom:24px}
-.success-ref strong{color:var(--text);font-size:15px;display:block;margin-top:4px}
-.btn-new{display:inline-block;padding:14px 28px;background:var(--green-mid);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.success-box{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:16px;font-size:13px;color:var(--text-muted);margin-bottom:24px;text-align:left}
+.success-box strong{color:var(--text);font-size:15px;display:block;margin-bottom:4px}
+.btn-new{padding:15px 28px;background:var(--green-mid);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
 
-/* ERR */
-.err-box{background:var(--red-pale);color:var(--red);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:-8px;margin-bottom:12px;display:none}
+.err-box{background:var(--red-pale);color:var(--red);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
 .err-box.show{display:block}
+
+.dsgvo{font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -101,23 +83,18 @@ select.field-in{cursor:pointer}
   <div class="hdr-title">Schaden melden</div>
   <div class="hdr-sub">Sidonie-Scharfe-Stiftung · Zehlendorf</div>
 </div>
-
 <div class="progress" id="progress-bar">
   <div class="prog-dot active" id="pd-1"></div>
   <div class="prog-dot" id="pd-2"></div>
   <div class="prog-dot" id="pd-3"></div>
-  <div class="prog-dot" id="pd-4"></div>
 </div>
 
-<div class="content" id="content">
-  <!-- Steps get rendered here by JS -->
-</div>
+<div class="content" id="content"></div>
 
 <div class="bottom-nav" id="bottom-nav">
   <button class="btn-back" id="btn-back" onclick="stepBack()" style="display:none">← Zurück</button>
   <button class="btn-next" id="btn-next" onclick="stepNext()">Weiter →</button>
 </div>
-
 <input type="file" id="foto-in" accept="image/*" capture="environment" multiple style="display:none" onchange="addFotos(this)">
 
 <script>
@@ -125,256 +102,193 @@ const SB  = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
 const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
 
 let step = 1;
-const STEPS = 4;
-let state = {
-  zimmer: '',
-  bewohnerId: null,
-  bewohnerinName: '',
-  raum: '',
-  problem: '',
-  fotos: [],   // base64 strings
-};
+const STEPS = 3;
+let state = { name: '', raum: '', problem: '', fotos: [] };
 
 const RAEUME = [
-  {v:'Küche',         icon:'🍳'},
-  {v:'Bad / Dusche',  icon:'🚿'},
-  {v:'WC / Toilette', icon:'🚽'},
-  {v:'Wohnzimmer',    icon:'🛋️'},
-  {v:'Schlafzimmer',  icon:'🛏️'},
-  {v:'Flur / Eingang',icon:'🚪'},
-  {v:'Balkon',        icon:'🌿'},
-  {v:'Keller',        icon:'🔑'},
-  {v:'Sonstiges',     icon:'📍'},
+  {v:'Küche',           icon:'🍳'},
+  {v:'Bad / Dusche',    icon:'🚿'},
+  {v:'WC / Toilette',   icon:'🚽'},
+  {v:'Wohnzimmer',      icon:'🛋️'},
+  {v:'Schlafzimmer',    icon:'🛏️'},
+  {v:'Flur / Eingang',  icon:'🚪'},
+  {v:'Balkon',          icon:'🌿'},
+  {v:'Treppenhaus',     icon:'🏛'},
+  {v:'Keller',          icon:'🔑'},
+  {v:'Sonstiges',       icon:'📍'},
 ];
 
-function render(){
-  updateProgress();
-  const c = document.getElementById('content');
-  const back = document.getElementById('btn-back');
-  const next = document.getElementById('btn-next');
-  back.style.display = step > 1 ? '' : 'none';
-  next.textContent = step === STEPS-1 ? 'Absenden' : step === STEPS ? '' : 'Weiter →';
-  next.style.display = step === STEPS ? 'none' : '';
-
-  if(step===1) renderStep1();
-  if(step===2) renderStep2();
-  if(step===3) renderStep3();
-  if(step===4) renderSuccess();
-}
-
-function updateProgress(){
-  for(let i=1;i<=STEPS;i++){
-    const el=document.getElementById('pd-'+i);
-    if(!el) continue;
-    el.className='prog-dot'+(i<step?' done':i===step?' active':'');
+function render() {
+  // Progress dots
+  for (let i = 1; i <= STEPS; i++) {
+    const el = document.getElementById('pd-' + i);
+    if (el) el.className = 'prog-dot' + (i < step ? ' done' : i === step ? ' active' : '');
   }
+  document.getElementById('btn-back').style.display = step > 1 ? '' : 'none';
+  const nxt = document.getElementById('btn-next');
+  nxt.textContent = step === STEPS ? 'Absenden' : 'Weiter →';
+  nxt.disabled = false;
+
+  if (step === 1) renderStep1();
+  if (step === 2) renderStep2();
+  if (step === 3) renderStep3();
 }
 
-// ── STEP 1: Wer bist du? ──────────────────────────────────────────────────────
-function renderStep1(){
+// ── STEP 1: Name ─────────────────────────────────────────────────────────────
+function renderStep1() {
   document.getElementById('content').innerHTML = `
     <div class="step-num">Schritt 1 von 3</div>
-    <div class="step-title">Wer bist du?</div>
-    <div class="step-sub">Gib deine Suite-Nummer ein, damit wir den Schaden richtig zuordnen können.</div>
-    <div class="err-box" id="s1-err">Bitte Suite-Nummer eingeben.</div>
+    <div class="step-title">Wie heißt du?</div>
+    <div class="step-sub">Dein Name ist optional — hilft uns aber bei Rückfragen.</div>
+    <div class="err-box" id="s1-err">Bitte mindestens einen Namen oder „Anonym" eingeben.</div>
     <div class="field">
-      <div class="field-lbl">Suite-Nummer</div>
-      <input class="field-in" id="s1-zimmer" type="number" inputmode="numeric" placeholder="z.B. 12"
-        value="${state.zimmer}" onkeydown="if(event.key==='Enter')stepNext()" oninput="s1Check(this)">
+      <div class="field-lbl">Dein Name <span style="font-weight:400">(optional)</span></div>
+      <input class="field-in" id="s1-name" type="text" placeholder="z. B. Hildegard Müller"
+        value="${state.name}" autocomplete="name" onkeydown="if(event.key==='Enter')stepNext()">
     </div>
-    <div class="bew-confirm ${state.bewohnerinName ? 'show' : ''}" id="s1-confirm">
-      <span class="bew-confirm-icon">👋</span>
-      <div>
-        <div class="bew-confirm-name">${state.bewohnerinName||''}</div>
-        <div class="bew-confirm-suite">Suite ${state.zimmer}</div>
-      </div>
-    </div>`;
-  document.getElementById('s1-zimmer').focus();
+    <div class="dsgvo">🔒 Datenschutz: Dein Name wird nur zur Bearbeitung deiner Meldung verwendet und nicht an Dritte weitergegeben. Verantwortlich: Sidonie-Scharfe-Stiftung, Zehlendorf.</div>`;
+  setTimeout(() => document.getElementById('s1-name')?.focus(), 100);
 }
 
-async function s1Check(el){
-  const zm = el.value.trim();
-  state.zimmer = zm;
-  state.bewohnerId = null;
-  state.bewohnerinName = '';
-  const conf = document.getElementById('s1-confirm');
-  if(zm.length < 1){ conf.classList.remove('show'); return; }
-  // lookup in supabase
-  try{
-    const r = await fetch(`${SB}/rest/v1/bewohner?zimmer=eq.${encodeURIComponent(zm)}&aktiv=eq.true&select=id,vorname,nachname,name&limit=1`,
-      {headers:{apikey:KEY,Authorization:'Bearer '+KEY}});
-    const rows = await r.json();
-    if(rows.length){
-      const b = rows[0];
-      const nm = (b.vorname||'')+' '+(b.nachname||b.name||'');
-      state.bewohnerId = b.id;
-      state.bewohnerinName = nm.trim();
-      conf.classList.add('show');
-      conf.innerHTML = `<span class="bew-confirm-icon">👋</span><div>
-        <div class="bew-confirm-name">Hallo, ${state.bewohnerinName}!</div>
-        <div class="bew-confirm-suite">Suite ${zm}</div></div>`;
-    } else {
-      conf.classList.remove('show');
-    }
-  } catch{ conf.classList.remove('show'); }
-}
-
-// ── STEP 2: Welcher Raum? ─────────────────────────────────────────────────────
-function renderStep2(){
+// ── STEP 2: Raum ─────────────────────────────────────────────────────────────
+function renderStep2() {
   document.getElementById('content').innerHTML = `
     <div class="step-num">Schritt 2 von 3</div>
     <div class="step-title">Wo ist das Problem?</div>
-    <div class="step-sub">Tippe auf den Raum, in dem der Schaden ist.</div>
-    <div class="err-box" id="s2-err">Bitte einen Raum auswählen.</div>
+    <div class="step-sub">Tippe auf den Bereich, in dem der Schaden ist.</div>
+    <div class="err-box" id="s2-err">Bitte einen Bereich auswählen.</div>
     <div class="raum-grid">
-      ${RAEUME.map(r=>`<button class="raum-btn${state.raum===r.v?' sel':''}" onclick="selRaum('${r.v}',this)">
+      ${RAEUME.map(r => `<button class="raum-btn${state.raum === r.v ? ' sel' : ''}" onclick="selRaum('${r.v}',this)">
         <span class="raum-icon">${r.icon}</span>${r.v}
       </button>`).join('')}
     </div>`;
 }
 
-function selRaum(v, el){
+function selRaum(v, el) {
   state.raum = v;
-  document.querySelectorAll('.raum-btn').forEach(b=>b.classList.remove('sel'));
+  document.querySelectorAll('.raum-btn').forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
 }
 
-// ── STEP 3: Was ist passiert? ─────────────────────────────────────────────────
-function renderStep3(){
+// ── STEP 3: Problem + Foto ────────────────────────────────────────────────────
+function renderStep3() {
   document.getElementById('content').innerHTML = `
     <div class="step-num">Schritt 3 von 3</div>
     <div class="step-title">Was ist passiert?</div>
-    <div class="step-sub">Kurze Beschreibung reicht — mach wenn möglich ein Foto.</div>
+    <div class="step-sub">Eine kurze Beschreibung reicht. Ein Foto hilft uns sehr.</div>
     <div class="err-box" id="s3-err">Bitte das Problem kurz beschreiben.</div>
     <div class="field">
       <div class="field-lbl">Beschreibung</div>
-      <textarea class="field-in" id="s3-prob" placeholder="z.B. Wasserhahn tropft, Heizung kalt, Türschloss klemmt …">${state.problem}</textarea>
+      <textarea class="field-in" id="s3-prob" placeholder="z. B. Wasserhahn tropft, Heizung kalt, Türschloss klemmt …">${state.problem}</textarea>
     </div>
     <div class="field">
-      <div class="field-lbl">📷 Fotos (empfohlen)</div>
+      <div class="field-lbl">📷 Foto <span style="font-weight:400">(empfohlen)</span></div>
       <div class="foto-prompt" onclick="document.getElementById('foto-in').click()">
-        <div class="foto-prompt-icon">📷</div>
-        <div class="foto-prompt-lbl">${state.fotos.length ? state.fotos.length+' Foto'+( state.fotos.length>1?'s':'')+' ausgewählt' : 'Foto aufnehmen oder auswählen'}</div>
+        <div class="foto-prompt-icon">${state.fotos.length ? '✅' : '📷'}</div>
+        <div class="foto-prompt-lbl">${state.fotos.length ? state.fotos.length + ' Foto' + (state.fotos.length > 1 ? 's' : '') + ' ausgewählt' : 'Foto aufnehmen oder auswählen'}</div>
         <div class="foto-prompt-sub">${state.fotos.length ? 'Tippen zum Hinzufügen' : 'Kamera oder Galerie'}</div>
       </div>
-      <div class="foto-grid" id="foto-grid">${state.fotos.map((f,i)=>`
+      ${state.fotos.length ? `<div class="foto-grid">${state.fotos.map((f, i) => `
         <div class="foto-thumb-wrap">
           <img class="foto-thumb" src="${f}">
           <button class="foto-rm" onclick="rmFoto(${i})">×</button>
-        </div>`).join('')}
-      </div>
+        </div>`).join('')}</div>` : ''}
     </div>`;
-  document.getElementById('s3-prob').focus();
+  setTimeout(() => document.getElementById('s3-prob')?.focus(), 100);
 }
 
-function addFotos(inp){
-  const files = Array.from(inp.files);
-  let done = 0;
-  files.slice(0, 4-state.fotos.length).forEach(f=>{
+function addFotos(inp) {
+  Array.from(inp.files).slice(0, 4 - state.fotos.length).forEach(f => {
     const r = new FileReader();
-    r.onload = e => {
-      state.fotos.push(e.target.result);
-      done++;
-      if(done===files.length) renderStep3();
-    };
+    r.onload = e => { state.fotos.push(e.target.result); renderStep3(); };
     r.readAsDataURL(f);
   });
+  inp.value = '';
 }
-
-function rmFoto(i){ state.fotos.splice(i,1); renderStep3(); }
+function rmFoto(i) { state.fotos.splice(i, 1); renderStep3(); }
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
-function stepNext(){
-  if(step===1){
-    const zm = document.getElementById('s1-zimmer')?.value?.trim();
-    if(!zm){ document.getElementById('s1-err').classList.add('show'); return; }
-    state.zimmer = zm;
-    document.getElementById('s1-err').classList.remove('show');
-    step=2; render(); return;
+function stepNext() {
+  if (step === 1) {
+    state.name = document.getElementById('s1-name')?.value?.trim() || '';
+    step = 2; render(); return;
   }
-  if(step===2){
-    if(!state.raum){ document.getElementById('s2-err').classList.add('show'); return; }
-    document.getElementById('s2-err').classList.remove('show');
-    step=3; render(); return;
+  if (step === 2) {
+    if (!state.raum) { document.getElementById('s2-err').classList.add('show'); return; }
+    step = 3; render(); return;
   }
-  if(step===3){
+  if (step === 3) {
     const prob = document.getElementById('s3-prob')?.value?.trim();
-    if(!prob){ document.getElementById('s3-err').classList.add('show'); return; }
+    if (!prob) { document.getElementById('s3-err').classList.add('show'); return; }
     state.problem = prob;
-    document.getElementById('s3-err').classList.remove('show');
     submitSchaden();
   }
 }
 
-function stepBack(){ if(step>1){ step--; render(); } }
+function stepBack() { if (step > 1) { step--; render(); } }
 
 // ── SUBMIT ────────────────────────────────────────────────────────────────────
-async function submitSchaden(){
+async function submitSchaden() {
   const btn = document.getElementById('btn-next');
   btn.disabled = true;
   btn.textContent = 'Wird gesendet …';
 
-  const ort = state.raum + (state.zimmer ? ' · Suite '+state.zimmer : '');
   const payload = {
-    datum: new Date().toISOString().slice(0,10),
-    zimmer: state.zimmer || null,
-    ort,
+    datum: new Date().toISOString().slice(0, 10),
+    ort: state.raum,
     problem: state.problem,
     kategorie: 'Schaden',
     prio: 'Mittel',
-    von: state.bewohnerinName ? state.bewohnerinName+' (Portal)' : 'Bewohnerin Suite '+state.zimmer+' (Portal)',
+    von: state.name ? state.name + ' (Bewohner-Portal)' : 'Bewohnerin (Bewohner-Portal)',
+    name: state.name || null,
     status: 'Offen',
     foto: state.fotos.length ? JSON.stringify(state.fotos) : null,
   };
 
-  try{
+  try {
     const r = await fetch(`${SB}/rest/v1/schaden`, {
-      method:'POST',
-      headers:{apikey:KEY,Authorization:'Bearer '+KEY,Prefer:'return=representation','Content-Type':'application/json'},
+      method: 'POST',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, Prefer: 'return=representation', 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    if(!r.ok) throw await r.text();
-    const [created] = await r.json();
-    state._refId = created.id?.slice(0,8)?.toUpperCase() || '—';
-    step=4; render();
-  } catch(e){
-    btn.disabled=false;
-    btn.textContent='Absenden';
+    if (!r.ok) throw await r.text();
+    step = 4; renderSuccess();
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Absenden';
     alert('Fehler beim Senden. Bitte versuche es nochmal.');
-    console.error(e);
   }
 }
 
 // ── SUCCESS ───────────────────────────────────────────────────────────────────
-function renderSuccess(){
-  document.getElementById('progress-bar').style.display='none';
-  document.getElementById('bottom-nav').style.display='none';
+function renderSuccess() {
+  document.getElementById('progress-bar').style.display = 'none';
+  document.getElementById('bottom-nav').style.display = 'none';
   document.getElementById('content').innerHTML = `
     <div class="success">
       <div class="success-icon">✅</div>
       <div class="success-title">Vielen Dank!</div>
       <div class="success-text">
         Deine Meldung wurde an den Hausmeister weitergeleitet.<br>
-        Du wirst informiert, sobald das Problem bearbeitet wird.
+        Wir kümmern uns so schnell wie möglich darum.
       </div>
-      <div class="success-ref">
-        Deine Meldung<br>
-        <strong>${state.raum} · Suite ${state.zimmer}</strong>
-        <span style="display:block;margin-top:4px;font-size:12px">${state.problem.slice(0,80)}${state.problem.length>80?'…':''}</span>
+      <div class="success-box">
+        <strong>${state.raum}</strong>
+        ${state.problem.slice(0, 100)}${state.problem.length > 100 ? ' …' : ''}
+        ${state.name ? `<span style="display:block;margin-top:6px;font-size:12px;color:var(--text-muted)">Gemeldet von: ${state.name}</span>` : ''}
       </div>
       <button class="btn-new" onclick="neuesMeldung()">Weiteren Schaden melden</button>
     </div>`;
 }
 
-function neuesMeldung(){
-  state = {zimmer:'', bewohnerId:null, bewohnerinName:'', raum:'', problem:'', fotos:[]};
-  step=1;
-  document.getElementById('progress-bar').style.display='';
-  document.getElementById('bottom-nav').style.display='';
+function neuesMeldung() {
+  state = { name: '', raum: '', problem: '', fotos: [] };
+  step = 1;
+  document.getElementById('progress-bar').style.display = '';
+  document.getElementById('bottom-nav').style.display = '';
   render();
 }
 
-// Init
 render();
 </script>
 </body>
