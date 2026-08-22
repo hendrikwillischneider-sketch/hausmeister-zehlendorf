@@ -585,7 +585,7 @@ async function init() {
   try {
     const [r1, r2] = await Promise.all([
       sbReq('schaden?order=created_at.desc&limit=500&select=*'),
-      sbReq('bewohner?aktiv=eq.true&order=zimmer.asc&select=id,name,zimmer')
+      sbReq('bewohner?aktiv=eq.true&order=haus.asc,etage.asc,name.asc&select=id,name,zimmer,haus,etage')
     ]);
     auftraege = (await r1.json()).map(fromSB);
     bewohnerListe = r2.ok ? await r2.json() : [];
@@ -659,7 +659,7 @@ const dc = p => p==='Hoch'?'d-hoch':p==='Mittel'?'d-mittel':'d-niedrig';
 function aiHTML(a) {
   const katBadge = a.kategorie && KAT_CSS[a.kategorie]
     ? `<span class="b-kat ${KAT_CSS[a.kategorie]}">${KAT_ICON[a.kategorie]} ${a.kategorie}</span>` : '';
-  const nameInfo = a.name ? ` · ${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}` : '';
+  const nameInfo = a.name ? ` · ${a.name}${a.zimmer ? ', Suite ' + a.zimmer : (a.haus ? ', ' + a.haus + ' ' + a.etage : '')}` : '';
   const kostenBadge = a.kosten != null ? `<span class="kosten-badge">· ${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>` : '';
   const hbFlag = (a.rueckmeldung && !['Abgeschlossen','Erledigt'].includes(a.status))
     ? `<div class="hb-flag">⚠️ Rückmeldung von Herrn Schneider — bitte weitergeben</div>` : '';
@@ -697,7 +697,7 @@ function openDetail(id) {
         ${a.rueckmeldung}
       </div>
     </div>` : '';
-  const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}</div></div>` : '';
+  const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Suite ' + a.zimmer : (a.haus ? ', ' + a.haus + ' ' + a.etage : '')}</div></div>` : '';
   const freigabeSection = '';
   const photoSection = a.photos && a.photos[0] ? `
     <div class="detail-section">
@@ -746,9 +746,10 @@ function openNew(kat) {
   // Bewohnerin dropdown
   const dd = document.getElementById('n-bw');
   dd.innerHTML = '<option value="">Keine Zuordnung</option>';
-  bewohnerListe.sort((a,b) => (parseInt(a.zimmer)||0)-(parseInt(b.zimmer)||0)).forEach(b => {
+  bewohnerListe.forEach(b => {
     const o = document.createElement('option'); o.value = b.name;
-    o.textContent = `Suite ${b.zimmer} — ${b.name}`; dd.appendChild(o);
+    const loc = b.zimmer ? `Suite ${b.zimmer}` : `${b.haus} · ${b.etage}`;
+    o.textContent = `${loc} — ${b.name}`; dd.appendChild(o);
   });
   // Show right category fields
   document.querySelectorAll('.nf-cat').forEach(el => el.style.display = 'none');
