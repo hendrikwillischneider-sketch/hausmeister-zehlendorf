@@ -697,12 +697,7 @@ function openDetail(id) {
       </div>
     </div>` : '';
   const nameSection = a.name ? `<div class="detail-section"><div class="detail-lbl">Bewohnerin</div><div class="detail-val">${a.name}${a.zimmer ? ', Suite ' + a.zimmer : ''}</div></div>` : '';
-  const freigabeSection = (a.status === 'Kosten geschätzt' && a.kosten != null) ? `
-    <div class="detail-section" style="background:var(--yellow-pale);border-radius:9px;padding:12px 14px;border:1px solid rgba(233,167,32,.3)">
-      <div style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:6px">💰 Kosten: ${Number(a.kosten).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</div>
-      <div style="font-size:12.5px;color:#92400e;margin-bottom:10px">Bitte prüfen und freigeben, damit die Umsetzung starten kann.</div>
-      <button onclick="genehmigenFreigabe('${a.id}')" style="display:block;width:100%;padding:11px;background:#166534;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer">✅ Freigabe erteilen</button>
-    </div>` : '';
+  const freigabeSection = '';
   const photoSection = a.photos && a.photos[0] ? `
     <div class="detail-section">
       <div class="detail-lbl">Foto</div>
@@ -1140,20 +1135,6 @@ function openFab() {
 }
 
 // ── FREIGABE ──────────────────────────────────────────────────────────────────
-async function genehmigenFreigabe(id) {
-  if (!confirm('Freigabe erteilen? Die Kosten werden genehmigt und die Umsetzung kann starten.')) return;
-  try {
-    const res = await sbReq(`schaden?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status: 'Freigegeben', freigabe_by: 'Frau Schwade' })
-    });
-    if (!res.ok) throw 0;
-    const a = auftraege.find(x => x.id === id);
-    if (a) { a.status = 'Freigegeben'; a.freigabe_by = 'Frau Schwade'; }
-    render();
-    ovClose('ov-detail');
-  } catch { alert('Fehler beim Speichern der Freigabe.'); }
-}
 
 // ── BUDGET ────────────────────────────────────────────────────────────────────
 let monatlichesBudget = 500;
