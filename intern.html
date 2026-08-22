@@ -290,6 +290,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <button onclick="show('artikel',this)">Artikel</button>
   <button onclick="show('pflanzen',this)">Pflanzen</button>
   <button onclick="show('baumkataster',this)">Baumkataster</button>
+  <button onclick="show('zugaenge',this)">Zugänge</button>
 </nav>
 
 <!-- ÜBERSICHT -->
@@ -398,6 +399,93 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(event)">
 </div>
 
+
+<!-- ZUGÄNGE -->
+<div class="view" id="view-zugaenge">
+  <div class="sec">Portal-Zugänge verwalten</div>
+  <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.5">
+    Passwörter für alle Portale. Frau Schwade und Bewohner-Passwort werden in Supabase gespeichert — nach dem Zurücksetzen gilt das neue Passwort beim nächsten Login.
+  </div>
+
+  <!-- Hendrik -->
+  <div class="card" style="margin-bottom:10px">
+    <div style="padding:13px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;border-radius:9px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔑</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600">Hendrik — Internes Dashboard</div>
+        <div style="font-size:11.5px;color:var(--text-muted)">hausmeister_intern.html · nur dieses Gerät</div>
+      </div>
+    </div>
+    <div style="padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Aktuelles Passwort</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="pw-hm-val" style="font-family:monospace;font-size:15px;letter-spacing:2px">••••••••</span>
+            <button onclick="toggleReveal('pw-hm-val','hm')" id="btn-reveal-hm" style="font-size:12px;color:var(--green-mid);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">Anzeigen</button>
+          </div>
+        </div>
+      </div>
+      <button onclick="changeHmPw()" class="set-btn" style="width:100%;padding:10px;border-radius:9px;font-size:14px;font-weight:500">Passwort ändern</button>
+    </div>
+  </div>
+
+  <!-- Frau Schwade -->
+  <div class="card" style="margin-bottom:10px">
+    <div style="padding:13px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;border-radius:9px;background:var(--yellow-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👩‍💼</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600">Frau Schwade — Serviceportal</div>
+        <div style="font-size:11.5px;color:var(--text-muted)">schwade.html · Supabase-Sync</div>
+      </div>
+      <div id="sw-sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0"></div>
+    </div>
+    <div style="padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Aktuelles Passwort</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="pw-sw-val" style="font-family:monospace;font-size:15px;letter-spacing:2px">••••••••</span>
+            <button onclick="toggleReveal('pw-sw-val','sw')" id="btn-reveal-sw" style="font-size:12px;color:var(--green-mid);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">Anzeigen</button>
+          </div>
+        </div>
+      </div>
+      <button onclick="resetSwPw()" class="set-btn" style="width:100%;padding:10px;border-radius:9px;font-size:14px;font-weight:500">Passwort zurücksetzen</button>
+    </div>
+  </div>
+
+  <!-- Bewohner -->
+  <div class="card" style="margin-bottom:10px">
+    <div style="padding:13px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;border-radius:9px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏠</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600">Bewohner — Bewohnerportal</div>
+        <div style="font-size:11.5px;color:var(--text-muted)">index.html · geteiltes Login · Supabase-Sync</div>
+      </div>
+      <div id="bw-sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0"></div>
+    </div>
+    <div style="padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Aktuelles Passwort</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="pw-bw-val" style="font-family:monospace;font-size:15px;letter-spacing:2px">••••••••</span>
+            <button onclick="toggleReveal('pw-bw-val','bw')" id="btn-reveal-bw" style="font-size:12px;color:var(--green-mid);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">Anzeigen</button>
+          </div>
+        </div>
+      </div>
+      <button onclick="resetBwPw()" class="set-btn" style="width:100%;padding:10px;border-radius:9px;font-size:14px;font-weight:500">Passwort zurücksetzen</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div style="padding:12px 14px">
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6">
+        <strong style="color:var(--text)">Hinweis:</strong> Frau Schwade und Bewohner-Passwörter werden zentral in Supabase gespeichert. Nach dem Zurücksetzen gilt das neue Passwort, sobald die Person das Portal neu lädt. Das Passwort für diese App (Hendrik) gilt nur auf diesem Gerät.
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ARTIKEL CMS -->
 <div class="view" id="view-artikel">
@@ -955,7 +1043,7 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
     <input type="text" id="bw-name" placeholder="z. B. Maria">
     <label>Suite-Nummer</label>
     <input type="text" id="bw-zimmer" placeholder="z. B. 7">
-    <label>Kontaktweg für Rückmeldungen</label>
+    <label>Bevorzugte Kontaktmöglichkeit</label>
     <select id="bw-kontakt" onchange="toggleKontaktFelder()">
       <option value="Türzettel">🖨 Türzettel (Standard)</option>
       <option value="E-Mail">📧 E-Mail</option>
@@ -966,10 +1054,12 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
       <label>E-Mail-Adresse</label>
       <input type="email" id="bw-email" placeholder="name@beispiel.de">
     </div>
-    <div id="bw-telefon-wrap" style="display:none">
-      <label>Telefonnummer</label>
-      <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
-    </div>
+    <label>Telefon <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-telefon" placeholder="z. B. 030 / 123 456">
+    <label>Handy <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-handy" placeholder="z. B. 0170 / 123 456">
+    <label>Fax <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+    <input type="text" id="bw-fax" placeholder="z. B. 030 / 123 456">
     <button class="btn btn-primary" id="bw-save-btn" onclick="saveBewohner()">Speichern</button>
     <button class="btn btn-ghost" onclick="ovClose('ov-bewohner')">Abbrechen</button>
     <button class="btn btn-danger" id="bw-delete-btn" onclick="deleteBewohnerRow()" style="margin-top:8px;display:none">Bewohnerin löschen</button>
@@ -1311,6 +1401,7 @@ function render(id) {
   if (id==='plan') renderPlan();
   if (id==='bewohner') renderBewohner();
   if (id==='settings') updateLastSyncDisplay();
+  if (id==='zugaenge') loadZugaenge();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
@@ -1517,7 +1608,6 @@ function renderBewohner() {
 function toggleKontaktFelder() {
   const art = document.getElementById('bw-kontakt').value;
   document.getElementById('bw-email-wrap').style.display = art === 'E-Mail' ? 'block' : 'none';
-  document.getElementById('bw-telefon-wrap').style.display = art === 'Anruf' ? 'block' : 'none';
 }
 
 function openNewBw() {
@@ -1528,6 +1618,8 @@ function openNewBw() {
   document.getElementById('bw-kontakt').value = 'Türzettel';
   document.getElementById('bw-email').value = '';
   document.getElementById('bw-telefon').value = '';
+  document.getElementById('bw-handy').value = '';
+  document.getElementById('bw-fax').value = '';
   toggleKontaktFelder();
   document.getElementById('bw-delete-btn').style.display = 'none';
   ovOpen('ov-bewohner');
@@ -1544,6 +1636,8 @@ function openEditBw(id) {
   document.getElementById('bw-kontakt').value = b.kontakt_art || 'Türzettel';
   document.getElementById('bw-email').value = b.email || '';
   document.getElementById('bw-telefon').value = b.telefon || '';
+  document.getElementById('bw-handy').value = b.handy || '';
+  document.getElementById('bw-fax').value = b.fax || '';
   toggleKontaktFelder();
   document.getElementById('bw-delete-btn').style.display = 'block';
   ovOpen('ov-bewohner');
@@ -1560,16 +1654,18 @@ async function saveBewohner() {
   const kontakt_art = document.getElementById('bw-kontakt').value;
   const email = document.getElementById('bw-email').value.trim() || null;
   const telefon = document.getElementById('bw-telefon').value.trim() || null;
+  const handy = document.getElementById('bw-handy').value.trim() || null;
+  const fax = document.getElementById('bw-fax').value.trim() || null;
   try {
     if (editingBwId) {
       await sbReq(`bewohner?id=eq.${editingBwId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ name, zimmer, kontakt_art, email, telefon })
+        body: JSON.stringify({ name, zimmer, kontakt_art, email, telefon, handy, fax })
       });
     } else {
       await sbReq('bewohner', {
         method: 'POST',
-        body: JSON.stringify({ name, zimmer, aktiv: true, kontakt_art, email, telefon })
+        body: JSON.stringify({ name, zimmer, aktiv: true, kontakt_art, email, telefon, handy, fax })
       });
     }
     await loadBewohnerList();
@@ -2534,6 +2630,95 @@ async function deletePflanz(id) {
   if (!confirm('Pflanze wirklich löschen?')) return;
   await sbReq(`pflanzen?id=eq.${id}`, {method:'DELETE'});
   loadPflanzenInt();
+}
+
+// ── ZUGÄNGE ───────────────────────────────────────────────────────────────────
+const ZG_REVEALED = {};
+
+async function loadZugaenge() {
+  document.getElementById('pw-sw-val').textContent = '••••••••';
+  document.getElementById('pw-bw-val').textContent = '••••••••';
+  document.getElementById('pw-hm-val').textContent = '••••••••';
+  ZG_REVEALED['hm'] = false;
+  ZG_REVEALED['sw'] = false;
+  ZG_REVEALED['bw'] = false;
+  ['btn-reveal-hm','btn-reveal-sw','btn-reveal-bw'].forEach(id => {
+    document.getElementById(id).textContent = 'Anzeigen';
+  });
+
+  try {
+    const res = await sbReq('settings?key=in.(pw_schwade,pw_bewohner)&select=key,value');
+    const rows = res.ok ? await res.json() : [];
+    const swRow = rows.find(r => r.key === 'pw_schwade');
+    const bwRow = rows.find(r => r.key === 'pw_bewohner');
+    ZG_REVEALED['sw_val'] = swRow?.value || 'Schwade26';
+    ZG_REVEALED['bw_val'] = bwRow?.value || 'Bewohner26';
+    document.getElementById('sw-sync-dot').style.background = '#52b788';
+    document.getElementById('bw-sync-dot').style.background = '#52b788';
+  } catch {
+    ZG_REVEALED['sw_val'] = 'Schwade26';
+    ZG_REVEALED['bw_val'] = 'Bewohner26';
+    document.getElementById('sw-sync-dot').style.background = 'var(--red)';
+    document.getElementById('bw-sync-dot').style.background = 'var(--red)';
+  }
+  ZG_REVEALED['hm_val'] = PW;
+}
+
+function toggleReveal(elId, key) {
+  const el = document.getElementById(elId);
+  const btn = document.getElementById('btn-reveal-' + key);
+  if (ZG_REVEALED[key]) {
+    el.textContent = '••••••••';
+    btn.textContent = 'Anzeigen';
+    ZG_REVEALED[key] = false;
+  } else {
+    el.textContent = ZG_REVEALED[key + '_val'] || '—';
+    btn.textContent = 'Verbergen';
+    ZG_REVEALED[key] = true;
+  }
+}
+
+function changeHmPw() {
+  const np = prompt('Neues Passwort für das interne Dashboard:');
+  if (!np || np.length < 4) { if (np !== null) alert('Mindestens 4 Zeichen.'); return; }
+  PW = np; localStorage.setItem('hm_pw', np);
+  ZG_REVEALED['hm_val'] = np;
+  ZG_REVEALED['hm'] = false;
+  document.getElementById('pw-hm-val').textContent = '••••••••';
+  document.getElementById('btn-reveal-hm').textContent = 'Anzeigen';
+  alert('Passwort geändert.');
+}
+
+async function resetSwPw() {
+  const np = prompt('Neues Passwort für Frau Schwade:');
+  if (!np || np.length < 4) { if (np !== null) alert('Mindestens 4 Zeichen.'); return; }
+  await zbSave('pw_schwade', np);
+  ZG_REVEALED['sw_val'] = np;
+  ZG_REVEALED['sw'] = false;
+  document.getElementById('pw-sw-val').textContent = '••••••••';
+  document.getElementById('btn-reveal-sw').textContent = 'Anzeigen';
+  alert('Passwort für Frau Schwade gesetzt. Gilt beim nächsten Login.');
+}
+
+async function resetBwPw() {
+  const np = prompt('Neues Bewohner-Passwort:');
+  if (!np || np.length < 4) { if (np !== null) alert('Mindestens 4 Zeichen.'); return; }
+  await zbSave('pw_bewohner', np);
+  ZG_REVEALED['bw_val'] = np;
+  ZG_REVEALED['bw'] = false;
+  document.getElementById('pw-bw-val').textContent = '••••••••';
+  document.getElementById('btn-reveal-bw').textContent = 'Anzeigen';
+  alert('Bewohner-Passwort gesetzt. Gilt beim nächsten Login.');
+}
+
+async function zbSave(key, value) {
+  const check = await sbReq(`settings?key=eq.${key}&select=key`);
+  const exists = check.ok && (await check.json()).length > 0;
+  if (exists) {
+    await sbReq(`settings?key=eq.${key}`, { method: 'PATCH', body: JSON.stringify({ value }) });
+  } else {
+    await sbReq('settings', { method: 'POST', body: JSON.stringify({ key, value }) });
+  }
 }
 </script>
 </body>
