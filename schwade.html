@@ -200,6 +200,14 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 .bereich-btn .bereich-icon{font-size:22px}
 .bereich-btn:hover{border-color:var(--green-mid);color:var(--text)}
 .bereich-btn.active{border-color:var(--green-mid);background:rgba(82,183,136,.1);color:var(--green-mid)}
+/* Gebäude sub-toggle */
+.gebaeude-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:0 0 12px}
+.gebaeude-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;
+  border:1.5px solid var(--border);border-radius:11px;background:var(--bg);color:var(--text-muted);
+  cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .18s;line-height:1.2;text-align:center}
+.gebaeude-btn .gb-icon{font-size:18px;line-height:1}
+.gebaeude-btn:hover{border-color:var(--green-mid);color:var(--text)}
+.gebaeude-btn.active{border-color:var(--green-mid);background:rgba(82,183,136,.1);color:var(--green-mid)}
 /* Sicherheit chips */
 .sicherheit-chip{background:var(--bg);border:1.5px solid var(--border);color:var(--text-muted);
   border-radius:20px;padding:5px 13px;font-size:12.5px;cursor:pointer;transition:all .14s;font-family:inherit}
@@ -514,19 +522,43 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
               <span style="font-size:11px;font-weight:400;opacity:.7">Zimmer, Bad, Küche …</span>
             </button>
           </div>
-          <div class="ort-chips" id="ort-chips-allgemein">
-            <button type="button" class="ort-chip" data-ort="Treppenhaus" onclick="selectOrt(this)">🏛 Treppenhaus</button>
-            <button type="button" class="ort-chip" data-ort="Eingang / Haustür" onclick="selectOrt(this)">🚪 Eingang</button>
-            <button type="button" class="ort-chip" data-ort="Keller" onclick="selectOrt(this)">📦 Keller</button>
-            <button type="button" class="ort-chip" data-ort="Park / Außenanlage" onclick="selectOrt(this)">🌿 Park</button>
-            <button type="button" class="ort-chip" data-ort="Gemeinschaftsküche" onclick="selectOrt(this)">🍴 Gemeinschaftsküche</button>
-            <button type="button" class="ort-chip" data-ort="Waschkeller" onclick="selectOrt(this)">🫧 Waschkeller</button>
-            <button type="button" class="ort-chip" data-ort="Flur-Beleuchtung" onclick="selectOrt(this)">💡 Flurbeleuchtung</button>
-            <button type="button" class="ort-chip" data-ort="Aufzug" onclick="selectOrt(this)">🛗 Aufzug</button>
-            <button type="button" class="ort-chip" data-ort="Technik / Heizungsraum" onclick="selectOrt(this)">🔧 Technikraum</button>
-            <button type="button" class="ort-chip" data-ort="Fassade / Dach" onclick="selectOrt(this)">🏗 Fassade / Dach</button>
-            <button type="button" class="ort-chip" data-ort="Parkplatz / Zufahrt" onclick="selectOrt(this)">🅿️ Parkplatz</button>
-            <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+          <div id="ort-chips-allgemein">
+            <div class="gebaeude-toggle">
+              <button type="button" class="gebaeude-btn" id="gb-h46" onclick="setGebaeude('h46')">
+                <span class="gb-icon">🏢</span><span>Haus 4–6</span>
+              </button>
+              <button type="button" class="gebaeude-btn" id="gb-h810" onclick="setGebaeude('h810')">
+                <span class="gb-icon">🏢</span><span>Haus 8–10</span>
+              </button>
+              <button type="button" class="gebaeude-btn" id="gb-park" onclick="setGebaeude('park')">
+                <span class="gb-icon">🌳</span><span>Park & Außen</span>
+              </button>
+            </div>
+            <div class="ort-chips" id="gc-gebaeude" style="display:none">
+              <button type="button" class="ort-chip" data-ort-base="Eingang / Haustür" onclick="selectOrt(this)">🚪 Eingang</button>
+              <button type="button" class="ort-chip" data-ort-base="Hintereingang (Bücherei-Seite)" onclick="selectOrt(this)">🔙 Hintereingang</button>
+              <button type="button" class="ort-chip" data-ort-base="Treppenhaus" onclick="selectOrt(this)">🏛 Treppenhaus</button>
+              <button type="button" class="ort-chip" data-ort-base="Flur / Korridor" onclick="selectOrt(this)">🚶 Flur</button>
+              <button type="button" class="ort-chip" data-ort-base="Keller / Kelleraußentür" onclick="selectOrt(this)">📦 Keller</button>
+              <button type="button" class="ort-chip" data-ort-base="Aufzug" onclick="selectOrt(this)">🛗 Aufzug</button>
+              <button type="button" class="ort-chip" data-ort-base="Gemeinschaftsküche" onclick="selectOrt(this)">🍴 Gemeinschaftsküche</button>
+              <button type="button" class="ort-chip" data-ort-base="Waschkeller" onclick="selectOrt(this)">🫧 Waschkeller</button>
+              <button type="button" class="ort-chip" data-ort-base="Technik / Heizungsraum" onclick="selectOrt(this)">🔧 Technikraum</button>
+              <button type="button" class="ort-chip" data-ort-base="Fassade / Dach" onclick="selectOrt(this)">🏗 Fassade</button>
+              <button type="button" class="ort-chip" data-ort-base="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+            </div>
+            <div class="ort-chips" id="gc-park" style="display:none">
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Gully / Kanalisation" onclick="selectOrt(this)">🔩 Gully / Kanalisation</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Rasen & Wiese" onclick="selectOrt(this)">🌿 Rasen & Wiese</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Bäume & Sträucher" onclick="selectOrt(this)">🌳 Bäume & Sträucher</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Wege & Zugang" onclick="selectOrt(this)">🚶 Wege & Zugang</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Parkplatz / Zufahrt" onclick="selectOrt(this)">🅿️ Parkplatz</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Außenbeleuchtung" onclick="selectOrt(this)">💡 Außenbeleuchtung</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Eingangstor" onclick="selectOrt(this)">🚪 Eingangstor</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Müllplatz" onclick="selectOrt(this)">🗑 Müllplatz</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Außenwasser / Brunnen" onclick="selectOrt(this)">💧 Außenwasser</button>
+              <button type="button" class="ort-chip" data-ort="Park & Außen · Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+            </div>
           </div>
           <div class="ort-chips" id="ort-chips-bewohner" style="display:none">
             <button type="button" class="ort-chip" data-ort="Zimmer / Schlafbereich" onclick="selectOrt(this)">🛏 Zimmer</button>
@@ -842,6 +874,9 @@ function fromSB(r) {
     freigabe_by: r.freigabe_by || null,
     rueckmeldung: r.rueckmeldung || '',
     notiz: r.notiz || '',
+    seit_wann: r.seit_wann || null,
+    sicherheit: r.sicherheit || null,
+    zutritt: r.zutritt || null,
     kosten: r.kosten != null ? r.kosten : null,
     quittung: r.quittung || '',
     termin: r.termin || '',
@@ -947,6 +982,10 @@ function openDetail(id) {
         ${nameSection}
         <div class="detail-section"><div class="detail-lbl">Gemeldet</div><div class="detail-val">${a.datum}${a.von ? ' · ' + a.von : ''}</div></div>
         ${a.prio ? `<div class="detail-section"><div class="detail-lbl">Priorität</div><div class="detail-val">${a.prio==='Hoch'?'🔴':a.prio==='Mittel'?'🟡':'🟢'} ${a.prio}</div></div>` : ''}
+        ${a.seit_wann ? `<div class="detail-section"><div class="detail-lbl">Seit wann</div><div class="detail-val">${a.seit_wann}</div></div>` : ''}
+        ${a.sicherheit ? `<div class="detail-section"><div class="detail-lbl">Sicherheit</div><div class="detail-val">${a.sicherheit}</div></div>` : ''}
+        ${a.zutritt ? `<div class="detail-section"><div class="detail-lbl">Zutritt nötig</div><div class="detail-val">${a.zutritt}</div></div>` : ''}
+        ${a.notiz ? `<div class="detail-section"><div class="detail-lbl" style="color:var(--orange)">Hinweis von Frau Schwade</div><div class="detail-val" style="background:var(--orange-pale);border-left:3px solid var(--orange);border-radius:8px;padding:10px 12px;font-size:14px">${a.notiz}</div></div>` : ''}
         ${photoSection}
       </div>
     </div>
@@ -1206,16 +1245,63 @@ function renderWochenplan() {
 }
 
 const ORT_PROBLEMS = {
-  'Zimmer':           ['Heizung kalt','Rolllade/Jalousie defekt','Steckdose defekt','Licht defekt','Fenster klemmt'],
-  'Küche':            ['Wasserhahn tropft','Abfluss verstopft','Herd/Ofen defekt','Kühlschrank defekt','Abzug defekt'],
-  'Badezimmer':       ['Duschkopf tropft','Abfluss verstopft','WC-Spülung defekt','Handtuchhalter lose','Wasser läuft nicht ab'],
-  'Treppenhaus':      ['Beleuchtung defekt','Geländer locker','Tür klemmt','Stufe beschädigt'],
-  'Eingang':          ['Beleuchtung defekt','Tür klemmt','Klingel defekt','Briefkasten defekt'],
-  'Keller':           ['Beleuchtung defekt','Feuchtigkeit / Schimmel','Tür klemmt','Wasserschaden'],
-  'Außenbereich':     ['Weg beschädigt','Beleuchtung defekt','Geländer locker','Bewässerungsanlage','Vandalismusschaden'],
-  'Gemeinschaftsküche':['Herd defekt','Kühlschrank defekt','Wasserhahn','Abfluss verstopft','Beleuchtung defekt'],
-  'Waschkeller':      ['Waschmaschine defekt','Trockner defekt','Beleuchtung defekt','Feuchtigkeit'],
+  'Zimmer / Schlafbereich': ['Heizung kalt','Rolllade/Jalousie defekt','Steckdose defekt','Licht defekt','Fenster klemmt'],
+  'Küche / Kochnische':     ['Wasserhahn tropft','Abfluss verstopft','Herd/Ofen defekt','Kühlschrank defekt','Abzug defekt'],
+  'Badezimmer / Dusche':    ['Duschkopf tropft','Abfluss verstopft','WC-Spülung defekt','Handtuchhalter lose','Wasser läuft nicht ab'],
+  'Fenster / Jalousie':     ['Fenster klemmt','Jalousie defekt','Dichtung defekt','Griff locker'],
+  'Heizung / Thermostat':   ['Heizkörper kalt','Thermostat reagiert nicht','Geräusche','Ventil defekt'],
+  'Wasserhahn / Abfluss':   ['Tropft','Kein Druck','Abfluss verstopft','Geruch'],
+  'Tür / Schloss':          ['Klemmt','Schloss defekt','Dichtung fehlt','Türstopper fehlt'],
+  'Flur / Diele':           ['Beleuchtung defekt','Boden beschädigt'],
+  'Strom / Steckdosen':     ['Steckdose defekt','Sicherung ausgefallen','Licht flackert'],
+  'Balkon / Terrasse':      ['Geländer locker','Entwässerung verstopft','Bodenbelag defekt'],
+  'Eingang / Haustür':      ['Beleuchtung defekt','Tür klemmt','Klingel defekt','Briefkasten defekt','Schließmechanismus defekt'],
+  'Hintereingang (Bücherei-Seite)': ['Regenwasser läuft ein','Tür klemmt','Dichtung defekt','Türschwelle prüfen','Gefälle falsch','Schließmechanismus defekt'],
+  'Treppenhaus':            ['Beleuchtung defekt','Geländer locker','Tür klemmt','Stufe beschädigt'],
+  'Flur / Korridor':        ['Beleuchtung defekt','Boden beschädigt','Tür klemmt'],
+  'Keller / Kelleraußentür':['Beleuchtung defekt','Feuchtigkeit / Schimmel','Tür klemmt','Wasserschaden','Regenwasser läuft ein','Gully / Abfluss'],
+  'Aufzug':                 ['Aufzug fährt nicht','Tür klemmt','Beleuchtung defekt','Notruf defekt'],
+  'Gemeinschaftsküche':     ['Herd defekt','Kühlschrank defekt','Wasserhahn','Abfluss verstopft','Beleuchtung defekt'],
+  'Waschkeller':            ['Waschmaschine defekt','Trockner defekt','Beleuchtung defekt','Feuchtigkeit'],
+  'Technik / Heizungsraum': ['Heizungsausfall','Druckabfall','Geräusche','Undichtigkeit'],
+  'Fassade / Dach':         ['Risse','Feuchtigkeitsflecken','Dachrinne verstopft','Fenster undicht'],
+  'Gully / Kanalisation':   ['Gully verstopft','Ablagerungen (Sand/Erde)','Rückstau','Geruch','Rohrverlauf unklar — Lageplan nötig'],
+  'Rasen & Wiese':          ['Kahle Stelle','Bewässerung defekt','Unkrautbefall','Rasenmäher-Schaden'],
+  'Bäume & Sträucher':      ['Ast abgebrochen','Baum krank','Schnittbedarf','Wurzeln heben Pflaster'],
+  'Wege & Zugang':          ['Pflaster locker','Weg beschädigt','Rutschgefahr','Geländer locker'],
+  'Parkplatz / Zufahrt':    ['Bodenmarkierung verblasst','Schranke defekt','Beleuchtung defekt','Risse im Belag'],
+  'Außenbeleuchtung':       ['Lampe defekt','Sensor reagiert nicht','Kabel beschädigt'],
+  'Eingangstor':            ['Tor klemmt','Schließmechanismus defekt','Beleuchtung defekt'],
+  'Müllplatz':              ['Tor defekt','Überfüllt','Geruch','Schäden'],
+  'Außenwasser / Brunnen':  ['Wasserhahn defekt','Undichtigkeit','Zuleitung defekt'],
 };
+
+let curGebaeude = '';
+
+function setGebaeude(type) {
+  curGebaeude = type;
+  ['h46','h810','park'].forEach(t => document.getElementById('gb-' + t)?.classList.toggle('active', t === type));
+  const isPark = type === 'park';
+  const gc = document.getElementById('gc-gebaeude');
+  const gp = document.getElementById('gc-park');
+  gc.style.display = isPark ? 'none' : 'flex';
+  gp.style.display = isPark ? 'flex' : 'none';
+  if (!isPark) {
+    const label = type === 'h46' ? 'Haus 4–6' : 'Haus 8–10';
+    gc.querySelectorAll('.ort-chip').forEach(btn => {
+      btn.dataset.ort = label + ' · ' + (btn.dataset.ortBase || btn.textContent.trim());
+    });
+  }
+  // Reset any previous ort selection
+  document.querySelectorAll('#gc-gebaeude .ort-chip,#gc-park .ort-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('n-s-ort').value = '';
+  document.getElementById('n-s-prob-section').style.display = 'none';
+  document.getElementById('n-s-prob').value = '';
+  document.getElementById('prob-chips').innerHTML = '';
+  ['nf-seit-section','nf-sicherheit-section'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+}
 
 function setBereich(type) {
   const isSuite = type === 'suite';
@@ -1223,7 +1309,7 @@ function setBereich(type) {
   document.getElementById('bt-suite')?.classList.toggle('active', isSuite);
   const ca = document.getElementById('ort-chips-allgemein');
   const cb = document.getElementById('ort-chips-bewohner');
-  if (ca) ca.style.display = isSuite ? 'none' : 'flex';
+  if (ca) ca.style.display = isSuite ? 'none' : 'block';
   if (cb) cb.style.display = isSuite ? 'flex' : 'none';
   resetOrtPicker();
 }
@@ -1241,6 +1327,9 @@ function onBwChange() {
 function resetOrtPicker() {
   document.querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.sicherheit-chip').forEach(c => c.classList.remove('active'));
+  ['gb-h46','gb-h810','gb-park'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  const gc = document.getElementById('gc-gebaeude'); if (gc) gc.style.display = 'none';
+  const gp = document.getElementById('gc-park'); if (gp) gp.style.display = 'none';
   document.getElementById('n-s-ort').value = '';
   document.getElementById('n-seit').value = '';
   document.getElementById('n-sicherheit').value = '';
@@ -1307,7 +1396,8 @@ function selectOrt(btn) {
   const probChips   = document.getElementById('prob-chips');
   document.getElementById('n-s-prob').value = '';
   document.querySelectorAll('.prob-chip').forEach(c => c.classList.remove('active'));
-  const suggs = ORT_PROBLEMS[ort] || [];
+  const ortBase = ort.includes('·') ? ort.split('·').pop().trim() : ort;
+  const suggs = ORT_PROBLEMS[ortBase] || ORT_PROBLEMS[ort] || [];
   probChips.innerHTML = suggs.map(s =>
     `<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,'${s.replace(/'/g,"\\'")}')">${s}</button>`
   ).join('') + '<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,\'\')">✏️ Sonstiges</button>';
