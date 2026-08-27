@@ -71,16 +71,17 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 .park-item{padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.45}
 .park-item:last-child{border:none;padding-bottom:0}
 .park-item-icon{font-size:18px;flex-shrink:0;margin-top:1px}
-.park-proj{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.park-proj{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
 .park-proj:last-child{border:none;padding-bottom:0}
-.park-proj-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.park-proj-icon{font-size:26px;flex-shrink:0;margin-top:2px}
 .park-proj-body{flex:1;min-width:0}
-.park-proj-name{font-weight:700;font-size:14px;color:var(--green);margin-bottom:2px}
-.park-proj-desc{font-size:13px;color:var(--stone);line-height:1.45}
-.park-proj-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
-.badge-active{background:rgba(82,183,136,.15);color:#2e7d5e}
-.badge-herbst{background:rgba(184,137,42,.15);color:#8a6020}
-.badge-plan{background:rgba(150,150,150,.12);color:#666}
+.park-proj-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px}
+.park-proj-name{font-weight:700;font-size:15px;color:var(--green)}
+.park-proj-desc{font-size:14px;color:var(--stone);line-height:1.55}
+.park-proj-badge{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.badge-active{background:rgba(82,183,136,.18);color:#2a7050}
+.badge-herbst{background:rgba(184,137,42,.18);color:#7a5a10}
+.badge-plan{background:rgba(150,150,150,.14);color:#555}
 
 /* SECTIONS */
 .section{padding:22px 18px 80px;display:none;max-width:640px;margin:0 auto}
@@ -462,34 +463,42 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
     <div class="park-proj">
       <div class="park-proj-icon">🌿</div>
       <div class="park-proj-body">
-        <div class="park-proj-name">Rasen-Sanierung</div>
-        <div class="park-proj-desc">Herbstdünger, Vertikutieren und Nachsaat — der Rasen wird für die neue Saison fit gemacht.</div>
+        <div class="park-proj-head">
+          <span class="park-proj-name">Rasen-Sanierung</span>
+          <span class="park-proj-badge badge-active">Herbst 2026</span>
+        </div>
+        <div class="park-proj-desc">Herbstdünger, Vertikutieren und Nachsaat — das Rasen-Herbstprogramm läuft bis Oktober.</div>
       </div>
-      <div class="park-proj-badge badge-active">Läuft</div>
     </div>
     <div class="park-proj">
       <div class="park-proj-icon">🛤️</div>
       <div class="park-proj-body">
-        <div class="park-proj-name">Wege-Sanierung</div>
-        <div class="park-proj-desc">Unkraut wird entfernt, danach kommt neues Material — ab September wird die Oberfläche erneuert.</div>
+        <div class="park-proj-head">
+          <span class="park-proj-name">Wege-Sanierung</span>
+          <span class="park-proj-badge badge-herbst">September</span>
+        </div>
+        <div class="park-proj-desc">Unkraut auf den Wegen wird aktuell entfernt. Material für die Oberflächenerneuerung kommt im September.</div>
       </div>
-      <div class="park-proj-badge badge-herbst">September</div>
     </div>
     <div class="park-proj">
       <div class="park-proj-icon">♻️</div>
       <div class="park-proj-body">
-        <div class="park-proj-name">Kompost-Anlage</div>
-        <div class="park-proj-desc">Neues 3-Kammer-System wird aufgebaut — Rasenschnitt und Laub werden wieder zu Erde.</div>
+        <div class="park-proj-head">
+          <span class="park-proj-name">Kompost-Anlage</span>
+          <span class="park-proj-badge badge-active">In Aufbau</span>
+        </div>
+        <div class="park-proj-desc">Ein neues Kompostsystem entsteht — Rasenschnitt und Laub werden künftig wieder zu Erde.</div>
       </div>
-      <div class="park-proj-badge badge-active">Läuft</div>
     </div>
     <div class="park-proj">
       <div class="park-proj-icon">🪑</div>
       <div class="park-proj-body">
-        <div class="park-proj-name">Parkmöbel</div>
-        <div class="park-proj-desc">Außenbänke werden geschliffen, geölt und für den Winter vorbereitet. Deadline Mitte Oktober.</div>
+        <div class="park-proj-head">
+          <span class="park-proj-name">Parkmöbel renovieren</span>
+          <span class="park-proj-badge badge-herbst">Oktober</span>
+        </div>
+        <div class="park-proj-desc">Die Außenbänke werden im Oktober geschliffen, geölt und winterfest gemacht.</div>
       </div>
-      <div class="park-proj-badge badge-herbst">Oktober</div>
     </div>
   </div>
 
