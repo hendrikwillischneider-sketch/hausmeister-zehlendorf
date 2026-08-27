@@ -66,6 +66,20 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 .tile-title{font-family:var(--serif);font-size:18px;color:var(--green);margin-bottom:5px}
 .tile-desc{font-size:14px;color:var(--stone);line-height:1.4}
 
+/* SPRECHSTUNDE */
+.sprechstunde{background:var(--card);border:1.5px solid var(--gold);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.sp-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sp-icon{font-size:26px;line-height:1}
+.sp-title{font-family:var(--serif);font-size:17px;color:var(--green);font-weight:normal}
+.sp-subtitle{font-size:11.5px;color:var(--stone);margin-top:1px;letter-spacing:.04em;text-transform:uppercase}
+.sp-rows{display:flex;flex-direction:column;gap:6px}
+.sp-row{display:flex;align-items:center;gap:10px;font-size:14px}
+.sp-key{color:var(--stone);min-width:80px;font-size:13px}
+.sp-val{color:var(--ink);font-weight:500}
+.sp-note{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:13px;color:var(--stone);line-height:1.55}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .sprechstunde{border-color:rgba(184,137,42,.4)}}
+:root[data-theme="dark"] .sprechstunde{border-color:rgba(184,137,42,.4)}
+
 /* NOTFALL */
 .notfall{background:var(--burg);border-radius:12px;padding:16px 18px;
   display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
@@ -267,6 +281,20 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
       </div>
     </div>
 
+    <div class="sprechstunde" id="sp-card">
+      <div class="sp-head">
+        <div class="sp-icon">🗓</div>
+        <div>
+          <div class="sp-title">Sprechstunde</div>
+          <div class="sp-subtitle" id="sp-subtitle">Persönliche Erreichbarkeit</div>
+        </div>
+      </div>
+      <div class="sp-rows" id="sp-rows">
+        <div style="color:var(--stone);font-size:13px">Wird geladen …</div>
+      </div>
+      <div class="sp-note" id="sp-note" style="display:none"></div>
+    </div>
+
     <a class="notfall" href="tel:+4917641167169">
       <div>
         <div class="notfall-lbl">Notfall / Sofort-Hilfe</div>
@@ -356,6 +384,46 @@ let wizStep = 1; const WIZ_STEPS = 3;
 let wizState = { name: '', raum: '', problem: '', fotos: [] };
 let bwName = '', bwZimmer = '';
 let hvToken = null, hvExp = 0, hvSession = null;
+
+// ── SPRECHSTUNDE ─────────────────────────────────────────────────────────────
+const SP_DEFAULT = {
+  zeit: 'Dienstag · 10:00–12:00 Uhr',
+  ort: 'Hausmeisterzimmer · Haus 8–10',
+  hinweis: 'Außerhalb der Sprechstunde erreichen Sie mich unter 0176 411 67 169.'
+};
+
+async function loadSprechstunde() {
+  try {
+    const res = await fetch(`${SB}/rest/v1/settings?key=in.(sprechstunde_zeit,sprechstunde_ort,sprechstunde_hinweis)&select=key,value`, {
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY }
+    });
+    const rows = await res.json();
+    const sp = {};
+    rows.forEach(r => { sp[r.key.replace('sprechstunde_','')] = r.value; });
+    renderSprechstunde({
+      zeit:    sp.zeit    || SP_DEFAULT.zeit,
+      ort:     sp.ort     || SP_DEFAULT.ort,
+      hinweis: sp.hinweis || SP_DEFAULT.hinweis,
+    });
+  } catch {
+    renderSprechstunde(SP_DEFAULT);
+  }
+}
+
+function renderSprechstunde(sp) {
+  const rows = document.getElementById('sp-rows');
+  const note = document.getElementById('sp-note');
+  if (!rows) return;
+  rows.innerHTML = `
+    <div class="sp-row"><span class="sp-key">📅 Wann</span><span class="sp-val">${sp.zeit}</span></div>
+    ${sp.ort ? `<div class="sp-row"><span class="sp-key">📍 Wo</span><span class="sp-val">${sp.ort}</span></div>` : ''}`;
+  if (sp.hinweis) {
+    note.textContent = sp.hinweis;
+    note.style.display = 'block';
+  }
+}
+
+loadSprechstunde();
 
 const RAEUME = [
   {v:'Küche',icon:'🍳'},{v:'Bad / Dusche',icon:'🚿'},{v:'WC / Toilette',icon:'🚽'},
