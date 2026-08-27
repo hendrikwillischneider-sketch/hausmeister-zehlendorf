@@ -254,6 +254,33 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 .set-row .lbl{font-size:14px}
 .set-row .sub{font-size:12px;color:var(--text-muted)}
 .set-btn{padding:7px 15px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text);font-family:inherit}
+/* BEWOHNER SEARCH */
+.bw-search-wrap{position:relative;margin-bottom:2px}
+.bw-search-field{display:flex;align-items:center;gap:8px;border:1.5px solid var(--border);
+  border-radius:9px;padding:0 10px;background:var(--bg);transition:border-color .15s}
+.bw-search-field:focus-within{border-color:var(--green-mid)}
+.bw-search-icon{font-size:14px;opacity:.5;flex:0 0 auto}
+.bw-search-field input{flex:1;border:none;background:transparent;padding:10px 0;
+  font-size:15px;color:var(--text);font-family:inherit;outline:none}
+.bw-clear-btn{background:none;border:none;font-size:18px;color:var(--text-muted);
+  cursor:pointer;padding:0;line-height:1;flex:0 0 auto;opacity:.6}
+.bw-clear-btn:hover{opacity:1}
+.bw-dd{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:50;
+  background:var(--card);border:1.5px solid var(--border);border-radius:11px;
+  box-shadow:0 6px 24px rgba(0,0,0,.18);max-height:220px;overflow-y:auto}
+.bw-dd-item{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;cursor:pointer;transition:background .12s;gap:8px}
+.bw-dd-item:hover{background:rgba(82,183,136,.09)}
+.bw-dd-item:first-child{border-radius:10px 10px 0 0}
+.bw-dd-item:last-child{border-radius:0 0 10px 10px}
+.bw-dd-item+.bw-dd-item{border-top:1px solid var(--border)}
+.bw-dd-name{font-size:14px;font-weight:600;color:var(--text)}
+.bw-dd-loc{font-size:12px;color:var(--text-muted);white-space:nowrap}
+.bw-dd-highlight{color:var(--green-mid)}
+.bw-dd-empty{padding:12px 14px;font-size:13px;color:var(--text-muted);font-style:italic}
+.bw-selected-badge{display:inline-flex;align-items:center;gap:6px;margin-top:6px;
+  padding:4px 10px;background:rgba(82,183,136,.12);border:1px solid rgba(82,183,136,.3);
+  border-radius:20px;font-size:12px;color:var(--green-mid);font-weight:600}
 </style>
 </head>
 <body>
@@ -412,7 +439,17 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
     </div>
 
     <label>Bewohnerin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
-    <select id="n-bw" onchange="onBwChange()"><option value="">Keine Zuordnung</option></select>
+    <div class="bw-search-wrap" id="bw-search-wrap">
+      <div class="bw-search-field">
+        <span class="bw-search-icon">🔍</span>
+        <input type="text" id="bw-search-in" placeholder="Name, Zimmer oder Gebäude suchen …"
+          oninput="bwFilter()" onfocus="bwFilter()" autocomplete="off" spellcheck="false">
+        <button class="bw-clear-btn" id="bw-clear-btn" onclick="bwClear()" style="display:none">×</button>
+      </div>
+      <div class="bw-dd" id="bw-dd" style="display:none"></div>
+    </div>
+    <input type="hidden" id="n-bw" value="">
+    <div class="bw-selected-badge" id="bw-selected-badge" style="display:none"></div>
 
     <!-- Schaden -->
     <div id="nf-schaden" class="nf-cat" style="display:none">
@@ -842,6 +879,75 @@ async function delAuftrag(id) {
   } catch(e) { alert('Fehler beim Löschen'); }
 }
 
+// ── BEWOHNER SEARCH ───────────────────────────────────────────────────────────
+function bwFilter() {
+  const q = (document.getElementById('bw-search-in').value || '').toLowerCase().trim();
+  const dd = document.getElementById('bw-dd');
+  const clearBtn = document.getElementById('bw-clear-btn');
+  clearBtn.style.display = q ? 'block' : 'none';
+  if (!q) { dd.style.display = 'none'; return; }
+
+  const scored = bewohnerListe.map(b => {
+    const name = (b.name || '').toLowerCase();
+    const zimmer = (b.zimmer || '').toString().toLowerCase();
+    const haus = (b.haus || '').toLowerCase();
+    const etage = (b.etage || '').toLowerCase();
+    const loc = zimmer ? `suite ${zimmer}` : `${haus} ${etage}`;
+    let score = 0;
+    if (name.startsWith(q)) score = 3;
+    else if (name.includes(q)) score = 2;
+    else if (zimmer === q || loc.includes(q) || haus.includes(q) || etage.includes(q)) score = 1;
+    return { b, score };
+  }).filter(x => x.score > 0).sort((a, b) => b.score - a.score);
+
+  if (!scored.length) {
+    dd.innerHTML = `<div class="bw-dd-empty">Keine Treffer für „${q}"</div>`;
+    dd.style.display = 'block'; return;
+  }
+  dd.innerHTML = scored.map(({ b }) => {
+    const loc = b.zimmer ? `Suite ${b.zimmer}` : `${b.haus} · ${b.etage}`;
+    const hi = t => t.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),
+      `<span class="bw-dd-highlight">$1</span>`);
+    return `<div class="bw-dd-item" onclick="bwSelect('${b.name.replace(/'/g,"\\'")}')">
+      <span class="bw-dd-name">${hi(b.name)}</span>
+      <span class="bw-dd-loc">${hi(loc)}</span>
+    </div>`;
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function bwSelect(name) {
+  const b = bewohnerListe.find(x => x.name === name);
+  document.getElementById('n-bw').value = name;
+  document.getElementById('bw-search-in').value = name;
+  document.getElementById('bw-dd').style.display = 'none';
+  document.getElementById('bw-clear-btn').style.display = 'block';
+  const badge = document.getElementById('bw-selected-badge');
+  if (badge && b) {
+    const loc = b.zimmer ? `Suite ${b.zimmer}` : `${b.haus} · ${b.etage}`;
+    badge.textContent = `✓ ${b.name} · ${loc}`;
+    badge.style.display = 'inline-flex';
+  }
+  if (typeof onBwChange === 'function') onBwChange();
+}
+
+function bwClear() {
+  document.getElementById('n-bw').value = '';
+  document.getElementById('bw-search-in').value = '';
+  document.getElementById('bw-dd').style.display = 'none';
+  document.getElementById('bw-clear-btn').style.display = 'none';
+  const badge = document.getElementById('bw-selected-badge');
+  if (badge) badge.style.display = 'none';
+  if (typeof onBwChange === 'function') onBwChange();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#bw-search-wrap')) {
+    const dd = document.getElementById('bw-dd');
+    if (dd) dd.style.display = 'none';
+  }
+});
+
 // ── NEUER AUFTRAG ─────────────────────────────────────────────────────────────
 const ICONS = {'Schaden':'🔧','Möbel & Aufbau':'🛋️','Sperrmüll':'🗑️','Kleiner Auftrag':'🔨'};
 const KAT_MAP = {'Schaden':'nf-schaden','Möbel & Aufbau':'nf-moebel','Sperrmüll':'nf-sperr','Kleiner Auftrag':'nf-auftrag'};
@@ -855,14 +961,7 @@ function openNew(kat) {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   resetOrtPicker();
-  // Bewohnerin dropdown
-  const dd = document.getElementById('n-bw');
-  dd.innerHTML = '<option value="">Keine Zuordnung</option>';
-  bewohnerListe.forEach(b => {
-    const o = document.createElement('option'); o.value = b.name;
-    const loc = b.zimmer ? `Suite ${b.zimmer}` : `${b.haus} · ${b.etage}`;
-    o.textContent = `${loc} — ${b.name}`; dd.appendChild(o);
-  });
+  bwClear();
   // Show right category fields
   document.querySelectorAll('.nf-cat').forEach(el => el.style.display = 'none');
   document.getElementById(KAT_MAP[kat]).style.display = 'block';
