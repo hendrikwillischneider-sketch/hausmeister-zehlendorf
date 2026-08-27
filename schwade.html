@@ -218,9 +218,9 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 
 /* FORM */
 label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.3px}
-input[type=text],input[type=email],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:15px;background:var(--bg);color:var(--text);font-family:inherit;transition:border-color .15s}
+input[type=text],input[type=email],input[type=tel],select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:15px;background:var(--bg);color:var(--text);font-family:inherit;transition:border-color .15s}
 textarea{min-height:80px;resize:vertical}
-input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outline:none;border-color:var(--green-mid)}
+input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,select:focus,textarea:focus{outline:none;border-color:var(--green-mid)}
 .btn{display:block;width:100%;padding:13px;border-radius:11px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px;transition:opacity .15s;font-family:inherit}
 .btn:active{opacity:.85}
 .btn-primary{background:var(--green-mid);color:#fff}
@@ -510,6 +510,39 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
     <div class="set-row"><div class="lbl">Hausmeister</div><span style="color:var(--text-muted);font-size:13px">Hendrik Schneider</span></div>
     <div class="set-row"><div class="lbl">Objekt</div><span style="color:var(--text-muted);font-size:13px">Scharfestraße 4–6, 14163 Berlin</span></div>
     <div class="set-row"><div class="lbl">Version</div><span style="color:var(--text-muted);font-size:13px">1.0 · Aug 2026</span></div>
+  </div>
+  <div class="sec" style="margin-top:20px">Handwerker</div>
+  <div class="card">
+    <div id="hw-list"></div>
+    <button class="set-btn" style="width:100%;margin-top:4px;text-align:center;color:var(--green-mid);border-color:var(--green-mid)" onclick="openHwForm()">＋ Handwerker hinzufügen</button>
+  </div>
+  <div class="card" id="hw-form-card" style="display:none;margin-top:10px">
+    <div style="font-size:13px;font-weight:700;color:var(--green-mid);margin-bottom:12px">Neuer Eintrag</div>
+    <div style="margin-bottom:8px">
+      <div class="set-row" style="border:none;padding:0 0 6px"><div class="lbl">Name / Firma</div></div>
+      <input type="text" id="hw-name-in" placeholder="z. B. Elektro Müller GmbH">
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="set-row" style="border:none;padding:4px 0 6px"><div class="lbl">Telefon</div></div>
+      <input type="tel" id="hw-tel-in" placeholder="z. B. 030 12345678">
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="set-row" style="border:none;padding:4px 0 8px"><div class="lbl">Fachgebiet</div></div>
+      <div class="chips" id="hw-fach-chips">
+        <button type="button" class="chip" onclick="hwFach(this)">Elektriker</button>
+        <button type="button" class="chip" onclick="hwFach(this)">Klempner</button>
+        <button type="button" class="chip" onclick="hwFach(this)">Schlosser</button>
+        <button type="button" class="chip" onclick="hwFach(this)">Maler</button>
+        <button type="button" class="chip" onclick="hwFach(this)">Tischler</button>
+        <button type="button" class="chip" onclick="hwFach(this)">Heizung/Sanitär</button>
+        <button type="button" class="chip" onclick="hwFach(this)">Sonstiges</button>
+      </div>
+      <input type="hidden" id="hw-fach-val" value="">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="set-btn" style="flex:1" onclick="closeHwForm()">Abbrechen</button>
+      <button class="set-btn" style="flex:2;background:var(--green);color:#fff;border-color:var(--green)" onclick="saveHw()">Speichern</button>
+    </div>
   </div>
 </div>
 
@@ -867,6 +900,7 @@ function show(id, btn) {
   if (btn) btn.classList.add('active');
   if (id === 'wochenplan') renderWochenplan();
   if (id === 'bewohner') loadBewohnerList();
+  if (id === 'settings') renderHwList();
 }
 function ovOpen(id) { document.getElementById(id).classList.add('open'); }
 function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); }
@@ -1187,6 +1221,8 @@ function openDetail(id) {
         </div>
         <button class="btn btn-primary" onclick="saveDetail('${id}')">Speichern</button>
         ${a.name && a.name !== 'Gästewohnung' ? `<button class="btn btn-ghost" style="margin-top:6px" onclick="druckTuerzettel('${id}')">🖨 Türzettel drucken</button>` : ''}
+        <button class="btn btn-ghost" style="margin-top:6px" onclick="showHwKontakt('${id}')">🔧 Handwerker kontaktieren</button>
+        <div id="hw-kontakt-${id}" style="display:none;margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:10px;border:1.5px solid var(--border);font-size:13px"></div>
         <button class="btn btn-ghost" style="margin-top:6px;color:var(--red);border-color:var(--red)" onclick="delAuftrag('${id}')">Meldung löschen</button>
       </div>
     </div>`;
@@ -1418,6 +1454,82 @@ function renderPreviews() {
     `<div class="photo-thumb-wrap"><img src="${p}" alt=""><button class="photo-rm" onclick="rmPhoto(${i})">×</button></div>`).join('');
 }
 function rmPhoto(i) { newPhotos.splice(i,1); renderPreviews(); }
+
+// ── HANDWERKER-ADRESSBUCH ─────────────────────────────────────────────────────
+let hwContacts = JSON.parse(localStorage.getItem('hw_contacts') || '[]');
+
+function renderHwList() {
+  const el = document.getElementById('hw-list');
+  if (!el) return;
+  if (!hwContacts.length) {
+    el.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:4px 0 10px">Noch keine Handwerker gespeichert.</div>`;
+    return;
+  }
+  el.innerHTML = hwContacts.map((c, i) => `
+    <div class="set-row">
+      <div>
+        <div class="lbl">${c.name}</div>
+        <div class="sub">${c.fachgebiet}</div>
+        ${c.telefon ? `<a href="tel:${c.telefon}" style="font-size:13px;color:var(--green-mid);text-decoration:none">📞 ${c.telefon}</a>` : ''}
+      </div>
+      <button class="set-btn" style="color:var(--red);font-size:18px;padding:0 8px;line-height:1" onclick="deleteHw(${i})">×</button>
+    </div>`).join('');
+}
+
+function openHwForm() {
+  document.getElementById('hw-form-card').style.display = '';
+  document.getElementById('hw-name-in').value = '';
+  document.getElementById('hw-tel-in').value = '';
+  document.getElementById('hw-fach-val').value = '';
+  document.querySelectorAll('#hw-fach-chips .chip').forEach(c => c.classList.remove('active'));
+}
+
+function closeHwForm() {
+  document.getElementById('hw-form-card').style.display = 'none';
+}
+
+function hwFach(btn) {
+  document.querySelectorAll('#hw-fach-chips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('hw-fach-val').value = btn.textContent;
+}
+
+function saveHw() {
+  const name = document.getElementById('hw-name-in').value.trim();
+  const tel = document.getElementById('hw-tel-in').value.trim();
+  const fach = document.getElementById('hw-fach-val').value;
+  if (!name) { document.getElementById('hw-name-in').focus(); return; }
+  hwContacts.push({ name, telefon: tel, fachgebiet: fach || 'Sonstiges' });
+  localStorage.setItem('hw_contacts', JSON.stringify(hwContacts));
+  closeHwForm();
+  renderHwList();
+}
+
+function deleteHw(i) {
+  if (!confirm(`"${hwContacts[i].name}" löschen?`)) return;
+  hwContacts.splice(i, 1);
+  localStorage.setItem('hw_contacts', JSON.stringify(hwContacts));
+  renderHwList();
+}
+
+function showHwKontakt(id) {
+  const el = document.getElementById('hw-kontakt-' + id);
+  if (!el) return;
+  if (el.style.display !== 'none') { el.style.display = 'none'; return; }
+  if (!hwContacts.length) {
+    el.innerHTML = `Noch keine Handwerker gespeichert. → <a href="#" onclick="show('settings',document.querySelector('nav button:last-child'));return false" style="color:var(--green-mid)">Einstellungen öffnen</a>`;
+  } else {
+    el.innerHTML = hwContacts.map(c => `
+      <div style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <span style="font-weight:600">${c.name}</span>
+          <span style="color:var(--text-muted);font-size:12px;margin-left:6px">${c.fachgebiet}</span>
+        </div>
+        ${c.telefon ? `<a href="tel:${c.telefon}" style="color:var(--green-mid);font-weight:600;text-decoration:none">📞 ${c.telefon}</a>` : '<span style="color:var(--text-muted)">Keine Tel.</span>'}
+      </div>`).join('').replace(/border-bottom:1px solid var\(--border\);([^"]*?)<\/div>\s*$/, '$1</div>');
+  }
+  el.style.display = 'block';
+}
 
 // ── WOCHENPLAN ────────────────────────────────────────────────────────────────
 const TASKS = [
