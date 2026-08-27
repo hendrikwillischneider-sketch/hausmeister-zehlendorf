@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1C4A2E">
+<title>Reporting — Sidonie-Scharfe-Stiftung</title>
+<style>
+:root{
+  --green:#1C4A2E;--green-mid:#2d6a4f;--accent:#52b788;
+  --bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;
+  --ink:#1A1510;--stone:#7A7168;--red:#b91c1c;
+  --orange:#e07b39;--orange-pale:#fdebd5;--gold:#B8892A;
+  --sans:-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --serif:'Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1810;--card:#142012;--border:#2A3828;--ink:#E4DDD0;--stone:#8A8278;
+  --orange-pale:#3a2010;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh}
+
+/* TOP BAR */
+.topbar{background:var(--green);padding:0 20px;display:flex;align-items:center;
+  justify-content:space-between;height:52px;position:sticky;top:0;z-index:20}
+.topbar-title{color:#fff;font-family:var(--serif);font-size:17px;font-weight:normal}
+.topbar-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:1px}
+.btn-logout{padding:7px 14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;color:rgba(255,255,255,.8);font-size:12px;cursor:pointer;font-family:var(--sans)}
+.btn-logout:hover{background:rgba(255,255,255,.2)}
+
+/* MAIN */
+.main{max-width:960px;margin:0 auto;padding:24px 18px 60px}
+
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+@media(min-width:640px){.stat-row{grid-template-columns:repeat(6,1fr)}}
+.stat-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+  padding:14px 12px;text-align:center}
+.stat-num{font-size:28px;font-weight:700;line-height:1}
+.stat-lbl{font-size:11px;color:var(--stone);margin-top:4px}
+.c-offen{color:var(--orange)}
+.c-arb{color:#1d4ed8}
+.c-erl{color:var(--accent)}
+.c-total{color:var(--ink)}
+.c-today{color:var(--gold)}
+.c-prio{color:var(--red)}
+
+/* FILTER */
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-select{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;background:var(--card);color:var(--ink);font-family:var(--sans);cursor:pointer}
+.filter-select:focus{outline:none;border-color:var(--accent)}
+.search-in{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;background:var(--card);color:var(--ink);font-family:var(--sans);
+  flex:1;min-width:160px}
+.search-in:focus{outline:none;border-color:var(--accent)}
+.filter-lbl{font-size:12px;color:var(--stone);font-weight:600}
+.btn-export{padding:8px 14px;background:var(--green);color:#fff;border:none;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);margin-left:auto}
+.btn-export:hover{background:var(--green-mid)}
+
+/* TABLE */
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto}
+.rep-table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+.rep-table th{text-align:left;padding:10px 12px;font-size:11px;font-weight:700;
+  color:var(--stone);border-bottom:1.5px solid var(--border);white-space:nowrap;
+  background:var(--bg);cursor:pointer;user-select:none}
+.rep-table th:hover{color:var(--ink)}
+.rep-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.rep-table tr:last-child td{border-bottom:none}
+.rep-table tr:hover td{background:rgba(82,183,136,.04)}
+.status-pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.s-Offen{background:var(--orange-pale);color:var(--orange)}
+.s-In-Bearbeitung{background:#dbeafe;color:#1d4ed8}
+.s-Erledigt{background:rgba(82,183,136,.15);color:var(--green-mid)}
+.prio-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.p-Hoch{background:#fee2e2;color:var(--red)}
+.p-Mittel{background:var(--orange-pale);color:var(--orange)}
+.p-Niedrig{background:rgba(82,183,136,.1);color:var(--green-mid)}
+.btn-status{padding:4px 10px;border:1.5px solid var(--border);border-radius:6px;
+  font-size:11px;background:var(--card);color:var(--stone);cursor:pointer;font-family:var(--sans)}
+.btn-status:hover{border-color:var(--accent);color:var(--green-mid)}
+.empty{text-align:center;padding:44px;color:var(--stone)}
+.empty-icon{font-size:40px;margin-bottom:8px}
+.count-lbl{font-size:12px;color:var(--stone);margin-bottom:10px}
+.loading{text-align:center;padding:44px;color:var(--stone);font-size:14px}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;
+  align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border-radius:16px;padding:24px;width:100%;max-width:480px;
+  max-height:85vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,.25)}
+.modal-h{font-family:var(--serif);font-size:20px;font-weight:normal;color:var(--green);margin-bottom:14px}
+.modal-row{display:flex;gap:8px;margin-bottom:10px;font-size:13px}
+.modal-key{font-weight:700;color:var(--stone);min-width:90px;flex:0 0 auto}
+.modal-val{color:var(--ink);word-break:break-word}
+.modal-foot{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.sel-status{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;background:var(--bg);color:var(--ink);font-family:var(--sans);flex:1}
+.btn-save{padding:9px 18px;background:var(--green-mid);color:#fff;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+.btn-close{padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;background:none;color:var(--stone);cursor:pointer;font-family:var(--sans)}
+.foto-grid-m{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+.foto-grid-m img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:7px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Sidonie-Scharfe-Stiftung</div>
+    <div class="topbar-sub" id="user-lbl">Hausverwaltung · Reporting</div>
+  </div>
+  <button class="btn-logout" onclick="logout()">Abmelden</button>
+</div>
+
+<div class="main">
+  <div id="stat-row" class="stat-row" style="display:none">
+    <div class="stat-card"><div class="stat-num c-total" id="s-total">—</div><div class="stat-lbl">Gesamt</div></div>
+    <div class="stat-card"><div class="stat-num c-offen" id="s-offen">—</div><div class="stat-lbl">Offen</div></div>
+    <div class="stat-card"><div class="stat-num c-arb" id="s-arb">—</div><div class="stat-lbl">In Arbeit</div></div>
+    <div class="stat-card"><div class="stat-num c-erl" id="s-erl">—</div><div class="stat-lbl">Erledigt</div></div>
+    <div class="stat-card"><div class="stat-num c-today" id="s-today">—</div><div class="stat-lbl">Heute</div></div>
+    <div class="stat-card"><div class="stat-num c-prio" id="s-prio">—</div><div class="stat-lbl">Prio Hoch</div></div>
+  </div>
+
+  <div class="filter-bar" id="filter-bar" style="display:none">
+    <span class="filter-lbl">Filter:</span>
+    <select class="filter-select" id="f-status" onchange="applyFilter()">
+      <option value="">Alle Status</option>
+      <option value="Offen">Offen</option>
+      <option value="In Bearbeitung">In Bearbeitung</option>
+      <option value="Erledigt">Erledigt</option>
+    </select>
+    <select class="filter-select" id="f-prio" onchange="applyFilter()">
+      <option value="">Alle Prioritäten</option>
+      <option value="Hoch">Hoch</option>
+      <option value="Mittel">Mittel</option>
+      <option value="Niedrig">Niedrig</option>
+    </select>
+    <input class="search-in" id="f-search" type="search" placeholder="Suchen …" oninput="applyFilter()">
+    <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
+  </div>
+
+  <div class="count-lbl" id="count-lbl"></div>
+
+  <div id="content">
+    <div class="loading">Wird geladen …</div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-inner"></div>
+</div>
+
+<script>
+const SB  = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
+const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+const AUTH_KEY = 'rep_auth';
+
+let token = null, allData = [], filtered = [];
+
+async function init() {
+  token = sessionStorage.getItem(AUTH_KEY);
+  if (!token) { window.location.href = 'login.html'; return; }
+  await load();
+}
+
+async function load() {
+  try {
+    const res = await fetch(`${SB}/rest/v1/schaden?order=datum.desc&limit=500`, {
+      headers: { apikey: KEY, Authorization: 'Bearer ' + token }
+    });
+    if (res.status === 401) { window.location.href = 'login.html'; return; }
+    allData = await res.json();
+    renderStats();
+    applyFilter();
+    document.getElementById('stat-row').style.display = '';
+    document.getElementById('filter-bar').style.display = '';
+  } catch {
+    document.getElementById('content').innerHTML =
+      '<div class="empty"><div class="empty-icon">⚠️</div><p>Ladefehler — bitte neu laden.</p></div>';
+  }
+}
+
+function renderStats() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('s-total').textContent = allData.length;
+  document.getElementById('s-offen').textContent = allData.filter(r => r.status === 'Offen').length;
+  document.getElementById('s-arb').textContent = allData.filter(r => r.status === 'In Bearbeitung').length;
+  document.getElementById('s-erl').textContent = allData.filter(r => r.status === 'Erledigt').length;
+  document.getElementById('s-today').textContent = allData.filter(r => r.datum === today).length;
+  document.getElementById('s-prio').textContent = allData.filter(r => r.prio === 'Hoch').length;
+}
+
+function applyFilter() {
+  const st = document.getElementById('f-status').value;
+  const pr = document.getElementById('f-prio').value;
+  const q  = document.getElementById('f-search').value.toLowerCase();
+  filtered = allData.filter(r => {
+    if (st && r.status !== st) return false;
+    if (pr && r.prio !== pr) return false;
+    if (q && !JSON.stringify(r).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('count-lbl').textContent = filtered.length + ' Einträge';
+  renderTable();
+}
+
+function renderTable() {
+  if (!filtered.length) {
+    document.getElementById('content').innerHTML =
+      '<div class="empty"><div class="empty-icon">📭</div><p>Keine Einträge gefunden.</p></div>';
+    return;
+  }
+  document.getElementById('content').innerHTML = `
+    <div class="table-wrap">
+      <table class="rep-table">
+        <thead><tr>
+          <th onclick="sortBy('datum')">Datum ↕</th>
+          <th>Bereich</th>
+          <th>Problem</th>
+          <th>Von</th>
+          <th onclick="sortBy('status')">Status ↕</th>
+          <th onclick="sortBy('prio')">Prio ↕</th>
+          <th></th>
+        </tr></thead>
+        <tbody>${filtered.map(r => `<tr>
+          <td style="white-space:nowrap;color:var(--stone);font-size:12px">${r.datum || '—'}</td>
+          <td style="white-space:nowrap;font-weight:600">${r.ort || '—'}</td>
+          <td style="color:var(--stone);max-width:220px">${(r.problem || '').slice(0, 70)}${(r.problem || '').length > 70 ? '…' : ''}</td>
+          <td style="white-space:nowrap;color:var(--stone);font-size:12px">${r.name || r.von || '—'}</td>
+          <td><span class="status-pill s-${(r.status || 'Offen').replace(/\s/g, '-')}">${r.status || 'Offen'}</span></td>
+          <td><span class="prio-pill p-${r.prio || 'Mittel'}">${r.prio || 'Mittel'}</span></td>
+          <td><button class="btn-status" onclick="openModal(${r.id})">Details</button></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+}
+
+let sortAsc = false, sortKey = 'datum';
+function sortBy(key) {
+  if (sortKey === key) sortAsc = !sortAsc; else { sortKey = key; sortAsc = true; }
+  filtered.sort((a, b) => {
+    const va = (a[key] || '').toString(), vb = (b[key] || '').toString();
+    return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+  renderTable();
+}
+
+function openModal(id) {
+  const r = allData.find(x => x.id === id);
+  if (!r) return;
+  let fotos = [];
+  try { fotos = JSON.parse(r.foto || '[]'); } catch {}
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-h">Meldung #${r.id}</div>
+    <div class="modal-row"><span class="modal-key">Datum</span><span class="modal-val">${r.datum || '—'}</span></div>
+    <div class="modal-row"><span class="modal-key">Bereich</span><span class="modal-val">${r.ort || '—'}</span></div>
+    <div class="modal-row"><span class="modal-key">Problem</span><span class="modal-val">${r.problem || '—'}</span></div>
+    <div class="modal-row"><span class="modal-key">Von</span><span class="modal-val">${r.name || r.von || '—'}</span></div>
+    <div class="modal-row"><span class="modal-key">Kategorie</span><span class="modal-val">${r.kategorie || '—'}</span></div>
+    <div class="modal-row"><span class="modal-key">Status</span><span class="modal-val">
+      <span class="status-pill s-${(r.status || 'Offen').replace(/\s/g, '-')}">${r.status || 'Offen'}</span>
+    </span></div>
+    <div class="modal-row"><span class="modal-key">Priorität</span><span class="modal-val">
+      <span class="prio-pill p-${r.prio || 'Mittel'}">${r.prio || 'Mittel'}</span>
+    </span></div>
+    ${fotos.length ? `<div class="modal-row"><span class="modal-key">Fotos</span><div class="foto-grid-m">${fotos.map(f => `<img src="${f}" onclick="window.open('${f}')">`).join('')}</div></div>` : ''}
+    <div class="modal-foot">
+      <select class="sel-status" id="modal-status">
+        <option ${r.status === 'Offen' ? 'selected' : ''}>Offen</option>
+        <option ${r.status === 'In Bearbeitung' ? 'selected' : ''}>In Bearbeitung</option>
+        <option ${r.status === 'Erledigt' ? 'selected' : ''}>Erledigt</option>
+      </select>
+      <button class="btn-save" onclick="saveStatus(${r.id})">Speichern</button>
+      <button class="btn-close" onclick="closeModal()">Schließen</button>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+async function saveStatus(id) {
+  const newStatus = document.getElementById('modal-status').value;
+  try {
+    await fetch(`${SB}/rest/v1/schaden?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const r = allData.find(x => x.id === id);
+    if (r) r.status = newStatus;
+    renderStats(); applyFilter(); closeModal();
+  } catch { alert('Fehler beim Speichern.'); }
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function exportCSV() {
+  const hdr = ['ID', 'Datum', 'Bereich', 'Problem', 'Von', 'Status', 'Priorität'];
+  const rows = filtered.map(r => [r.id, r.datum, r.ort, `"${(r.problem || '').replace(/"/g, '""')}"`, r.name || r.von, r.status, r.prio].join(';'));
+  const csv = [hdr.join(';'), ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'schadensmeldungen.csv';
+  a.click();
+}
+
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  sessionStorage.removeItem(AUTH_KEY + '_exp');
+  window.location.href = 'login.html';
+}
+
+init();
+</script>
+</body>
+</html>
