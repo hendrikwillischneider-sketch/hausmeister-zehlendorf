@@ -509,6 +509,25 @@ function wizBack() {
   }
 }
 
+async function sendNotificationEmail(p) {
+  try {
+    await fetch('https://formsubmit.co/ajax/haustechnikderstiftung@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: `🔧 Neue Schadensmeldung: ${p.ort}`,
+        _captcha: 'false',
+        _template: 'table',
+        Datum: p.datum,
+        Ort: p.ort,
+        Problem: p.problem,
+        Bewohnerin: p.name || '(anonym)',
+        Link: 'https://hendrikwillischneider-sketch.github.io/hausmeister-zehlendorf/schwade.html',
+      })
+    });
+  } catch { /* fire and forget — Supabase-Eintrag hat Vorrang */ }
+}
+
 async function submitSchaden() {
   const btn = document.getElementById('wiz-next');
   btn.disabled = true; btn.textContent = 'Wird gesendet …';
@@ -527,6 +546,7 @@ async function submitSchaden() {
       body: JSON.stringify(payload)
     });
     if (!r.ok) throw await r.text();
+    sendNotificationEmail(payload); /* fire and forget */
     renderWizSuccess();
   } catch {
     btn.disabled=false; btn.textContent='Absenden';
