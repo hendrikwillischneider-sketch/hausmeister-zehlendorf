@@ -168,19 +168,16 @@ textarea.field-in{resize:none;height:110px;line-height:1.5;font-size:16px}
 const SB  = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
 const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
 
-// shared bewohner account
-const BW_EMAIL = 'hendrikwillischneider+bewohner@gmail.com';
-const BW_PW    = 'Bewoh' + 'ner26';
-
 let currentTab = 'melden';
 let step = 1;
 const STEPS = 3;
 let state = { name: '', zimmer: '', raum: '', problem: '', fotos: [] };
 
-// Session tokens
-let bwToken = null, bwExp = 0;
+// Bewohner: kein Login, nur Namensfilter (anon SELECT)
+let bwName = '', bwZimmer = '';
+// Hausverwaltung: Supabase Auth
 let hvToken = null, hvExp = 0;
-let hvSession = null; // { name, email }
+let hvSession = null;
 
 const RAEUME = [
   {v:'Küche',           icon:'🍳'},
@@ -385,7 +382,7 @@ function resetWizard() {
 
 // ── Meine Meldungen ───────────────────────────────────────────────────────────
 function renderMeineMeldungen() {
-  if (bwToken && Date.now() < bwExp && state.name) {
+  if (bwName) {
     loadMeineMeldungen();
     return;
   }
@@ -413,40 +410,16 @@ function renderMeineMeldungen() {
   setTimeout(() => document.getElementById('mm-name')?.focus(), 100);
 }
 
-async function mmLogin() {
+function mmLogin() {
   const nameVal   = document.getElementById('mm-name')?.value?.trim();
   const zimmerVal = document.getElementById('mm-zimmer')?.value?.trim();
-  const btn       = document.getElementById('mm-btn');
   const err       = document.getElementById('mm-err');
 
   if (!nameVal) { err.textContent = 'Bitte deinen Namen eingeben.'; err.classList.add('show'); return; }
   err.classList.remove('show');
-  btn.disabled = true;
-  btn.textContent = 'Wird geladen …';
 
-  // Login with shared bewohner account
-  if (!bwToken || Date.now() >= bwExp) {
-    try {
-      const res = await fetch(`${SB}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { apikey: KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: BW_EMAIL, password: BW_PW })
-      });
-      const d = await res.json();
-      if (!d.access_token) throw new Error('auth failed');
-      bwToken = d.access_token;
-      bwExp   = Date.now() + d.expires_in * 1000;
-    } catch {
-      err.textContent = 'Verbindungsfehler. Bitte später erneut versuchen.';
-      err.classList.add('show');
-      btn.disabled = false;
-      btn.textContent = 'Meine Meldungen anzeigen';
-      return;
-    }
-  }
-
-  state.name   = nameVal;
-  state.zimmer = zimmerVal;
+  bwName   = nameVal;
+  bwZimmer = zimmerVal;
   loadMeineMeldungen();
 }
 
@@ -454,9 +427,9 @@ async function loadMeineMeldungen() {
   document.getElementById('content').innerHTML = '<div class="loading">Wird geladen …</div>';
 
   try {
-    const params = new URLSearchParams({ 'name': `ilike.*${state.name}*`, order: 'datum.desc', limit: '50' });
+    const params = new URLSearchParams({ 'name': `ilike.*${bwName}*`, order: 'datum.desc', limit: '50' });
     const res = await fetch(`${SB}/rest/v1/schaden?${params}`, {
-      headers: { apikey: KEY, Authorization: `Bearer ${bwToken}` }
+      headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }
     });
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
@@ -464,10 +437,10 @@ async function loadMeineMeldungen() {
     let html = `
       <div class="mm-logout">
         <div>
-          <div class="mm-user-label">Angemeldet als</div>
-          <div class="mm-user-name">${state.name}${state.zimmer ? ' · Zimmer ' + state.zimmer : ''}</div>
+          <div class="mm-user-label">Meldungen von</div>
+          <div class="mm-user-name">${bwName}${bwZimmer ? ' · Zimmer ' + bwZimmer : ''}</div>
         </div>
-        <button class="btn-logout" onclick="mmLogout()">Abmelden</button>
+        <button class="btn-logout" onclick="mmLogout()">Zurück</button>
       </div>`;
 
     if (data.length === 0) {
@@ -506,7 +479,7 @@ async function loadMeineMeldungen() {
 }
 
 function mmLogout() {
-  bwToken = null; bwExp = 0; state.name = ''; state.zimmer = '';
+  bwName = ''; bwZimmer = '';
   renderMeineMeldungen();
 }
 
