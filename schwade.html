@@ -516,7 +516,21 @@ input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,select:focu
     <div class="set-row"><div><div class="lbl">Passwort ändern</div></div><button class="set-btn" onclick="changePw()">Ändern</button></div>
     <div class="set-row"><div class="lbl">Abmelden</div><button class="set-btn" style="color:var(--red)" onclick="logout()">Abmelden</button></div>
   </div>
-  <div class="sec">Info</div>
+  <div class="sec" style="margin-top:20px">Sprechstunde (Bewohner-Portal)</div>
+  <div class="card">
+    <div class="set-row" style="border:none;padding-bottom:4px"><div style="font-size:12px;color:var(--text-muted)">Wird im Bewohner-Portal auf der Startseite angezeigt.</div></div>
+    <div style="padding:0 13px 12px">
+      <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Wann (z. B. Dienstag · 10:00–12:00 Uhr)</div>
+      <input type="text" id="sp-zeit-in" placeholder="Dienstag · 10:00–12:00 Uhr">
+      <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin:10px 0 4px">Wo (z. B. Hausmeisterzimmer · Haus 8–10)</div>
+      <input type="text" id="sp-ort-in" placeholder="Hausmeisterzimmer · Haus 8–10">
+      <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin:10px 0 4px">Hinweis (optional)</div>
+      <textarea id="sp-hinweis-in" rows="2" placeholder="Außerhalb erreichen Sie mich unter …"></textarea>
+      <button class="set-btn" id="sp-save-btn" style="margin-top:12px;width:100%;background:var(--green);color:#fff;border-color:var(--green)" onclick="saveSprechstunde()">Sprechstunde speichern</button>
+      <div id="sp-save-msg" style="display:none;font-size:12px;color:var(--green-mid);margin-top:6px;text-align:center">✓ Gespeichert und im Portal sichtbar</div>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:20px">Info</div>
   <div class="card">
     <div class="set-row"><div class="lbl">Hausmeister</div><span style="color:var(--text-muted);font-size:13px">Hendrik Schneider</span></div>
     <div class="set-row"><div class="lbl">Objekt</div><span style="color:var(--text-muted);font-size:13px">Scharfestraße 4–6, 14163 Berlin</span></div>
@@ -911,7 +925,7 @@ function show(id, btn) {
   if (btn) btn.classList.add('active');
   if (id === 'wochenplan') renderWochenplan();
   if (id === 'bewohner') loadBewohnerList();
-  if (id === 'settings') renderHwList();
+  if (id === 'settings') { renderHwList(); loadSprechstundeSettings(); }
 }
 function ovOpen(id) { document.getElementById(id).classList.add('open'); }
 function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open'); }
@@ -1482,6 +1496,42 @@ function renderPreviews() {
     `<div class="photo-thumb-wrap"><img src="${p}" alt=""><button class="photo-rm" onclick="rmPhoto(${i})">×</button></div>`).join('');
 }
 function rmPhoto(i) { newPhotos.splice(i,1); renderPreviews(); }
+
+// ── SPRECHSTUNDE EINSTELLUNGEN ────────────────────────────────────────────────
+async function loadSprechstundeSettings() {
+  try {
+    const res = await sbReq('settings?key=in.(sprechstunde_zeit,sprechstunde_ort,sprechstunde_hinweis)&select=key,value');
+    const rows = await res.json();
+    rows.forEach(r => {
+      const field = r.key.replace('sprechstunde_', '');
+      const el = document.getElementById('sp-' + field + '-in');
+      if (el) el.value = r.value || '';
+    });
+  } catch { /* ignorieren — leer lassen */ }
+}
+
+async function saveSprechstunde() {
+  const btn = document.getElementById('sp-save-btn');
+  btn.disabled = true; btn.textContent = 'Speichern …';
+  const fields = [
+    { key: 'sprechstunde_zeit',    val: document.getElementById('sp-zeit-in')?.value.trim() },
+    { key: 'sprechstunde_ort',     val: document.getElementById('sp-ort-in')?.value.trim() },
+    { key: 'sprechstunde_hinweis', val: document.getElementById('sp-hinweis-in')?.value.trim() },
+  ];
+  try {
+    await Promise.all(fields.map(f =>
+      sbReq('settings', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ key: f.key, value: f.val || '' }),
+      })
+    ));
+    const msg = document.getElementById('sp-save-msg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+  } catch { alert('Fehler beim Speichern — bitte eingeloggt sein.'); }
+  btn.disabled = false; btn.textContent = 'Sprechstunde speichern';
+}
 
 // ── HANDWERKER-ADRESSBUCH ─────────────────────────────────────────────────────
 let hwContacts = JSON.parse(localStorage.getItem('hw_contacts') || '[]');
