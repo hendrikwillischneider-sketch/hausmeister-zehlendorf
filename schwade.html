@@ -291,6 +291,19 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 .photo-fs.open{display:flex}
 .photo-fs img{max-width:100%;max-height:100%;object-fit:contain}
 
+/* ORT-FILTER zweite Zeile */
+.ort-filter-row{display:flex;gap:6px;margin:-4px 0 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.ort-filter-row::-webkit-scrollbar{display:none}
+.ort-chip-sm{padding:4px 11px;border-radius:20px;border:1px solid var(--border);font-size:11.5px;cursor:pointer;white-space:nowrap;background:var(--card);color:var(--text-muted);transition:all .15s;font-family:inherit}
+.ort-chip-sm.active{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+/* EDIT-CHIPS im Detail-Meldung-Tab */
+.d-seit-chip,.d-sich-chip{display:inline-flex;align-items:center;padding:4px 11px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;background:var(--bg);color:var(--text-muted);transition:all .14s;margin:3px 3px 0 0;font-family:inherit}
+.d-seit-chip.active,.d-sich-chip.active{border-color:var(--green-mid);background:rgba(82,183,136,.1);color:var(--green-mid);font-weight:600}
+.d-sich-chip.red.active{border-color:#ef4444;background:rgba(239,68,68,.1);color:#ef4444}
+.d-sich-chip.safe.active{border-color:var(--green-mid);background:rgba(82,183,136,.12);color:var(--green-mid)}
+/* TÜRZETTEL */
+@media print{body>*{display:none!important}.tuze-print{display:block!important;position:fixed;inset:0;background:#fff;padding:28mm 22mm;font-family:'Helvetica Neue',Arial,sans-serif;color:#111;font-size:14pt;line-height:1.6}}
+.tuze-print{display:none}
 /* SETTINGS */
 .set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid var(--border)}
 .set-row:last-child{border:none}
@@ -400,6 +413,14 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
     <button class="chip" onclick="setFilter('In Umsetzung',this)">🔨 In Umsetzung</button>
     <button class="chip" onclick="setFilter('Abgeschlossen',this)">✓ Abgeschlossen</button>
     <button class="chip" onclick="setFilter('Handlungsbedarf',this)">⚠️ Handlungsbedarf</button>
+  </div>
+  <div class="ort-filter-row" id="ort-filter">
+    <button class="ort-chip-sm active" onclick="setOrtFilter('Alle',this)">🗂 Alle Orte</button>
+    <button class="ort-chip-sm" onclick="setOrtFilter('h46',this)">🏢 Haus 4–6</button>
+    <button class="ort-chip-sm" onclick="setOrtFilter('h810',this)">🏢 Haus 8–10</button>
+    <button class="ort-chip-sm" onclick="setOrtFilter('park',this)">🌳 Park & Außen</button>
+    <button class="ort-chip-sm" onclick="setOrtFilter('suite',this)">🛏 Suite</button>
+    <button class="ort-chip-sm" onclick="setOrtFilter('gaeste',this)">🏠 Gästewohnung</button>
   </div>
   <div class="card" id="au-list">
     <div class="empty"><div class="empty-icon">⏳</div><p>Wird geladen …</p></div>
@@ -762,6 +783,7 @@ const AUTH_KEY = 'sw_auth';
 let auftraege = [];
 let bewohnerListe = [];
 let curFilter = 'Alle';
+let curOrtFilter = 'Alle';
 let curNewKat = null;
 let newPhotos = [];
 let curView = 'auftraege';
@@ -909,6 +931,17 @@ function render() {
   else if (curFilter === 'Abgeschlossen') list = list.filter(a => ['Abgeschlossen','Erledigt'].includes(a.status));
   else if (curFilter !== 'Alle') list = list.filter(a => a.status === curFilter);
 
+  if (curOrtFilter !== 'Alle') {
+    const ortFilters = {
+      'h46':   a => (a.ort||'').includes('Haus 4–6'),
+      'h810':  a => (a.ort||'').includes('Haus 8–10'),
+      'park':  a => (a.ort||'').includes('Park & Außen'),
+      'suite': a => a.name && a.name !== 'Gästewohnung',
+      'gaeste':a => (a.ort||'').includes('Gästewohnung') || a.name === 'Gästewohnung',
+    };
+    if (ortFilters[curOrtFilter]) list = list.filter(ortFilters[curOrtFilter]);
+  }
+
   document.getElementById('au-list').innerHTML = list.length
     ? list.map(aiHTML).join('')
     : '<div class="empty"><div class="empty-icon">🌿</div><p>Keine Aufträge</p></div>';
@@ -943,6 +976,13 @@ function aiHTML(a) {
 function setFilter(f, btn) {
   curFilter = f;
   document.querySelectorAll('#au-filter .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function setOrtFilter(f, btn) {
+  curOrtFilter = f;
+  document.querySelectorAll('#ort-filter .ort-chip-sm').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   render();
 }
@@ -982,11 +1022,32 @@ function openDetail(id) {
         ${nameSection}
         <div class="detail-section"><div class="detail-lbl">Gemeldet</div><div class="detail-val">${a.datum}${a.von ? ' · ' + a.von : ''}</div></div>
         ${a.prio ? `<div class="detail-section"><div class="detail-lbl">Priorität</div><div class="detail-val">${a.prio==='Hoch'?'🔴':a.prio==='Mittel'?'🟡':'🟢'} ${a.prio}</div></div>` : ''}
-        ${a.seit_wann ? `<div class="detail-section"><div class="detail-lbl">Seit wann</div><div class="detail-val">${a.seit_wann}</div></div>` : ''}
-        ${a.sicherheit ? `<div class="detail-section"><div class="detail-lbl">Sicherheit</div><div class="detail-val">${a.sicherheit}</div></div>` : ''}
-        ${a.zutritt ? `<div class="detail-section"><div class="detail-lbl">Zutritt nötig</div><div class="detail-val">${a.zutritt}</div></div>` : ''}
-        ${a.notiz ? `<div class="detail-section"><div class="detail-lbl" style="color:var(--orange)">Hinweis von Frau Schwade</div><div class="detail-val" style="background:var(--orange-pale);border-left:3px solid var(--orange);border-radius:8px;padding:10px 12px;font-size:14px">${a.notiz}</div></div>` : ''}
         ${photoSection}
+        <div style="border-top:1px solid var(--border);margin:14px 0 10px"></div>
+        <div class="detail-section">
+          <div class="detail-lbl">Seit wann</div>
+          <div style="display:flex;flex-wrap:wrap;margin-top:4px">
+            ${['Seit heute','Seit gestern','Seit 2–3 Tagen','Seit einer Woche','Seit mehreren Wochen','Schon länger'].map(s=>`<button class="d-seit-chip${a.seit_wann===s?' active':''}" onclick="dSeitClick(this,'${s}')">${s}</button>`).join('')}
+          </div>
+          <input type="hidden" id="d-seit-wann" value="${a.seit_wann||''}">
+        </div>
+        <div class="detail-section">
+          <div class="detail-lbl">Sicherheitsrelevanz</div>
+          <div style="display:flex;flex-wrap:wrap;margin-top:4px">
+            ${[['safe','✅ Kein Risiko','Kein Risiko'],['','💧 Wasseraustritt','Wasseraustritt'],['red','⚡ Stromgefahr','Stromgefahr'],['red','🔥 Brandgefahr','Brandgefahr'],['','⚠️ Sturzgefahr','Sturzgefahr'],['','🔒 Zugangsproblem','Zugangsproblem']].map(([cls,lbl,val])=>`<button class="d-sich-chip ${cls}${a.sicherheit===val?' active':''}" onclick="dSichClick(this,'${val}')">${lbl}</button>`).join('')}
+          </div>
+          <input type="hidden" id="d-sicherheit" value="${a.sicherheit||''}">
+        </div>
+        ${a.name && a.name !== 'Gästewohnung' ? `
+        <div class="detail-section">
+          <div class="detail-lbl">Zutritt nötig</div>
+          <input type="text" id="d-zutritt" value="${(a.zutritt||'').replace(/"/g,'&quot;')}" placeholder="z. B. Ja · Mo–Fr 9–12 Uhr" style="margin-top:6px">
+        </div>` : ''}
+        <div class="detail-section">
+          <div class="detail-lbl" style="color:var(--orange)">Hinweis von Frau Schwade</div>
+          <textarea id="d-notiz-meldung" rows="2" placeholder="Eigene Beobachtungen, Hinweise …" style="margin-top:6px">${a.notiz||''}</textarea>
+        </div>
+        <button class="btn btn-ghost" onclick="saveMeldung('${id}')" style="margin-top:2px;font-size:13px;padding:9px">Meldung speichern</button>
       </div>
     </div>
     <div id="dt-behebung" class="det-pane" style="display:none">
@@ -1015,6 +1076,7 @@ function openDetail(id) {
           ${a.erledigt_am ? `<div style="font-size:13px;color:var(--green-mid)">✓ Erledigt am ${a.erledigt_am}</div>` : `<button class="btn btn-primary" onclick="setStatus('${id}','Abgeschlossen')" style="margin:0">✓ Als abgeschlossen markieren</button>`}
         </div>
         <button class="btn btn-primary" onclick="saveDetail('${id}')">Speichern</button>
+        ${a.name && a.name !== 'Gästewohnung' ? `<button class="btn btn-ghost" style="margin-top:6px" onclick="druckTuerzettel('${id}')">🖨 Türzettel drucken</button>` : ''}
         <button class="btn btn-ghost" style="margin-top:6px;color:var(--red);border-color:var(--red)" onclick="delAuftrag('${id}')">Meldung löschen</button>
       </div>
     </div>`;
@@ -1026,6 +1088,73 @@ function switchDetTab(name, btn) {
   document.querySelectorAll('.det-pane').forEach(p => p.style.display = 'none');
   btn.classList.add('active');
   document.getElementById('dt-' + name).style.display = 'block';
+}
+
+function dSeitClick(btn, val) {
+  document.querySelectorAll('.d-seit-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('d-seit-wann').value = val;
+}
+
+function dSichClick(btn, val) {
+  document.querySelectorAll('.d-sich-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('d-sicherheit').value = val;
+}
+
+async function saveMeldung(id) {
+  const a = auftraege.find(x => x.id === id);
+  if (!a) return;
+  const upd = {
+    seit_wann: document.getElementById('d-seit-wann')?.value || null,
+    sicherheit: document.getElementById('d-sicherheit')?.value || null,
+    zutritt: document.getElementById('d-zutritt')?.value.trim() || null,
+    notiz: document.getElementById('d-notiz-meldung')?.value.trim() || null,
+  };
+  try {
+    await sbReq(`schaden?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(upd) });
+    Object.assign(a, upd);
+  } catch(e) { alert('Fehler beim Speichern'); return; }
+  openDetail(id);
+  render();
+}
+
+function druckTuerzettel(id) {
+  const a = auftraege.find(x => x.id === id);
+  if (!a) return;
+  const heute = new Date().toLocaleDateString('de-DE', {day:'2-digit',month:'long',year:'numeric'});
+  const statusText = {
+    'Offen': 'wird geprüft und zeitnah bearbeitet.',
+    'In Umsetzung': 'wird aktuell bearbeitet.',
+    'Kosten geschätzt': 'wurde geprüft — Kosten werden freigegeben.',
+    'Abgeschlossen': 'wurde behoben.',
+  }[a.status] || 'wird bearbeitet.';
+  const rueckText = a.rueckmeldung ? `<p style="margin-top:16px"><strong>Nächster Schritt:</strong> ${a.rueckmeldung}</p>` : '';
+  const notizText = a.notiz ? `<p style="margin-top:8px;font-style:italic;color:#555">${a.notiz}</p>` : '';
+  const win = window.open('', '_blank', 'width=600,height=800');
+  win.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
+    <title>Türzettel</title>
+    <style>
+      body{font-family:'Helvetica Neue',Arial,sans-serif;margin:0;padding:32mm 22mm 20mm;color:#111;font-size:13pt;line-height:1.65}
+      h1{font-size:16pt;font-weight:700;border-bottom:2px solid #1C4A2E;padding-bottom:8px;color:#1C4A2E;margin-bottom:18px}
+      .meta{font-size:10.5pt;color:#555;margin-bottom:18px}
+      .ort{background:#f5f5f0;border-left:3px solid #1C4A2E;padding:8px 12px;font-weight:600;font-size:12pt;margin-bottom:14px}
+      p{margin:8px 0}
+      .footer{margin-top:36px;border-top:1px solid #ccc;padding-top:10px;font-size:9.5pt;color:#777}
+      @media print{@page{size:A5;margin:20mm 16mm}}
+    </style></head><body>
+    <h1>🔧 Hausmeister-Mitteilung</h1>
+    <div class="meta">Datum: ${heute}${a.zimmer ? ' &nbsp;·&nbsp; Suite ' + a.zimmer : ''}</div>
+    <p>Liebe ${a.name ? 'Frau ' + a.name.split(' ').pop() : 'Bewohnerin'},</p>
+    <p>Ihre Schadensmeldung vom <strong>${a.datum}</strong> zu:</p>
+    <div class="ort">${a.ort}</div>
+    <p><strong>${a.prob}</strong></p>
+    <p>${statusText}</p>
+    ${rueckText}${notizText}
+    <div class="footer">Ihr Hausmeister · Sidonie-Scharfe-Stiftung Zehlendorf<br>Hendrik Schneider &nbsp;·&nbsp; haustechnikderstiftung@gmail.com</div>
+    <script>window.onload=()=>window.print()<\/script>
+    </body></html>`);
+  win.document.close();
 }
 
 async function setStatus(id, status) {
