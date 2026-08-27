@@ -157,28 +157,33 @@ body {
   margin: 24px 0 20px;
 }
 
-/* Role chips */
+/* Role cards */
 .role-hint {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 .role-chip {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 16px 8px;
+  border-radius: 14px;
   background: var(--bg);
-  border: 1.5px solid var(--border);
+  border: 2px solid var(--border);
   font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   font-family: inherit;
   transition: all .15s;
+  text-align: center;
+  line-height: 1.3;
 }
+.role-chip-icon { font-size: 26px; display: block; }
 .role-chip:hover { border-color: var(--accent); color: var(--text); }
-.role-chip.active { border-color: var(--accent); background: rgba(82,183,136,.12); color: var(--green-mid); font-weight: 600; }
+.role-chip.active { border-color: var(--accent); background: rgba(82,183,136,.12); color: var(--green-mid); }
 
 .footer {
   margin-top: 24px;
@@ -236,9 +241,15 @@ body {
 
   <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Schnellauswahl</div>
   <div class="role-hint">
-    <button class="role-chip" onclick="prefill('hendrik')">👷 Hendrik</button>
-    <button class="role-chip" onclick="prefill('schwade')">👩‍💼 Frau Schwade</button>
-    <button class="role-chip" onclick="prefill('hv')">🏢 Hausverwaltung</button>
+    <button class="role-chip" onclick="prefill('hendrik')">
+      <span class="role-chip-icon">👷</span>Hendrik
+    </button>
+    <button class="role-chip" onclick="prefill('schwade')">
+      <span class="role-chip-icon">👩‍💼</span>Frau Schwade
+    </button>
+    <button class="role-chip" onclick="prefill('hv')">
+      <span class="role-chip-icon">🏢</span>Hausverwaltung
+    </button>
   </div>
 </div>
 
