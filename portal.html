@@ -71,6 +71,16 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 .park-item{padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.45}
 .park-item:last-child{border:none;padding-bottom:0}
 .park-item-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.park-proj{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.park-proj:last-child{border:none;padding-bottom:0}
+.park-proj-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.park-proj-body{flex:1;min-width:0}
+.park-proj-name{font-weight:700;font-size:14px;color:var(--green);margin-bottom:2px}
+.park-proj-desc{font-size:13px;color:var(--stone);line-height:1.45}
+.park-proj-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.badge-active{background:rgba(82,183,136,.15);color:#2e7d5e}
+.badge-herbst{background:rgba(184,137,42,.15);color:#8a6020}
+.badge-plan{background:rgba(150,150,150,.12);color:#666}
 
 /* SECTIONS */
 .section{padding:22px 18px 80px;display:none;max-width:640px;margin:0 auto}
@@ -443,15 +453,44 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
 
   <div class="park-season">
     <div class="park-season-hdr">
-      <div class="park-season-icon">🗓</div>
+      <div class="park-season-icon">🏗️</div>
       <div>
-        <div class="park-season-title">Sprechstunde im Park</div>
-        <div class="park-season-sub">Persönlicher Kontakt</div>
+        <div class="park-season-title">Laufende Projekte</div>
+        <div class="park-season-sub">Was wir gerade im Park aufbauen</div>
       </div>
     </div>
-    <div class="park-item"><div class="park-item-icon">📅</div><div id="park-sp-zeit">Wird geladen …</div></div>
-    <div class="park-item" id="park-sp-ort-row"><div class="park-item-icon">📍</div><div id="park-sp-ort"></div></div>
-    <div class="park-item"><div class="park-item-icon">📞</div><div>Notfall: <a href="tel:+4917641167169" style="color:var(--green);font-weight:600">0176 411 67 169</a></div></div>
+    <div class="park-proj">
+      <div class="park-proj-icon">🌿</div>
+      <div class="park-proj-body">
+        <div class="park-proj-name">Rasen-Sanierung</div>
+        <div class="park-proj-desc">Herbstdünger, Vertikutieren und Nachsaat — der Rasen wird für die neue Saison fit gemacht.</div>
+      </div>
+      <div class="park-proj-badge badge-active">Läuft</div>
+    </div>
+    <div class="park-proj">
+      <div class="park-proj-icon">🛤️</div>
+      <div class="park-proj-body">
+        <div class="park-proj-name">Wege-Sanierung</div>
+        <div class="park-proj-desc">Unkraut wird entfernt, danach kommt neues Material — ab September wird die Oberfläche erneuert.</div>
+      </div>
+      <div class="park-proj-badge badge-herbst">September</div>
+    </div>
+    <div class="park-proj">
+      <div class="park-proj-icon">♻️</div>
+      <div class="park-proj-body">
+        <div class="park-proj-name">Kompost-Anlage</div>
+        <div class="park-proj-desc">Neues 3-Kammer-System wird aufgebaut — Rasenschnitt und Laub werden wieder zu Erde.</div>
+      </div>
+      <div class="park-proj-badge badge-active">Läuft</div>
+    </div>
+    <div class="park-proj">
+      <div class="park-proj-icon">🪑</div>
+      <div class="park-proj-body">
+        <div class="park-proj-name">Parkmöbel</div>
+        <div class="park-proj-desc">Außenbänke werden geschliffen, geölt und für den Winter vorbereitet. Deadline Mitte Oktober.</div>
+      </div>
+      <div class="park-proj-badge badge-herbst">Oktober</div>
+    </div>
   </div>
 
   <div class="park-season">
@@ -631,7 +670,6 @@ function showSection(name) {
   window.scrollTo(0, 0);
   if (name === 'meine') renderMM();
   if (name === 'artikel') renderArtikel();
-  if (name === 'park') renderParkSp();
 }
 
 // ── WIZARD ────────────────────────────────────────────────────────────────────
