@@ -291,6 +291,21 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 .photo-fs.open{display:flex}
 .photo-fs img{max-width:100%;max-height:100%;object-fit:contain}
 
+/* SUCHE */
+.such-wrap{position:relative;margin-bottom:8px}
+.such-wrap input{width:100%;padding:9px 36px 9px 38px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);font-family:inherit;transition:border-color .15s}
+.such-wrap input:focus{outline:none;border-color:var(--green-mid)}
+.such-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.45;pointer-events:none}
+.such-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:17px;color:var(--text-muted);cursor:pointer;padding:0;line-height:1;display:none}
+/* WOCHENBERICHT */
+.woche-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:16px}
+.woche-overlay.open{display:flex}
+.woche-box{background:var(--card);border-radius:16px;width:100%;max-width:560px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.woche-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);flex:0 0 auto}
+.woche-hdr h2{font-size:16px;font-weight:700}
+.woche-body{flex:1;overflow-y:auto;padding:16px 20px}
+.woche-pre{font-family:inherit;font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:14px;margin:0;width:100%;box-sizing:border-box}
+.woche-foot{flex:0 0 auto;padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px}
 /* ORT-FILTER zweite Zeile */
 .ort-filter-row{display:flex;gap:6px;margin:-4px 0 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
 .ort-filter-row::-webkit-scrollbar{display:none}
@@ -404,7 +419,15 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
     </button>
   </div>
 
-  <div class="sec">Laufende Aufträge</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;margin-bottom:8px">
+    <div class="sec" style="margin:0">Laufende Aufträge</div>
+    <button onclick="openWochenbericht()" style="background:none;border:1.5px solid var(--border);border-radius:9px;padding:5px 11px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--green-mid)';this.style.color='var(--green-mid)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">📋 Wochenbericht</button>
+  </div>
+  <div class="such-wrap">
+    <span class="such-icon">🔍</span>
+    <input type="text" id="such-in" placeholder="Problem, Ort oder Bewohnerin suchen …" oninput="setSearch(this.value)" autocomplete="off" spellcheck="false">
+    <button class="such-clear" id="such-clear" onclick="clearSearch()">×</button>
+  </div>
   <div class="chips" id="au-filter">
     <button class="chip active" onclick="setFilter('Alle',this)">Alle</button>
     <button class="chip" onclick="setFilter('Offen',this)">Offen</button>
@@ -784,6 +807,7 @@ let auftraege = [];
 let bewohnerListe = [];
 let curFilter = 'Alle';
 let curOrtFilter = 'Alle';
+let curSearch = '';
 let curNewKat = null;
 let newPhotos = [];
 let curView = 'auftraege';
@@ -942,6 +966,15 @@ function render() {
     if (ortFilters[curOrtFilter]) list = list.filter(ortFilters[curOrtFilter]);
   }
 
+  if (curSearch) {
+    list = list.filter(a =>
+      (a.prob||'').toLowerCase().includes(curSearch) ||
+      (a.ort||'').toLowerCase().includes(curSearch) ||
+      (a.name||'').toLowerCase().includes(curSearch) ||
+      (a.notiz||'').toLowerCase().includes(curSearch)
+    );
+  }
+
   document.getElementById('au-list').innerHTML = list.length
     ? list.map(aiHTML).join('')
     : '<div class="empty"><div class="empty-icon">🌿</div><p>Keine Aufträge</p></div>';
@@ -987,6 +1020,82 @@ function setOrtFilter(f, btn) {
   render();
 }
 
+function setSearch(val) {
+  curSearch = val.trim().toLowerCase();
+  document.getElementById('such-clear').style.display = val ? 'block' : 'none';
+  render();
+}
+
+function clearSearch() {
+  curSearch = '';
+  document.getElementById('such-in').value = '';
+  document.getElementById('such-clear').style.display = 'none';
+  render();
+}
+
+function openWochenbericht() {
+  const heute = new Date();
+  const vor7 = new Date(heute); vor7.setDate(heute.getDate() - 7);
+  const fmt = d => new Date(d).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+  const aktiv = auftraege.filter(a => !['Abgeschlossen','Erledigt','Annuliert'].includes(a.status));
+  const erledigt = auftraege.filter(a => ['Abgeschlossen','Erledigt'].includes(a.status) && a.erledigt_am && new Date(a.erledigt_am) >= vor7);
+  const gesamtKosten = auftraege.filter(a => a.kosten != null).reduce((s,a) => s + Number(a.kosten), 0);
+
+  const prioSort = {Hoch:0,Mittel:1,Niedrig:2};
+  aktiv.sort((a,b) => (prioSort[a.prio]??2) - (prioSort[b.prio]??2));
+
+  const zeile = a => `  • ${a.ort}${a.name ? ' (' + a.name + ')' : ''}\n    ${a.prob.slice(0,80)}${a.prob.length>80?'…':''} [${a.prio} · ${a.status}]`;
+
+  let text = `WOCHENBERICHT HAUSMEISTER\n`;
+  text += `Sidonie-Scharfe-Stiftung · Zehlendorf\n`;
+  text += `Stand: ${fmt(heute)}\n`;
+  text += `${'─'.repeat(44)}\n\n`;
+
+  text += `OFFENE AUFTRÄGE (${aktiv.length})\n`;
+  if (aktiv.length) text += aktiv.map(zeile).join('\n') + '\n';
+  else text += '  Keine offenen Aufträge.\n';
+
+  text += `\nLETZTE 7 TAGE — ERLEDIGT (${erledigt.length})\n`;
+  if (erledigt.length) text += erledigt.map(a => `  ✓ ${fmt(a.erledigt_am)} · ${a.ort} — ${a.prob.slice(0,60)}${a.prob.length>60?'…':''}`).join('\n') + '\n';
+  else text += '  Keine erledigten Aufträge in den letzten 7 Tagen.\n';
+
+  if (gesamtKosten > 0) {
+    text += `\nKOSTEN GESAMT\n  ${gesamtKosten.toLocaleString('de-DE',{style:'currency',currency:'EUR'})}\n`;
+  }
+
+  document.getElementById('woche-text').textContent = text;
+  document.getElementById('ov-woche').classList.add('open');
+}
+
+async function copyWoche() {
+  const t = document.getElementById('woche-text').textContent;
+  try { await navigator.clipboard.writeText(t); } catch { }
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ Kopiert!';
+  setTimeout(() => btn.textContent = orig, 1800);
+}
+
+function folgeSchaden(parentId) {
+  const a = auftraege.find(x => x.id === parentId);
+  if (!a) return;
+  ovClose('ov-detail');
+  openNew('Schaden');
+  setTimeout(() => {
+    // Pre-fill Bewohnerin if available
+    if (a.name && a.name !== 'Gästewohnung') {
+      const inp = document.getElementById('bw-search-in');
+      if (inp) { inp.value = a.name; bwFilter(); }
+      document.getElementById('n-bw').value = a.name;
+      const badge = document.getElementById('bw-selected-badge');
+      if (badge) { badge.textContent = a.name; badge.style.display = 'inline-flex'; }
+    }
+    // Pre-fill notiz with reference
+    const notizEl = document.getElementById('n-notiz');
+    if (notizEl) notizEl.value = `Folgeschaden zu: #${a.nr||a.id.slice(0,6)} — ${a.ort}\nUrsprung: ${a.prob.slice(0,80)}`;
+  }, 200);
+}
+
 // ── DETAIL ────────────────────────────────────────────────────────────────────
 function openDetail(id) {
   const a = auftraege.find(x => x.id === id);
@@ -1020,6 +1129,7 @@ function openDetail(id) {
         <div class="detail-section"><div class="detail-lbl">Problem</div><div class="detail-val">${a.prob}</div></div>
         <div class="detail-section"><div class="detail-lbl">Ort</div><div class="detail-val">${a.ort}</div></div>
         ${nameSection}
+        <button onclick="folgeSchaden('${id}')" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:8px;padding:5px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text-muted);font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--burg)';this.style.color='var(--burg)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">🔗 Folgeschaden anlegen</button>
         <div class="detail-section"><div class="detail-lbl">Gemeldet</div><div class="detail-val">${a.datum}${a.von ? ' · ' + a.von : ''}</div></div>
         ${a.prio ? `<div class="detail-section"><div class="detail-lbl">Priorität</div><div class="detail-val">${a.prio==='Hoch'?'🔴':a.prio==='Mittel'?'🟡':'🟢'} ${a.prio}</div></div>` : ''}
         ${photoSection}
@@ -1837,5 +1947,22 @@ function renderBudgetBar() {
 }
 
 </script>
+
+<!-- WOCHENBERICHT OVERLAY -->
+<div class="woche-overlay" id="ov-woche">
+  <div class="woche-box">
+    <div class="woche-hdr">
+      <h2>📋 Wochenbericht</h2>
+      <button class="modal-close" onclick="document.getElementById('ov-woche').classList.remove('open')">×</button>
+    </div>
+    <div class="woche-body">
+      <pre class="woche-pre" id="woche-text"></pre>
+    </div>
+    <div class="woche-foot">
+      <button class="btn btn-primary" onclick="copyWoche()" style="margin:0;flex:1">Kopieren</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('ov-woche').classList.remove('open')" style="margin:0;flex:1">Schließen</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
