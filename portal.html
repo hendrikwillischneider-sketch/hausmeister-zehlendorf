@@ -404,7 +404,8 @@ function showSection(name) {
 function startWizard() {
   document.getElementById('meld-start').style.display = 'none';
   document.getElementById('wizard').classList.add('active');
-  wizStep = 1; wizState = { name:'', raum:'', problem:'', fotos:[] };
+  wizState = { name: bwName || '', raum:'', problem:'', fotos:[] };
+  wizStep = bwName ? 2 : 1;
   renderWiz();
 }
 
@@ -482,7 +483,7 @@ function rmFoto(i) { wizState.fotos.splice(i,1); renderWiz3(); }
 function wizNext() {
   const err = document.getElementById('wiz-err');
   err.classList.remove('show');
-  if (wizStep === 1) { wizState.name = document.getElementById('wiz-name')?.value?.trim()||''; wizStep++; renderWiz(); return; }
+  if (wizStep === 1) { const n = document.getElementById('wiz-name')?.value?.trim()||''; wizState.name = n; if(n) bwName = n; wizStep++; renderWiz(); return; }
   if (wizStep === 2) {
     if (!wizState.raum) { err.textContent='Bitte einen Bereich auswählen.'; err.classList.add('show'); return; }
     wizStep++; renderWiz(); return;
