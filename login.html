@@ -7,157 +7,80 @@
 <title>Anmelden — Sidonie-Scharfe-Stiftung</title>
 <style>
 :root{
-  --green:#1C4A2E;--green-mid:#2d6a4f;--green-light:#e8f4ee;
-  --gold:#B8892A;--cream:#F6F1E9;--card:#FDFAF4;
-  --ink:#111;--stone:#555;--border:#C8BFA8;
-  --red:#b91c1c;--red-pale:#fee2e2;
-  --accent:#52b788;
-  --serif:'Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
-  --sans:-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --green:#1C4A2E;--green-mid:#2d6a4f;--accent:#52b788;
+  --bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;
+  --text:#1A1510;--muted:#7A7168;--red:#c1121f;--red-pale:#ffe5e5;
 }
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --cream:#0a1208;--card:#0f1a0d;--ink:#eee;--stone:#aaa;
-  --border:#2a3828;--green-light:#0f2010;--red-pale:#3a0f0f;
+  --bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--muted:#8A8278;--red-pale:#3a0f0f;
 }}
 *{box-sizing:border-box;margin:0;padding:0}
-html{font-size:18px}
-body{
-  font-family:var(--sans);
-  background:var(--green);
-  min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px 16px;
-}
-
-/* HEADER */
-.top{text-align:center;margin-bottom:28px}
-.top-icon{font-size:64px;display:block;margin-bottom:10px;filter:drop-shadow(0 3px 10px rgba(0,0,0,.35))}
-.top-title{
-  font-family:var(--serif);font-size:26px;font-weight:normal;
-  color:#fff;letter-spacing:.01em;
-}
-.top-sub{font-size:14px;color:rgba(255,255,255,.55);margin-top:5px}
-
-/* CARD */
-.card{
-  background:var(--card);border-radius:24px;
-  padding:36px 28px 32px;
-  width:100%;max-width:420px;
-  box-shadow:0 10px 48px rgba(0,0,0,.30);
-}
-
-/* SCHNELLAUSWAHL */
-.section-lbl{
-  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
-  color:var(--stone);margin-bottom:14px;
-}
-.role-grid{display:flex;flex-direction:column;gap:11px;margin-bottom:26px}
-.role-btn{
-  display:flex;align-items:center;gap:16px;
-  width:100%;padding:18px 20px;
-  background:var(--green-light);
-  border:2.5px solid var(--border);border-radius:16px;
-  cursor:pointer;font-family:var(--sans);
-  text-align:left;transition:all .15s;
-}
-.role-btn:hover,.role-btn:focus{border-color:var(--accent);outline:none;background:#ddf0e7}
-.role-btn.active{border-color:var(--green-mid);background:#cce8d8}
-.role-icon{font-size:36px;flex:0 0 auto;line-height:1}
-.role-info{}
-.role-name{font-size:20px;font-weight:700;color:var(--ink);line-height:1.1}
-.role-desc{font-size:14px;color:var(--stone);margin-top:3px}
-
-/* DIVIDER */
-.divider{
-  display:flex;align-items:center;gap:12px;margin:0 0 22px;color:var(--stone);font-size:13px;
-}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--green);min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px}
+.top{text-align:center;margin-bottom:24px}
+.top-icon{font-size:48px;display:block;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))}
+.top-title{color:#fff;font-size:18px;font-weight:700}
+.top-sub{color:rgba(255,255,255,.5);font-size:12px;margin-top:3px}
+.card{background:var(--card);border-radius:20px;padding:28px 24px;width:100%;max-width:360px;
+  box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.slbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);margin-bottom:10px}
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:22px}
+.role-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px 8px;
+  background:var(--bg);border:2px solid var(--border);border-radius:14px;
+  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;
+  transition:all .15s;text-align:center;line-height:1.2}
+.role-btn:hover,.role-btn:focus{border-color:var(--accent);color:var(--text);outline:none}
+.role-btn.active{border-color:var(--accent);background:rgba(82,183,136,.12);color:var(--green-mid)}
+.role-icon{font-size:24px;display:block}
+.divider{display:flex;align-items:center;gap:10px;margin:0 0 18px;color:var(--muted);font-size:11px}
 .divider::before,.divider::after{content:'';flex:1;border-top:1px solid var(--border)}
-
-/* FIELDS */
-.f-lbl{font-size:14px;font-weight:700;color:var(--stone);margin-bottom:8px;display:block}
-.f-group{margin-bottom:18px}
-.f-in{
-  width:100%;padding:18px 20px;
-  border:2.5px solid var(--border);border-radius:14px;
-  font-size:20px;font-family:var(--sans);
-  background:var(--cream);color:var(--ink);
-  -webkit-appearance:none;transition:border-color .15s;
-}
-.f-in:focus{outline:none;border-color:var(--accent)}
-.f-in::placeholder{color:#aaa}
-
-/* ERROR */
-.err{
-  background:var(--red-pale);color:var(--red);
-  border-radius:12px;padding:14px 18px;
-  font-size:16px;margin-bottom:18px;
-  display:none;line-height:1.4;font-weight:600;
-}
+.err{background:var(--red-pale);color:var(--red);border-radius:10px;padding:10px 14px;
+  font-size:13px;margin-bottom:14px;display:none;line-height:1.4}
 .err.show{display:block}
-
-/* SUBMIT */
-.btn-submit{
-  width:100%;padding:22px;
-  border:none;border-radius:14px;
-  background:var(--green-mid);color:#fff;
-  font-size:22px;font-weight:700;
-  cursor:pointer;font-family:var(--sans);
-  letter-spacing:.01em;
-  transition:background .15s,opacity .15s;
-  margin-top:4px;
-}
-.btn-submit:hover{background:var(--green)}
-.btn-submit:disabled{opacity:.45;cursor:default}
-
-/* FOOTER */
-.footer{margin-top:22px;text-align:center;color:rgba(255,255,255,.35);font-size:13px}
-.footer a{color:rgba(255,255,255,.55);text-decoration:none}
-
+.f-group{margin-bottom:14px}
+.f-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);margin-bottom:6px;display:block}
+.f-in{width:100%;padding:13px 15px;border:2px solid var(--border);border-radius:11px;
+  font-size:16px;background:var(--bg);color:var(--text);font-family:inherit;
+  -webkit-appearance:none;transition:border-color .15s}
+.f-in:focus{outline:none;border-color:var(--accent)}
+.btn{width:100%;padding:15px;border:none;border-radius:11px;background:var(--green-mid);
+  color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:background .15s,opacity .15s;margin-top:4px}
+.btn:hover{background:var(--green)}
+.btn:disabled{opacity:.45;cursor:default}
+.footer{margin-top:20px;text-align:center;color:rgba(255,255,255,.3);font-size:11px}
+.footer a{color:rgba(255,255,255,.5);text-decoration:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spin{display:inline-block;width:22px;height:22px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+  vertical-align:middle;margin-right:6px}
 </style>
 </head>
 <body>
-
 <div class="top">
   <span class="top-icon">🏡</span>
   <div class="top-title">Sidonie-Scharfe-Stiftung</div>
   <div class="top-sub">Wohnheim Zehlendorf · Interner Zugang</div>
 </div>
-
 <div class="card">
-
-  <div class="section-lbl">Wer sind Sie?</div>
-  <div class="role-grid" id="role-grid">
+  <div class="slbl">Schnellauswahl</div>
+  <div class="role-grid">
     <button class="role-btn" onclick="prefill('hendrik')" id="chip-hendrik">
-      <span class="role-icon">👷</span>
-      <div class="role-info">
-        <div class="role-name">Hendrik</div>
-        <div class="role-desc">Hausmeister</div>
-      </div>
+      <span class="role-icon">👷</span>Hendrik
     </button>
     <button class="role-btn" onclick="prefill('schwade')" id="chip-schwade">
-      <span class="role-icon">👩‍💼</span>
-      <div class="role-info">
-        <div class="role-name">Frau Schwade</div>
-        <div class="role-desc">Hausverwaltung</div>
-      </div>
+      <span class="role-icon">👩‍💼</span>Frau Schwade
     </button>
     <button class="role-btn" onclick="prefill('hv')" id="chip-hv">
-      <span class="role-icon">🏢</span>
-      <div class="role-info">
-        <div class="role-name">Hausverwaltung</div>
-        <div class="role-desc">Reporting & Übersicht</div>
-      </div>
+      <span class="role-icon">🏢</span>Hausverwaltung
     </button>
   </div>
-
   <div class="divider">oder E-Mail eingeben</div>
-
   <div class="err" id="err"></div>
-
   <div class="f-group">
-    <label class="f-lbl" for="email">E-Mail-Adresse</label>
+    <label class="f-lbl" for="email">E-Mail</label>
     <input class="f-in" id="email" type="email" placeholder="name@example.de"
       autocomplete="email" autocapitalize="none" spellcheck="false"
       onkeydown="if(event.key==='Enter')document.getElementById('pw').focus()">
@@ -168,95 +91,50 @@ body{
       autocomplete="current-password"
       onkeydown="if(event.key==='Enter')doLogin()">
   </div>
-
-  <button class="btn-submit" id="btn" onclick="doLogin()">Anmelden</button>
-
+  <button class="btn" id="btn" onclick="doLogin()">Anmelden</button>
 </div>
-
 <div class="footer">
   Sidonie-Scharfe-Stiftung · Zehlendorf &nbsp;·&nbsp;
   <a href="portal.html">Bewohner-Portal</a>
 </div>
-
 <script>
-const SB  = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
-const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
-
-const ROUTES = {
-  'hendrikwillischneider@gmail.com':              { key: 'hm_auth',  target: 'intern.html' },
-  'hendrikwillischneider+schwade@gmail.com':       { key: 'sw_auth',  target: 'schwade.html' },
-  'hendrikwillischneider+reporting@gmail.com':     { key: 'rep_auth', target: 'reporting.html' },
+const SB='https://rzpsmvczwaeraupnhhkx.supabase.co';
+const KEY='sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+const ROUTES={
+  'hendrikwillischneider@gmail.com':{key:'hm_auth',target:'intern.html'},
+  'hendrikwillischneider+schwade@gmail.com':{key:'sw_auth',target:'schwade.html'},
+  'hendrikwillischneider+reporting@gmail.com':{key:'rep_auth',target:'reporting.html'},
 };
-
-const PREFILL = {
-  hendrik: 'hendrikwillischneider@gmail.com',
-  schwade: 'hendrikwillischneider+schwade@gmail.com',
-  hv:      'hendrikwillischneider+reporting@gmail.com',
-};
-
-function prefill(role) {
-  document.getElementById('email').value = PREFILL[role] || '';
-  document.querySelectorAll('.role-btn').forEach(c => c.classList.remove('active'));
-  document.getElementById('chip-' + role)?.classList.add('active');
+const PREFILL={hendrik:'hendrikwillischneider@gmail.com',schwade:'hendrikwillischneider+schwade@gmail.com',hv:'hendrikwillischneider+reporting@gmail.com'};
+function prefill(role){
+  document.getElementById('email').value=PREFILL[role]||'';
+  document.querySelectorAll('.role-btn').forEach(c=>c.classList.remove('active'));
+  document.getElementById('chip-'+role)?.classList.add('active');
   document.getElementById('pw').focus();
 }
-
-async function doLogin() {
-  const email = document.getElementById('email').value.trim();
-  const pw    = document.getElementById('pw').value;
-  const btn   = document.getElementById('btn');
-  const err   = document.getElementById('err');
-
+async function doLogin(){
+  const email=document.getElementById('email').value.trim();
+  const pw=document.getElementById('pw').value;
+  const btn=document.getElementById('btn');
+  const err=document.getElementById('err');
   err.classList.remove('show');
-
-  if (!email || !pw) {
-    err.textContent = 'Bitte E-Mail-Adresse und Passwort eingeben.';
-    err.classList.add('show');
-    return;
-  }
-
-  const route = ROUTES[email];
-  if (!route) {
-    err.textContent = 'Diese E-Mail-Adresse ist nicht hinterlegt.';
-    err.classList.add('show');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span>Anmeldung …';
-
-  try {
-    const res = await fetch(`${SB}/auth/v1/token?grant_type=password`, {
-      method: 'POST',
-      headers: { apikey: KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pw })
-    });
-    const d = await res.json();
-
-    if (!d.access_token) {
-      err.textContent = 'Passwort falsch. Bitte nochmal versuchen.';
-      err.classList.add('show');
-      document.getElementById('pw').value = '';
-      document.getElementById('pw').focus();
-      btn.disabled = false;
-      btn.textContent = 'Anmelden';
-      return;
-    }
-
-    const exp = Date.now() + d.expires_in * 1000;
-    sessionStorage.setItem(route.key, d.access_token);
-    sessionStorage.setItem(route.key + '_exp', exp);
-    window.location.href = route.target;
-
-  } catch {
-    err.textContent = 'Verbindungsfehler. Bitte erneut versuchen.';
-    err.classList.add('show');
-    btn.disabled = false;
-    btn.textContent = 'Anmelden';
-  }
+  if(!email||!pw){err.textContent='Bitte E-Mail und Passwort eingeben.';err.classList.add('show');return;}
+  const route=ROUTES[email];
+  if(!route){err.textContent='Kein Zugang für diese E-Mail-Adresse.';err.classList.add('show');return;}
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>Anmeldung …';
+  try{
+    const res=await fetch(`${SB}/auth/v1/token?grant_type=password`,{method:'POST',
+      headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
+    const d=await res.json();
+    if(!d.access_token){err.textContent='E-Mail oder Passwort falsch.';err.classList.add('show');
+      document.getElementById('pw').value='';btn.disabled=false;btn.textContent='Anmelden';return;}
+    sessionStorage.setItem(route.key,d.access_token);
+    sessionStorage.setItem(route.key+'_exp',Date.now()+d.expires_in*1000);
+    window.location.href=route.target;
+  }catch{err.textContent='Verbindungsfehler. Bitte erneut versuchen.';err.classList.add('show');
+    btn.disabled=false;btn.textContent='Anmelden';}
 }
-
-setTimeout(() => document.getElementById('email').focus(), 100);
+setTimeout(()=>document.getElementById('email').focus(),100);
 </script>
 </body>
 </html>
