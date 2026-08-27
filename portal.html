@@ -48,6 +48,29 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
   border-bottom:3px solid transparent;transition:all .18s}
 .nav-btn.active{color:#fff;border-bottom-color:var(--gold)}
 .nav-btn:hover:not(.active){color:rgba(255,255,255,.85)}
+.nav-links{display:flex;flex:1;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-auth-wrap{flex-shrink:0;display:flex;align-items:center;padding:0 10px;border-left:1px solid rgba(255,255,255,.1);background:rgba(14,38,22,.95)}
+.nav-auth-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;color:#fff;font-size:12.5px;font-weight:600;padding:6px 13px;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:background .15s}
+.nav-auth-btn:hover{background:rgba(255,255,255,.22)}
+.nav-user-info{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.nav-user-name{color:#fff;font-size:12px;font-weight:700;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.nav-logout-btn{background:none;border:none;color:rgba(255,255,255,.55);font-size:11px;cursor:pointer;font-family:var(--sans);padding:0;text-decoration:underline}
+.lock-badge{font-size:10px;margin-left:4px;opacity:.7}
+/* GATE */
+.gate-wrap{max-width:400px;margin:40px auto 0;padding:0 4px}
+.gate-icon{font-size:44px;text-align:center;margin-bottom:14px}
+.gate-h{font-family:var(--serif);font-size:24px;font-weight:normal;color:var(--green);text-align:center;margin-bottom:6px}
+.gate-sub{font-size:14.5px;color:var(--stone);text-align:center;line-height:1.6;margin-bottom:20px}
+/* PARK */
+.park-season{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.park-season-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.park-season-icon{font-size:28px}
+.park-season-title{font-family:var(--serif);font-size:18px;color:var(--green);font-weight:normal}
+.park-season-sub{font-size:11.5px;color:var(--stone);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.park-item{padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.45}
+.park-item:last-child{border:none;padding-bottom:0}
+.park-item-icon{font-size:18px;flex-shrink:0;margin-top:1px}
 
 /* SECTIONS */
 .section{padding:22px 18px 80px;display:none;max-width:640px;margin:0 auto}
@@ -242,10 +265,20 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
 </div>
 
 <nav class="nav-bar">
-  <button class="nav-btn active" onclick="showSection('willkommen')">Willkommen</button>
-  <button class="nav-btn" onclick="showSection('melden')">Schaden melden</button>
-  <button class="nav-btn" onclick="showSection('artikel')">Aktuelles</button>
-  <button class="nav-btn" onclick="showSection('meine')">Meine Meldungen</button>
+  <div class="nav-links">
+    <button class="nav-btn active" data-sec="willkommen" onclick="showSection('willkommen')">Willkommen</button>
+    <button class="nav-btn" data-sec="artikel" onclick="showSection('artikel')">Aktuelles</button>
+    <button class="nav-btn" data-sec="park" onclick="showSection('park')">🌿 Park</button>
+    <button class="nav-btn" data-sec="melden" onclick="showSection('melden')">Schaden melden<span class="lock-badge" id="lb-melden">🔒</span></button>
+    <button class="nav-btn" data-sec="meine" onclick="showSection('meine')">Meine Meldungen<span class="lock-badge" id="lb-meine">🔒</span></button>
+  </div>
+  <div class="nav-auth-wrap">
+    <button class="nav-auth-btn" id="nav-auth-btn" onclick="showSection('melden')">🔑 Anmelden</button>
+    <div class="nav-user-info" id="nav-user-info" style="display:none">
+      <span class="nav-user-name" id="nav-user-name"></span>
+      <button class="nav-logout-btn" onclick="doLogout()">Abmelden</button>
+    </div>
+  </div>
 </nav>
 
 <!-- ═══════════ WILLKOMMEN ═══════════ -->
@@ -264,9 +297,9 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
         <div class="tile-title">Schaden melden</div>
         <div class="tile-desc">Etwas defekt oder kaputt?</div>
       </div>
-      <div class="tile" onclick="showSection('artikel')">
+      <div class="tile" onclick="showSection('park')">
         <div class="tile-icon">🌿</div>
-        <div class="tile-title">Park & Aktuelles</div>
+        <div class="tile-title">Park & Termine</div>
         <div class="tile-desc">Was gerade passiert</div>
       </div>
       <div class="tile" onclick="showSection('meine')">
@@ -274,10 +307,10 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
         <div class="tile-title">Meine Meldungen</div>
         <div class="tile-desc">Status Ihrer Meldungen</div>
       </div>
-      <div class="tile">
-        <div class="tile-icon">💬</div>
-        <div class="tile-title">Kleine Wünsche</div>
-        <div class="tile-desc">Demnächst verfügbar</div>
+      <div class="tile" onclick="showSection('artikel')">
+        <div class="tile-icon">📰</div>
+        <div class="tile-title">Aktuelles</div>
+        <div class="tile-desc">Neuigkeiten aus dem Haus</div>
       </div>
     </div>
 
@@ -368,6 +401,74 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
   </div>
 </section>
 
+<!-- ═══════════ LOGIN GATE ═══════════ -->
+<section class="section" id="sec-gate">
+  <div class="gate-wrap">
+    <div class="gate-icon">🔑</div>
+    <h2 class="gate-h">Anmelden</h2>
+    <p class="gate-sub">Um fortzufahren, geben Sie bitte Ihren Namen ein.</p>
+    <div class="err-box" id="gate-err">Bitte Ihren Namen eingeben.</div>
+    <div class="f-group">
+      <div class="f-lbl">Ihr Name</div>
+      <input class="f-in" id="gate-name-in" type="text" placeholder="z. B. Hildegard Müller"
+        autocomplete="name" autocorrect="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-full" onclick="doLogin()">Anmelden</button>
+    <div class="dsgvo" style="margin-top:14px">🔒 Ihr Name wird nur in diesem Browser gespeichert und nicht weitergegeben.</div>
+  </div>
+</section>
+
+<!-- ═══════════ PARK & TERMINE ═══════════ -->
+<section class="section" id="sec-park">
+  <div style="margin-bottom:20px">
+    <div class="pg-eyebrow">Natur & Gemeinschaft</div>
+    <h2 class="pg-h1">Park & Termine</h2>
+    <hr class="gold-rule" style="margin:10px 0 16px">
+  </div>
+
+  <div class="park-season">
+    <div class="park-season-hdr">
+      <div class="park-season-icon">☀️</div>
+      <div>
+        <div class="park-season-title">Was gerade im Park passiert</div>
+        <div class="park-season-sub">Sommer 2026 · August</div>
+      </div>
+    </div>
+    <div class="park-item"><div class="park-item-icon">🌿</div><div><strong>Rasenpflege</strong> — Der Rasen wird 1–2× wöchentlich gemäht, damit die Wege und Sitzbereiche gepflegt bleiben.</div></div>
+    <div class="park-item"><div class="park-item-icon">💧</div><div><strong>Bewässerung</strong> — Bei Hitze werden Beete und Neupflanzungen morgens gewässert.</div></div>
+    <div class="park-item"><div class="park-item-icon">🌳</div><div><strong>Baumkontrolle</strong> — Alle Bäume werden regelmäßig auf Standfestigkeit geprüft.</div></div>
+    <div class="park-item"><div class="park-item-icon">🛤️</div><div><strong>Wege</strong> — Wege werden wöchentlich gefegt und freigehalten.</div></div>
+  </div>
+
+  <div class="park-season">
+    <div class="park-season-hdr">
+      <div class="park-season-icon">🗓</div>
+      <div>
+        <div class="park-season-title">Sprechstunde im Park</div>
+        <div class="park-season-sub">Persönlicher Kontakt</div>
+      </div>
+    </div>
+    <div class="park-item"><div class="park-item-icon">📅</div><div id="park-sp-zeit">Wird geladen …</div></div>
+    <div class="park-item" id="park-sp-ort-row"><div class="park-item-icon">📍</div><div id="park-sp-ort"></div></div>
+    <div class="park-item"><div class="park-item-icon">📞</div><div>Notfall: <a href="tel:+4917641167169" style="color:var(--green);font-weight:600">0176 411 67 169</a></div></div>
+  </div>
+
+  <div class="park-season">
+    <div class="park-season-hdr">
+      <div class="park-season-icon">🍂</div>
+      <div>
+        <div class="park-season-title">Vorschau: Herbstvorbereitung</div>
+        <div class="park-season-sub">Ab September · Oktober</div>
+      </div>
+    </div>
+    <div class="park-item"><div class="park-item-icon">🍁</div><div>Laubentsorgung — Wege und Eingänge täglich freihalten</div></div>
+    <div class="park-item"><div class="park-item-icon">✂️</div><div>Heckenschnitt — Abschlussschnitt vor dem Winter</div></div>
+    <div class="park-item"><div class="park-item-icon">🪑</div><div>Gartenmöbel — Einlagerung der Außenbänke</div></div>
+    <div class="park-item"><div class="park-item-icon">❄️</div><div>Winterdienst-Vorbereitung — Streugut und Geräte bereitstellen</div></div>
+  </div>
+</section>
+
 <!-- ═══════════ MEINE MELDUNGEN ═══════════ -->
 <section class="section" id="sec-meine">
   <div id="mm-content"></div>
@@ -384,6 +485,42 @@ let wizStep = 1; const WIZ_STEPS = 3;
 let wizState = { name: '', raum: '', problem: '', fotos: [] };
 let bwName = '', bwZimmer = '';
 let hvToken = null, hvExp = 0, hvSession = null;
+let pendingSection = null;
+const PROTECTED = ['melden', 'meine'];
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function initAuth() {
+  const saved = sessionStorage.getItem('bw_name');
+  if (saved) { bwName = saved; }
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const loggedIn = !!bwName;
+  document.getElementById('lb-melden').style.display = loggedIn ? 'none' : '';
+  document.getElementById('lb-meine').style.display  = loggedIn ? 'none' : '';
+  document.getElementById('nav-auth-btn').style.display   = loggedIn ? 'none' : '';
+  document.getElementById('nav-user-info').style.display  = loggedIn ? 'flex' : 'none';
+  if (loggedIn) document.getElementById('nav-user-name').textContent = bwName.split(' ')[0];
+}
+
+function doLogin() {
+  const name = document.getElementById('gate-name-in')?.value?.trim();
+  if (!name) { document.getElementById('gate-err').classList.add('show'); return; }
+  bwName = name;
+  sessionStorage.setItem('bw_name', name);
+  updateAuthUI();
+  const target = pendingSection || 'melden';
+  pendingSection = null;
+  showSection(target);
+}
+
+function doLogout() {
+  bwName = ''; bwZimmer = '';
+  sessionStorage.removeItem('bw_name');
+  updateAuthUI();
+  showSection('willkommen');
+}
 
 // ── SPRECHSTUNDE ─────────────────────────────────────────────────────────────
 const SP_DEFAULT = {
@@ -424,6 +561,23 @@ function renderSprechstunde(sp) {
 }
 
 loadSprechstunde();
+initAuth();
+
+function renderParkSp() {
+  fetch(`${SB}/rest/v1/settings?key=in.(sprechstunde_zeit,sprechstunde_ort)&select=key,value`, {
+    headers: { apikey: KEY, Authorization: 'Bearer ' + KEY }
+  }).then(r => r.json()).then(rows => {
+    const sp = {};
+    rows.forEach(r => { sp[r.key.replace('sprechstunde_', '')] = r.value; });
+    const zt = document.getElementById('park-sp-zeit');
+    const ort = document.getElementById('park-sp-ort');
+    if (zt) zt.textContent = sp.zeit || 'Dienstag · 10:00–12:00 Uhr';
+    if (ort) ort.textContent = sp.ort || 'Hausmeisterzimmer · Haus 8–10';
+  }).catch(() => {
+    const zt = document.getElementById('park-sp-zeit');
+    if (zt) zt.textContent = 'Dienstag · 10:00–12:00 Uhr';
+  });
+}
 
 const RAEUME = [
   {v:'Küche',icon:'🍳'},{v:'Bad / Dusche',icon:'🚿'},{v:'WC / Toilette',icon:'🚽'},
@@ -459,18 +613,25 @@ const ARTIKEL = [
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
 function showSection(name) {
-  currentSection = name;
+  if (PROTECTED.includes(name) && !bwName) {
+    pendingSection = name;
+    name = 'gate';
+    document.getElementById('gate-err')?.classList.remove('show');
+    document.getElementById('gate-name-in') && (document.getElementById('gate-name-in').value = '');
+    setTimeout(() => document.getElementById('gate-name-in')?.focus(), 120);
+  }
+  currentSection = name === 'gate' ? (pendingSection || name) : name;
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-links .nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('sec-' + name)?.classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    if (b.textContent.toLowerCase().includes(name === 'willkommen' ? 'willkommen'
-      : name === 'melden' ? 'schaden' : name === 'artikel' ? 'aktuelles' : 'meine'))
-      b.classList.add('active');
+  const target = name === 'gate' ? pendingSection : name;
+  document.querySelectorAll('.nav-links .nav-btn').forEach(b => {
+    if (b.dataset.sec === target || b.dataset.sec === name) b.classList.add('active');
   });
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
   if (name === 'meine') renderMM();
   if (name === 'artikel') renderArtikel();
+  if (name === 'park') renderParkSp();
 }
 
 // ── WIZARD ────────────────────────────────────────────────────────────────────
@@ -724,7 +885,7 @@ async function loadMM() {
       <div><div class="mm-user-lbl">Meldungen von</div>
         <div class="mm-user-name">${bwName}${bwZimmer?' · Zimmer '+bwZimmer:''}</div>
       </div>
-      <button class="btn-sm" onclick="bwName='';bwZimmer='';renderMM()">Zurück</button>
+      <button class="btn-sm" onclick="doLogout()">Abmelden</button>
     </div>`;
     if (!data.length) {
       html += `<div class="empty-state"><div class="empty-icon">📭</div>
