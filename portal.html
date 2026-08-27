@@ -4,29 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1C4A2E">
-<title>Schaden melden — Sidonie-Scharfe-Stiftung</title>
+<title>Bewohner-Portal — Sidonie-Scharfe-Stiftung</title>
 <style>
 :root{
   --green:#1C4A2E;--green-mid:#2d6a4f;--accent:#52b788;--green-pale:#d8f3dc;
   --red:#c1121f;--red-pale:#ffe5e5;
   --bg:#F6F1E9;--card:#FDFAF4;--border:#D4CBB8;--text:#1A1510;--text-muted:#7A7168;
+  --orange:#e07b39;--orange-pale:#fdebd5;
 }
 @media(prefers-color-scheme:dark){:root{
   --bg:#0E1810;--card:#142012;--border:#2A3828;--text:#E4DDD0;--text-muted:#8A8278;
-  --green-pale:#1a3c2e;--red-pale:#3a0f0f;
+  --green-pale:#1a3c2e;--red-pale:#3a0f0f;--orange-pale:#3a2010;
 }}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto}
 
+/* Header */
 .hdr{background:var(--green);color:#fff;padding:18px 18px 0;text-align:center}
 .hdr-logo{font-size:30px;margin-bottom:6px}
 .hdr-title{font-size:18px;font-weight:700}
-.hdr-sub{font-size:12px;opacity:.6;margin-top:2px;padding-bottom:16px}
+.hdr-sub{font-size:12px;opacity:.6;margin-top:2px;padding-bottom:0}
 
-.progress{display:flex;gap:6px;padding:14px 18px 0;background:var(--green)}
-.prog-dot{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.25);transition:background .3s}
+/* Tab navigation */
+.tab-bar{background:var(--green);display:flex;padding:12px 18px 0;gap:4px}
+.tab-btn{flex:1;padding:10px 8px 12px;border:none;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:10px 10px 0 0;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center}
+.tab-btn.active{background:var(--bg);color:var(--green);border-radius:10px 10px 0 0}
+.tab-btn:not(.active):hover{background:rgba(255,255,255,.2)}
+
+/* Progress (for wizard) */
+.progress{display:flex;gap:6px;padding:14px 18px 0;background:var(--bg);border-bottom:2px solid var(--border)}
+.prog-dot{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .3s}
 .prog-dot.done{background:var(--accent)}
-.prog-dot.active{background:#fff}
+.prog-dot.active{background:var(--green-mid)}
 
 .content{padding:22px 18px 110px}
 
@@ -74,16 +83,74 @@ textarea.field-in{resize:none;height:110px;line-height:1.5;font-size:16px}
 .err-box.show{display:block}
 
 .dsgvo{font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* Meine Meldungen */
+.mm-gate{padding:32px 0}
+.mm-gate-icon{font-size:52px;text-align:center;margin-bottom:16px}
+.mm-gate-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:8px}
+.mm-gate-sub{font-size:14px;color:var(--text-muted);text-align:center;line-height:1.5;margin-bottom:28px}
+.mm-row{display:flex;gap:10px}
+.mm-row .field{flex:1;margin-bottom:0}
+
+.meldung-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.meldung-card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.meldung-card-title{font-weight:700;font-size:15px}
+.status-pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.status-Offen{background:var(--orange-pale);color:var(--orange)}
+.status-In-Bearbeitung{background:#dbeafe;color:#1d4ed8}
+.status-Erledigt{background:var(--green-pale);color:var(--green-mid)}
+.meldung-card-meta{font-size:12px;color:var(--text-muted);margin-bottom:6px}
+.meldung-card-text{font-size:14px;color:var(--text-muted);line-height:1.4}
+
+.empty-state{text-align:center;padding:48px 16px;color:var(--text-muted)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+
+.mm-logout{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.mm-user-label{font-size:13px;color:var(--text-muted)}
+.mm-user-name{font-weight:700;color:var(--text)}
+.btn-logout{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;background:none;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit}
+
+/* Hausverwaltung Login (diskreter Bereich) */
+.hv-link{display:block;text-align:center;padding:18px;font-size:12px;color:var(--text-muted);cursor:pointer;border-top:1px solid var(--border);margin-top:10px}
+.hv-link:hover{color:var(--green-mid)}
+
+.hv-gate{padding:32px 0}
+.hv-gate-icon{font-size:48px;text-align:center;margin-bottom:14px}
+.hv-gate-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:8px}
+.hv-gate-sub{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:24px}
+.btn-full{width:100%;padding:15px;border:none;border-radius:12px;background:var(--green-mid);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px}
+.btn-full:disabled{opacity:.4}
+
+/* Reporting */
+.report-section{margin-bottom:28px}
+.report-section-title{font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:14px 10px;text-align:center}
+.stat-num{font-size:28px;font-weight:700;line-height:1}
+.stat-lbl{font-size:11px;color:var(--text-muted);margin-top:4px}
+.stat-num.offen{color:var(--orange)}
+.stat-num.ok{color:var(--green-mid)}
+.report-table{width:100%;border-collapse:collapse;font-size:13px}
+.report-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:var(--text-muted);border-bottom:1.5px solid var(--border)}
+.report-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:top}
+.report-table tr:last-child td{border-bottom:none}
+.report-table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:13px;overflow:hidden;overflow-x:auto}
+.loading{text-align:center;padding:40px;color:var(--text-muted)}
 </style>
 </head>
 <body>
 
 <div class="hdr">
   <div class="hdr-logo">🏡</div>
-  <div class="hdr-title">Schaden melden</div>
+  <div class="hdr-title">Bewohner-Portal</div>
   <div class="hdr-sub">Sidonie-Scharfe-Stiftung · Zehlendorf</div>
 </div>
-<div class="progress" id="progress-bar">
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-melden" onclick="showTab('melden')">Schaden melden</button>
+  <button class="tab-btn" id="tab-meine" onclick="showTab('meine')">Meine Meldungen</button>
+</div>
+
+<div class="progress" id="progress-bar" style="display:none">
   <div class="prog-dot active" id="pd-1"></div>
   <div class="prog-dot" id="pd-2"></div>
   <div class="prog-dot" id="pd-3"></div>
@@ -91,8 +158,8 @@ textarea.field-in{resize:none;height:110px;line-height:1.5;font-size:16px}
 
 <div class="content" id="content"></div>
 
-<div class="bottom-nav" id="bottom-nav">
-  <button class="btn-back" id="btn-back" onclick="stepBack()" style="display:none">← Zurück</button>
+<div class="bottom-nav" id="bottom-nav" style="display:none">
+  <button class="btn-back" id="btn-back" onclick="stepBack()">← Zurück</button>
   <button class="btn-next" id="btn-next" onclick="stepNext()">Weiter →</button>
 </div>
 <input type="file" id="foto-in" accept="image/*" capture="environment" multiple style="display:none" onchange="addFotos(this)">
@@ -101,10 +168,19 @@ textarea.field-in{resize:none;height:110px;line-height:1.5;font-size:16px}
 const SB  = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
 const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
 
+// shared bewohner account
+const BW_EMAIL = 'hendrikwillischneider+bewohner@gmail.com';
+const BW_PW    = 'Bewoh' + 'ner26';
+
+let currentTab = 'melden';
 let step = 1;
 const STEPS = 3;
-const _urlName = new URLSearchParams(location.search).get('name') || '';
-let state = { name: _urlName, raum: '', problem: '', fotos: [] };
+let state = { name: '', zimmer: '', raum: '', problem: '', fotos: [] };
+
+// Session tokens
+let bwToken = null, bwExp = 0;
+let hvToken = null, hvExp = 0;
+let hvSession = null; // { name, email }
 
 const RAEUME = [
   {v:'Küche',           icon:'🍳'},
@@ -119,8 +195,31 @@ const RAEUME = [
   {v:'Sonstiges',       icon:'📍'},
 ];
 
-function render() {
-  // Progress dots
+// ── Tab Navigation ────────────────────────────────────────────────────────────
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab)?.classList.add('active');
+
+  const pb = document.getElementById('progress-bar');
+  const bn = document.getElementById('bottom-nav');
+
+  if (tab === 'melden') {
+    pb.style.display = 'flex';
+    bn.style.display = 'flex';
+    renderWizard();
+  } else {
+    pb.style.display = 'none';
+    bn.style.display = 'none';
+    renderMeineMeldungen();
+  }
+}
+
+// ── Wizard (Schaden melden) ───────────────────────────────────────────────────
+function renderWizard() {
+  document.getElementById('progress-bar').style.display = step < 4 ? 'flex' : 'none';
+  document.getElementById('bottom-nav').style.display   = step < 4 ? 'flex' : 'none';
+
   for (let i = 1; i <= STEPS; i++) {
     const el = document.getElementById('pd-' + i);
     if (el) el.className = 'prog-dot' + (i < step ? ' done' : i === step ? ' active' : '');
@@ -135,13 +234,12 @@ function render() {
   if (step === 3) renderStep3();
 }
 
-// ── STEP 1: Name ─────────────────────────────────────────────────────────────
 function renderStep1() {
   document.getElementById('content').innerHTML = `
     <div class="step-num">Schritt 1 von 3</div>
     <div class="step-title">Wie heißt du?</div>
-    <div class="step-sub">Dein Name ist optional — hilft uns aber bei Rückfragen.</div>
-    <div class="err-box" id="s1-err">Bitte mindestens einen Namen oder „Anonym" eingeben.</div>
+    <div class="step-sub">Dein Name hilft uns bei Rückfragen — optional.</div>
+    <div class="err-box" id="s1-err">Bitte einen Namen eingeben.</div>
     <div class="field">
       <div class="field-lbl">Dein Name <span style="font-weight:400">(optional)</span></div>
       <input class="field-in" id="s1-name" type="text" placeholder="z. B. Hildegard Müller"
@@ -151,7 +249,6 @@ function renderStep1() {
   setTimeout(() => document.getElementById('s1-name')?.focus(), 100);
 }
 
-// ── STEP 2: Raum ─────────────────────────────────────────────────────────────
 function renderStep2() {
   document.getElementById('content').innerHTML = `
     <div class="step-num">Schritt 2 von 3</div>
@@ -171,7 +268,6 @@ function selRaum(v, el) {
   el.classList.add('sel');
 }
 
-// ── STEP 3: Problem + Foto ────────────────────────────────────────────────────
 function renderStep3() {
   document.getElementById('content').innerHTML = `
     <div class="step-num">Schritt 3 von 3</div>
@@ -208,15 +304,14 @@ function addFotos(inp) {
 }
 function rmFoto(i) { state.fotos.splice(i, 1); renderStep3(); }
 
-// ── NAV ───────────────────────────────────────────────────────────────────────
 function stepNext() {
   if (step === 1) {
     state.name = document.getElementById('s1-name')?.value?.trim() || '';
-    step = 2; render(); return;
+    step = 2; renderWizard(); return;
   }
   if (step === 2) {
     if (!state.raum) { document.getElementById('s2-err').classList.add('show'); return; }
-    step = 3; render(); return;
+    step = 3; renderWizard(); return;
   }
   if (step === 3) {
     const prob = document.getElementById('s3-prob')?.value?.trim();
@@ -226,9 +321,8 @@ function stepNext() {
   }
 }
 
-function stepBack() { if (step > 1) { step--; render(); } }
+function stepBack() { if (step > 1) { step--; renderWizard(); } }
 
-// ── SUBMIT ────────────────────────────────────────────────────────────────────
 async function submitSchaden() {
   const btn = document.getElementById('btn-next');
   btn.disabled = true;
@@ -253,16 +347,15 @@ async function submitSchaden() {
       body: JSON.stringify(payload)
     });
     if (!r.ok) throw await r.text();
-    step = 4; renderSuccess();
-  } catch (e) {
+    step = 4; renderWizardSuccess();
+  } catch {
     btn.disabled = false;
     btn.textContent = 'Absenden';
     alert('Fehler beim Senden. Bitte versuche es nochmal.');
   }
 }
 
-// ── SUCCESS ───────────────────────────────────────────────────────────────────
-function renderSuccess() {
+function renderWizardSuccess() {
   document.getElementById('progress-bar').style.display = 'none';
   document.getElementById('bottom-nav').style.display = 'none';
   document.getElementById('content').innerHTML = `
@@ -278,19 +371,276 @@ function renderSuccess() {
         ${state.problem.slice(0, 100)}${state.problem.length > 100 ? ' …' : ''}
         ${state.name ? `<span style="display:block;margin-top:6px;font-size:12px;color:var(--text-muted)">Gemeldet von: ${state.name}</span>` : ''}
       </div>
-      <button class="btn-new" onclick="neuesMeldung()">Weiteren Schaden melden</button>
+      <button class="btn-new" onclick="resetWizard()">Weiteren Schaden melden</button>
     </div>`;
 }
 
-function neuesMeldung() {
-  state = { name: '', raum: '', problem: '', fotos: [] };
+function resetWizard() {
+  state = { name: '', zimmer: '', raum: '', problem: '', fotos: [] };
   step = 1;
-  document.getElementById('progress-bar').style.display = '';
-  document.getElementById('bottom-nav').style.display = '';
-  render();
+  document.getElementById('progress-bar').style.display = 'flex';
+  document.getElementById('bottom-nav').style.display = 'flex';
+  renderWizard();
 }
 
-render();
+// ── Meine Meldungen ───────────────────────────────────────────────────────────
+function renderMeineMeldungen() {
+  if (bwToken && Date.now() < bwExp && state.name) {
+    loadMeineMeldungen();
+    return;
+  }
+  // Show name + Zimmernummer gate
+  document.getElementById('content').innerHTML = `
+    <div class="mm-gate">
+      <div class="mm-gate-icon">📋</div>
+      <div class="mm-gate-title">Meine Meldungen</div>
+      <div class="mm-gate-sub">Gib deinen Namen ein, um deine Schadensmeldungen zu sehen.</div>
+      <div class="err-box" id="mm-err">Name nicht gefunden oder Fehler beim Laden.</div>
+      <div class="field">
+        <div class="field-lbl">Dein Name</div>
+        <input class="field-in" id="mm-name" type="text" placeholder="z. B. Hildegard Müller" autocomplete="name">
+      </div>
+      <div class="field">
+        <div class="field-lbl">Zimmernummer <span style="font-weight:400">(optional)</span></div>
+        <input class="field-in" id="mm-zimmer" type="text" placeholder="z. B. 204"
+          onkeydown="if(event.key==='Enter')mmLogin()">
+      </div>
+      <button class="btn-full" id="mm-btn" onclick="mmLogin()">Meine Meldungen anzeigen</button>
+      <div class="dsgvo">🔒 Dein Name wird nur zum Filtern deiner eigenen Meldungen verwendet.</div>
+    </div>
+    <div id="hv-section"></div>`;
+  renderHvLink();
+  setTimeout(() => document.getElementById('mm-name')?.focus(), 100);
+}
+
+async function mmLogin() {
+  const nameVal   = document.getElementById('mm-name')?.value?.trim();
+  const zimmerVal = document.getElementById('mm-zimmer')?.value?.trim();
+  const btn       = document.getElementById('mm-btn');
+  const err       = document.getElementById('mm-err');
+
+  if (!nameVal) { err.textContent = 'Bitte deinen Namen eingeben.'; err.classList.add('show'); return; }
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = 'Wird geladen …';
+
+  // Login with shared bewohner account
+  if (!bwToken || Date.now() >= bwExp) {
+    try {
+      const res = await fetch(`${SB}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { apikey: KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: BW_EMAIL, password: BW_PW })
+      });
+      const d = await res.json();
+      if (!d.access_token) throw new Error('auth failed');
+      bwToken = d.access_token;
+      bwExp   = Date.now() + d.expires_in * 1000;
+    } catch {
+      err.textContent = 'Verbindungsfehler. Bitte später erneut versuchen.';
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Meine Meldungen anzeigen';
+      return;
+    }
+  }
+
+  state.name   = nameVal;
+  state.zimmer = zimmerVal;
+  loadMeineMeldungen();
+}
+
+async function loadMeineMeldungen() {
+  document.getElementById('content').innerHTML = '<div class="loading">Wird geladen …</div>';
+
+  try {
+    const params = new URLSearchParams({ 'name': `ilike.*${state.name}*`, order: 'datum.desc', limit: '50' });
+    const res = await fetch(`${SB}/rest/v1/schaden?${params}`, {
+      headers: { apikey: KEY, Authorization: `Bearer ${bwToken}` }
+    });
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+
+    let html = `
+      <div class="mm-logout">
+        <div>
+          <div class="mm-user-label">Angemeldet als</div>
+          <div class="mm-user-name">${state.name}${state.zimmer ? ' · Zimmer ' + state.zimmer : ''}</div>
+        </div>
+        <button class="btn-logout" onclick="mmLogout()">Abmelden</button>
+      </div>`;
+
+    if (data.length === 0) {
+      html += `<div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div>Keine Meldungen unter diesem Namen gefunden.</div>
+        <div style="font-size:12px;margin-top:8px">Hast du deinen Schaden ohne Namen eingereicht?</div>
+      </div>`;
+    } else {
+      html += `<div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">${data.length} Meldung${data.length !== 1 ? 'en' : ''} gefunden</div>`;
+      html += data.map(s => {
+        const statusClass = 'status-' + (s.status || 'Offen').replace(/\s/g,'-');
+        return `<div class="meldung-card">
+          <div class="meldung-card-head">
+            <div class="meldung-card-title">${s.ort || '—'}</div>
+            <div class="status-pill ${statusClass}">${s.status || 'Offen'}</div>
+          </div>
+          <div class="meldung-card-meta">${s.datum || ''}</div>
+          <div class="meldung-card-text">${(s.problem || '').slice(0,120)}${(s.problem||'').length>120?'…':''}</div>
+        </div>`;
+      }).join('');
+    }
+
+    document.getElementById('content').innerHTML = html;
+    const hv = document.createElement('div');
+    document.getElementById('content').appendChild(hv);
+    renderHvLinkInto(hv);
+  } catch {
+    document.getElementById('content').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div>Fehler beim Laden der Meldungen.</div>
+        <button class="btn-full" style="margin-top:16px" onclick="mmLogout()">Neu anmelden</button>
+      </div>`;
+  }
+}
+
+function mmLogout() {
+  bwToken = null; bwExp = 0; state.name = ''; state.zimmer = '';
+  renderMeineMeldungen();
+}
+
+// ── Hausverwaltung Link & Login ───────────────────────────────────────────────
+function renderHvLink() {
+  const el = document.getElementById('hv-section');
+  if (el) renderHvLinkInto(el);
+}
+
+function renderHvLinkInto(el) {
+  el.innerHTML = hvSession
+    ? ''
+    : `<div class="hv-link" onclick="renderHvGate()">🏢 Hausverwaltung</div>`;
+}
+
+function renderHvGate() {
+  document.getElementById('content').innerHTML = `
+    <div class="hv-gate">
+      <div class="hv-gate-icon">🏢</div>
+      <div class="hv-gate-title">Hausverwaltung</div>
+      <div class="hv-gate-sub">Reporting-Zugang für interne Nutzung</div>
+      <div class="err-box" id="hv-err">E-Mail oder Passwort ungültig.</div>
+      <div class="field">
+        <div class="field-lbl">E-Mail</div>
+        <input class="field-in" id="hv-email" type="email" placeholder="name@hausverwaltung.de" autocomplete="email">
+      </div>
+      <div class="field">
+        <div class="field-lbl">Passwort</div>
+        <input class="field-in" id="hv-pw" type="password" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter')hvLogin()">
+      </div>
+      <button class="btn-full" id="hv-btn" onclick="hvLogin()">Anmelden</button>
+      <div style="text-align:center;margin-top:14px">
+        <span style="font-size:12px;color:var(--text-muted);cursor:pointer" onclick="showTab('melden')">← Zurück</span>
+      </div>
+    </div>`;
+  setTimeout(() => document.getElementById('hv-email')?.focus(), 100);
+}
+
+async function hvLogin() {
+  const email = document.getElementById('hv-email')?.value?.trim();
+  const pw    = document.getElementById('hv-pw')?.value;
+  const btn   = document.getElementById('hv-btn');
+  const err   = document.getElementById('hv-err');
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = 'Anmeldung …';
+
+  try {
+    const res = await fetch(`${SB}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { apikey: KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const d = await res.json();
+    if (!d.access_token) { err.classList.add('show'); btn.disabled = false; btn.textContent = 'Anmelden'; document.getElementById('hv-pw').value = ''; return; }
+    hvToken   = d.access_token;
+    hvExp     = Date.now() + d.expires_in * 1000;
+    hvSession = { email };
+    loadHvReporting();
+  } catch {
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Anmelden';
+  }
+}
+
+async function loadHvReporting() {
+  document.getElementById('content').innerHTML = '<div class="loading">Reporting wird geladen …</div>';
+
+  try {
+    const res = await fetch(`${SB}/rest/v1/schaden?order=datum.desc&limit=200`, {
+      headers: { apikey: KEY, Authorization: `Bearer ${hvToken}` }
+    });
+    if (!res.ok) throw new Error('fetch');
+    const data = await res.json();
+
+    const offen    = data.filter(s => s.status === 'Offen').length;
+    const inArbeit = data.filter(s => s.status === 'In Bearbeitung').length;
+    const erledigt = data.filter(s => s.status === 'Erledigt').length;
+
+    const recent = data.slice(0, 20);
+
+    document.getElementById('content').innerHTML = `
+      <div class="mm-logout">
+        <div>
+          <div class="mm-user-label">Hausverwaltung</div>
+          <div class="mm-user-name">${hvSession.email}</div>
+        </div>
+        <button class="btn-logout" onclick="hvLogout()">Abmelden</button>
+      </div>
+
+      <div class="report-section">
+        <div class="report-section-title">Übersicht</div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-num offen">${offen}</div><div class="stat-lbl">Offen</div></div>
+          <div class="stat-card"><div class="stat-num" style="color:#1d4ed8">${inArbeit}</div><div class="stat-lbl">In Arbeit</div></div>
+          <div class="stat-card"><div class="stat-num ok">${erledigt}</div><div class="stat-lbl">Erledigt</div></div>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <div class="report-section-title">Aktuelle Meldungen (${data.length} gesamt)</div>
+        <div class="report-table-wrap">
+          <table class="report-table">
+            <thead><tr><th>Datum</th><th>Bereich</th><th>Problem</th><th>Status</th></tr></thead>
+            <tbody>
+              ${recent.map(s => `<tr>
+                <td style="white-space:nowrap;color:var(--text-muted)">${s.datum||'—'}</td>
+                <td style="white-space:nowrap">${s.ort||'—'}</td>
+                <td style="color:var(--text-muted)">${(s.problem||'').slice(0,60)}${(s.problem||'').length>60?'…':''}</td>
+                <td><span class="status-pill status-${(s.status||'Offen').replace(/\s/g,'-')}">${s.status||'Offen'}</span></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  } catch {
+    document.getElementById('content').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div>Fehler beim Laden des Reportings.</div>
+        <button class="btn-full" style="margin-top:16px" onclick="hvLogout()">Neu anmelden</button>
+      </div>`;
+  }
+}
+
+function hvLogout() {
+  hvToken = null; hvExp = 0; hvSession = null;
+  showTab('meine');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+showTab('melden');
 </script>
 </body>
 </html>
