@@ -166,19 +166,47 @@ nav button.active{color:var(--green-mid);border-bottom-color:var(--green-mid);fo
 
 
 /* OVERLAY / MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:16px}
+/* DRAWER */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;justify-content:flex-end}
 .overlay.open{display:flex}
-.modal{background:var(--card);border-radius:16px;width:100%;max-width:640px;padding:22px 20px 32px;max-height:96vh;overflow-y:auto}
-.bereich-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 18px}
+#ov-new{align-items:stretch}
+#ov-new .modal{border-radius:0;max-width:720px;width:100%;height:100%;max-height:none;padding:0;
+  display:flex;flex-direction:column;animation:slideIn .22s ease}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;
+  border-bottom:1px solid var(--border);flex:0 0 auto}
+.modal-hdr h2{font-size:17px;font-weight:700}
+.modal-close{background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;font-size:18px;
+  color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-body{flex:1;overflow-y:auto;padding:20px 22px}
+.modal-footer{flex:0 0 auto;padding:14px 22px;border-top:1px solid var(--border);
+  display:flex;gap:10px;background:var(--card)}
+.modal-footer .btn{flex:1;margin:0}
+/* Non-Schaden modals stay centered */
+#ov-detail,#ov-bw{align-items:center;justify-content:center;padding:16px}
+#ov-detail .modal,#ov-bw .modal{border-radius:16px;height:auto;max-height:90vh;width:100%;max-width:580px;padding:20px 18px 28px;flex-direction:column;animation:none}
+#ov-detail .modal-hdr,#ov-bw .modal-hdr{padding:0 0 14px;border-bottom:none}
+#ov-detail .modal-body,#ov-bw .modal-body{padding:0}
+/* Form sections */
+.form-section{margin-bottom:22px}
+.form-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* Bereich toggle */
+.bereich-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 16px}
 .bereich-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px 10px;
   border:2px solid var(--border);border-radius:13px;background:var(--bg);color:var(--text-muted);
   cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all .18s;line-height:1.2}
-.bereich-btn .bereich-icon{font-size:24px}
+.bereich-btn .bereich-icon{font-size:22px}
 .bereich-btn:hover{border-color:var(--green-mid);color:var(--text)}
 .bereich-btn.active{border-color:var(--green-mid);background:rgba(82,183,136,.1);color:var(--green-mid)}
-.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.modal-hdr h2{font-size:17px;font-weight:700}
-.modal-close{background:var(--bg);border:none;width:30px;height:30px;border-radius:50%;font-size:18px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* Sicherheit chips */
+.sicherheit-chip{background:var(--bg);border:1.5px solid var(--border);color:var(--text-muted);
+  border-radius:20px;padding:5px 13px;font-size:12.5px;cursor:pointer;transition:all .14s;font-family:inherit}
+.sicherheit-chip:hover{border-color:var(--orange)}
+.sicherheit-chip.active{background:rgba(245,158,11,.12);border-color:var(--orange);color:var(--orange);font-weight:600}
+.sicherheit-chip.safe.active{background:rgba(82,183,136,.12);border-color:var(--green-mid);color:var(--green-mid)}
+.sicherheit-chip.red.active{background:rgba(239,68,68,.12);border-color:#ef4444;color:#ef4444}
 
 /* FORM */
 label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.3px}
@@ -433,125 +461,217 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
   </div>
 </div>
 
-<!-- NEUER AUFTRAG MODAL -->
+<!-- NEUER AUFTRAG DRAWER -->
 <div class="overlay" id="ov-new" onclick="ovClose('ov-new',event)">
   <div class="modal">
+
+    <!-- HEADER -->
     <div class="modal-hdr">
-      <h2 id="n-modal-title">Neuer Auftrag</h2>
+      <div>
+        <div style="font-size:11px;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">Neuer Auftrag</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px" id="n-kat-icon"></span>
+          <h2 id="n-modal-title" style="font-size:18px">Schaden</h2>
+        </div>
+      </div>
       <button class="modal-close" onclick="ovClose('ov-new')">×</button>
     </div>
-    <div class="n-kat-hdr">
-      <span class="n-kat-hdr-icon" id="n-kat-icon"></span>
-      <span class="n-kat-hdr-title" id="n-kat-title"></span>
-    </div>
 
-    <label>Bewohnerin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
-    <div class="bw-search-wrap" id="bw-search-wrap">
-      <div class="bw-search-field">
-        <span class="bw-search-icon">🔍</span>
-        <input type="text" id="bw-search-in" placeholder="Name, Zimmer oder Gebäude suchen …"
-          oninput="bwFilter()" onfocus="bwFilter()" autocomplete="off" spellcheck="false">
-        <button class="bw-clear-btn" id="bw-clear-btn" onclick="bwClear()" style="display:none">×</button>
-      </div>
-      <div class="bw-dd" id="bw-dd" style="display:none"></div>
-    </div>
-    <input type="hidden" id="n-bw" value="">
-    <div class="bw-selected-badge" id="bw-selected-badge" style="display:none"></div>
+    <!-- BODY -->
+    <div class="modal-body">
 
-    <!-- Schaden -->
-    <div id="nf-schaden" class="nf-cat" style="display:none">
-      <div class="bereich-toggle">
-        <button type="button" class="bereich-btn active" id="bt-allg" onclick="setBereich('allgemein')">
-          <span class="bereich-icon">🏛</span>
-          <span>Allgemeine Bereiche</span>
-          <span style="font-size:11px;font-weight:400;color:inherit;opacity:.7">Park, Keller, Flure …</span>
-        </button>
-        <button type="button" class="bereich-btn" id="bt-suite" onclick="setBereich('suite')">
-          <span class="bereich-icon">🛏</span>
-          <span>Suite / Wohnbereich</span>
-          <span style="font-size:11px;font-weight:400;color:inherit;opacity:.7">Zimmer, Bad, Küche …</span>
-        </button>
+      <!-- ① BEWOHNERIN (alle Kategorien) -->
+      <div class="form-section">
+        <div class="form-section-title">Bewohnerin — optional</div>
+        <div class="bw-search-wrap" id="bw-search-wrap">
+          <div class="bw-search-field">
+            <span class="bw-search-icon">🔍</span>
+            <input type="text" id="bw-search-in" placeholder="Name, Zimmer oder Gebäude suchen …"
+              oninput="bwFilter()" onfocus="bwFilter()" autocomplete="off" spellcheck="false">
+            <button class="bw-clear-btn" id="bw-clear-btn" onclick="bwClear()" style="display:none">×</button>
+          </div>
+          <div class="bw-dd" id="bw-dd" style="display:none"></div>
+        </div>
+        <input type="hidden" id="n-bw" value="">
+        <div class="bw-selected-badge" id="bw-selected-badge" style="display:none"></div>
       </div>
 
-      <div class="ort-chips" id="ort-chips-allgemein">
-        <button type="button" class="ort-chip" data-ort="Treppenhaus" onclick="selectOrt(this)">🏛 Treppenhaus</button>
-        <button type="button" class="ort-chip" data-ort="Eingang / Haustür" onclick="selectOrt(this)">🚪 Eingang</button>
-        <button type="button" class="ort-chip" data-ort="Keller" onclick="selectOrt(this)">📦 Keller</button>
-        <button type="button" class="ort-chip" data-ort="Park / Außenanlage" onclick="selectOrt(this)">🌿 Park</button>
-        <button type="button" class="ort-chip" data-ort="Gemeinschaftsküche" onclick="selectOrt(this)">🍴 Gemeinschaftsküche</button>
-        <button type="button" class="ort-chip" data-ort="Waschkeller" onclick="selectOrt(this)">🫧 Waschkeller</button>
-        <button type="button" class="ort-chip" data-ort="Flur-Beleuchtung" onclick="selectOrt(this)">💡 Flurbeleuchtung</button>
-        <button type="button" class="ort-chip" data-ort="Aufzug" onclick="selectOrt(this)">🛗 Aufzug</button>
-        <button type="button" class="ort-chip" data-ort="Technik / Heizungsraum" onclick="selectOrt(this)">🔧 Technikraum</button>
-        <button type="button" class="ort-chip" data-ort="Fassade / Dach" onclick="selectOrt(this)">🏗 Fassade / Dach</button>
-        <button type="button" class="ort-chip" data-ort="Parkplatz / Zufahrt" onclick="selectOrt(this)">🅿️ Parkplatz</button>
-        <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+      <!-- ② SCHADEN -->
+      <div id="nf-schaden" class="nf-cat" style="display:none">
+
+        <!-- Bereich -->
+        <div class="form-section">
+          <div class="form-section-title">Wo ist der Schaden?</div>
+          <div class="bereich-toggle">
+            <button type="button" class="bereich-btn active" id="bt-allg" onclick="setBereich('allgemein')">
+              <span class="bereich-icon">🏛</span>
+              <span>Allgemeine Bereiche</span>
+              <span style="font-size:11px;font-weight:400;opacity:.7">Park, Keller, Flure …</span>
+            </button>
+            <button type="button" class="bereich-btn" id="bt-suite" onclick="setBereich('suite')">
+              <span class="bereich-icon">🛏</span>
+              <span>Suite / Wohnbereich</span>
+              <span style="font-size:11px;font-weight:400;opacity:.7">Zimmer, Bad, Küche …</span>
+            </button>
+          </div>
+          <div class="ort-chips" id="ort-chips-allgemein">
+            <button type="button" class="ort-chip" data-ort="Treppenhaus" onclick="selectOrt(this)">🏛 Treppenhaus</button>
+            <button type="button" class="ort-chip" data-ort="Eingang / Haustür" onclick="selectOrt(this)">🚪 Eingang</button>
+            <button type="button" class="ort-chip" data-ort="Keller" onclick="selectOrt(this)">📦 Keller</button>
+            <button type="button" class="ort-chip" data-ort="Park / Außenanlage" onclick="selectOrt(this)">🌿 Park</button>
+            <button type="button" class="ort-chip" data-ort="Gemeinschaftsküche" onclick="selectOrt(this)">🍴 Gemeinschaftsküche</button>
+            <button type="button" class="ort-chip" data-ort="Waschkeller" onclick="selectOrt(this)">🫧 Waschkeller</button>
+            <button type="button" class="ort-chip" data-ort="Flur-Beleuchtung" onclick="selectOrt(this)">💡 Flurbeleuchtung</button>
+            <button type="button" class="ort-chip" data-ort="Aufzug" onclick="selectOrt(this)">🛗 Aufzug</button>
+            <button type="button" class="ort-chip" data-ort="Technik / Heizungsraum" onclick="selectOrt(this)">🔧 Technikraum</button>
+            <button type="button" class="ort-chip" data-ort="Fassade / Dach" onclick="selectOrt(this)">🏗 Fassade / Dach</button>
+            <button type="button" class="ort-chip" data-ort="Parkplatz / Zufahrt" onclick="selectOrt(this)">🅿️ Parkplatz</button>
+            <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+          </div>
+          <div class="ort-chips" id="ort-chips-bewohner" style="display:none">
+            <button type="button" class="ort-chip" data-ort="Zimmer / Schlafbereich" onclick="selectOrt(this)">🛏 Zimmer</button>
+            <button type="button" class="ort-chip" data-ort="Küche / Kochnische" onclick="selectOrt(this)">🍳 Küche</button>
+            <button type="button" class="ort-chip" data-ort="Badezimmer / Dusche" onclick="selectOrt(this)">🚿 Badezimmer</button>
+            <button type="button" class="ort-chip" data-ort="Fenster / Jalousie" onclick="selectOrt(this)">🪟 Fenster</button>
+            <button type="button" class="ort-chip" data-ort="Heizung / Thermostat" onclick="selectOrt(this)">🔥 Heizung</button>
+            <button type="button" class="ort-chip" data-ort="Wasserhahn / Abfluss" onclick="selectOrt(this)">💧 Wasser</button>
+            <button type="button" class="ort-chip" data-ort="Tür / Schloss" onclick="selectOrt(this)">🚪 Tür / Schloss</button>
+            <button type="button" class="ort-chip" data-ort="Flur / Diele" onclick="selectOrt(this)">🏠 Flur / Diele</button>
+            <button type="button" class="ort-chip" data-ort="Strom / Steckdosen" onclick="selectOrt(this)">⚡ Strom</button>
+            <button type="button" class="ort-chip" data-ort="Balkon / Terrasse" onclick="selectOrt(this)">🌇 Balkon</button>
+            <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+          </div>
+          <input type="text" id="n-s-ort-frei" placeholder="Genauer Ort …" style="display:none;margin-top:8px">
+          <input type="hidden" id="n-s-ort">
+        </div>
+
+        <!-- Problem -->
+        <div class="form-section" id="n-s-prob-section" style="display:none">
+          <div class="form-section-title">Was ist das Problem?</div>
+          <div class="ort-chips" id="prob-chips" style="margin-bottom:10px"></div>
+          <textarea id="n-s-prob" rows="3" placeholder="So genau wie möglich beschreiben …"></textarea>
+        </div>
+
+        <!-- Seit wann -->
+        <div class="form-section" id="nf-seit-section" style="display:none">
+          <div class="form-section-title">Seit wann besteht das Problem?</div>
+          <div class="ort-chips" id="seit-chips">
+            <button type="button" class="ort-chip" data-seit="Seit heute" onclick="selectSeit(this)">Seit heute</button>
+            <button type="button" class="ort-chip" data-seit="Seit gestern" onclick="selectSeit(this)">Seit gestern</button>
+            <button type="button" class="ort-chip" data-seit="Seit 2–3 Tagen" onclick="selectSeit(this)">2–3 Tage</button>
+            <button type="button" class="ort-chip" data-seit="Seit einer Woche" onclick="selectSeit(this)">1 Woche</button>
+            <button type="button" class="ort-chip" data-seit="Seit mehreren Wochen" onclick="selectSeit(this)">Mehrere Wochen</button>
+            <button type="button" class="ort-chip" data-seit="Schon länger" onclick="selectSeit(this)">Schon länger</button>
+          </div>
+          <input type="hidden" id="n-seit">
+        </div>
+
+        <!-- Sicherheit -->
+        <div class="form-section" id="nf-sicherheit-section" style="display:none">
+          <div class="form-section-title">Sicherheitsrelevanz</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button type="button" class="sicherheit-chip safe" data-s="Kein Risiko" onclick="selectSicherheit(this)">✅ Kein Risiko</button>
+            <button type="button" class="sicherheit-chip" data-s="Wasseraustritt" onclick="selectSicherheit(this)">💧 Wasseraustritt</button>
+            <button type="button" class="sicherheit-chip red" data-s="Stromgefahr" onclick="selectSicherheit(this)">⚡ Stromgefahr</button>
+            <button type="button" class="sicherheit-chip red" data-s="Brandgefahr" onclick="selectSicherheit(this)">🔥 Brandgefahr</button>
+            <button type="button" class="sicherheit-chip" data-s="Sturzgefahr" onclick="selectSicherheit(this)">⚠️ Sturzgefahr</button>
+            <button type="button" class="sicherheit-chip" data-s="Zugangsproblem" onclick="selectSicherheit(this)">🔒 Zugangsproblem</button>
+          </div>
+          <input type="hidden" id="n-sicherheit">
+        </div>
+
+        <!-- Zutritt (nur Suite) -->
+        <div class="form-section" id="nf-zutritt-section" style="display:none">
+          <div class="form-section-title">Zutritt zur Suite nötig?</div>
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <button type="button" class="ort-chip" id="zutritt-ja" data-z="Ja" onclick="selectZutritt('Ja')">✅ Ja</button>
+            <button type="button" class="ort-chip" id="zutritt-nein" data-z="Nein" onclick="selectZutritt('Nein')">❌ Nein</button>
+          </div>
+          <input type="text" id="n-zutritt-wann" placeholder="Bewohnerin erreichbar: z. B. Mo–Fr 9–12 Uhr …" style="display:none">
+          <input type="hidden" id="n-zutritt">
+        </div>
+
+        <!-- Rückmeldung -->
+        <div class="form-section" id="nf-rueck-section" style="display:none">
+          <div class="form-section-title">Rückmeldung an Bewohnerin</div>
+          <div class="ort-chips" id="rueck-chips">
+            <button type="button" class="ort-chip" data-r="Türzettel" onclick="selectRueck(this)">🖨 Türzettel</button>
+            <button type="button" class="ort-chip" data-r="Persönlich" onclick="selectRueck(this)">🤝 Persönlich</button>
+            <button type="button" class="ort-chip" data-r="Telefonanruf" onclick="selectRueck(this)">📞 Anruf</button>
+            <button type="button" class="ort-chip" data-r="Keine" onclick="selectRueck(this)">— Keine</button>
+          </div>
+          <input type="hidden" id="n-rueck">
+        </div>
+
+      </div><!-- /nf-schaden -->
+
+      <!-- ③ MÖBEL & AUFBAU -->
+      <div id="nf-moebel" class="nf-cat" style="display:none">
+        <div class="form-section">
+          <div class="form-section-title">Möbel & Aufbau</div>
+          <label>Was soll gemacht werden?</label>
+          <select id="n-m-art"><option>Möbel aufbauen</option><option>Möbel abbauen</option><option>Möbel umstellen</option><option>Sonstiges</option></select>
+          <label>Was genau?</label>
+          <textarea id="n-m-was" placeholder="z. B. Kleiderschrank 2-türig …"></textarea>
+          <label>Aktueller Standort</label>
+          <input type="text" id="n-m-wo" placeholder="z. B. Suite 3, Flur …">
+          <label>Neuer Standort <span style="text-transform:none;font-weight:400;font-size:11px">— falls umstellen</span></label>
+          <input type="text" id="n-m-ziel" placeholder="optional">
+        </div>
       </div>
 
-      <div class="ort-chips" id="ort-chips-bewohner" style="display:none">
-        <button type="button" class="ort-chip" data-ort="Zimmer / Schlafbereich" onclick="selectOrt(this)">🛏 Zimmer</button>
-        <button type="button" class="ort-chip" data-ort="Küche / Kochnische" onclick="selectOrt(this)">🍳 Küche</button>
-        <button type="button" class="ort-chip" data-ort="Badezimmer / Dusche" onclick="selectOrt(this)">🚿 Badezimmer</button>
-        <button type="button" class="ort-chip" data-ort="Fenster / Jalousie" onclick="selectOrt(this)">🪟 Fenster</button>
-        <button type="button" class="ort-chip" data-ort="Heizung / Thermostat" onclick="selectOrt(this)">🔥 Heizung</button>
-        <button type="button" class="ort-chip" data-ort="Wasserhahn / Abfluss" onclick="selectOrt(this)">💧 Wasser</button>
-        <button type="button" class="ort-chip" data-ort="Tür / Schloss" onclick="selectOrt(this)">🚪 Tür / Schloss</button>
-        <button type="button" class="ort-chip" data-ort="Flur / Diele" onclick="selectOrt(this)">🏠 Flur / Diele</button>
-        <button type="button" class="ort-chip" data-ort="Strom / Steckdosen" onclick="selectOrt(this)">⚡ Strom</button>
-        <button type="button" class="ort-chip" data-ort="Balkon / Terrasse" onclick="selectOrt(this)">🌇 Balkon</button>
-        <button type="button" class="ort-chip" data-ort="Sonstiges" onclick="selectOrt(this)">✏️ Sonstiges</button>
+      <!-- ④ SPERRMÜLL -->
+      <div id="nf-sperr" class="nf-cat" style="display:none">
+        <div class="form-section">
+          <div class="form-section-title">Sperrmüll</div>
+          <label>Was soll entsorgt werden?</label>
+          <textarea id="n-sp-was" placeholder="z. B. alter Sessel, ca. 80 cm breit …"></textarea>
+          <label>Wo steht es?</label>
+          <input type="text" id="n-sp-wo" placeholder="z. B. Suite 3, Keller …">
+          <label>Wunschtermin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+          <input type="text" id="n-sp-termin" placeholder="z. B. Ende August …">
+        </div>
       </div>
-      <input type="text" id="n-s-ort-frei" placeholder="Genauer Ort …" style="display:none;margin-top:8px">
-      <input type="hidden" id="n-s-ort">
-      <div id="n-s-prob-section" style="display:none">
-        <label style="margin-top:16px">Was ist das Problem?</label>
-        <div class="ort-chips" id="prob-chips" style="margin-bottom:8px"></div>
-        <textarea id="n-s-prob" placeholder="So genau wie möglich beschreiben …"></textarea>
+
+      <!-- ⑤ KLEINER AUFTRAG -->
+      <div id="nf-auftrag" class="nf-cat" style="display:none">
+        <div class="form-section">
+          <div class="form-section-title">Kleiner Auftrag</div>
+          <label>Was soll gemacht werden?</label>
+          <select id="n-a-art"><option>Bild aufhängen</option><option>Regal montieren</option><option>Glühbirne wechseln</option><option>Gardine aufhängen</option><option>Sonstiges</option></select>
+          <label>Wo? (Zimmer / Bereich)</label>
+          <input type="text" id="n-a-wo" placeholder="z. B. Suite 3 …">
+          <label>Details <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+          <textarea id="n-a-details" placeholder="z. B. 3 Bilder, Haken vorhanden …"></textarea>
+        </div>
       </div>
-    </div>
-    <!-- Möbel -->
-    <div id="nf-moebel" class="nf-cat" style="display:none">
-      <label>Was soll gemacht werden?</label>
-      <select id="n-m-art"><option>Möbel aufbauen</option><option>Möbel abbauen</option><option>Möbel umstellen</option><option>Sonstiges</option></select>
-      <label>Was genau?</label>
-      <textarea id="n-m-was" placeholder="z. B. Kleiderschrank 2-türig …"></textarea>
-      <label>Aktueller Standort</label>
-      <input type="text" id="n-m-wo" placeholder="z. B. Suite 3, Flur …">
-      <label>Neuer Standort <span style="text-transform:none;font-weight:400;font-size:11px">— falls umstellen</span></label>
-      <input type="text" id="n-m-ziel" placeholder="optional">
-    </div>
-    <!-- Sperrmüll -->
-    <div id="nf-sperr" class="nf-cat" style="display:none">
-      <label>Was soll entsorgt werden?</label>
-      <textarea id="n-sp-was" placeholder="z. B. alter Sessel, ca. 80 cm breit …"></textarea>
-      <label>Wo steht es?</label>
-      <input type="text" id="n-sp-wo" placeholder="z. B. Suite 3, Keller …">
-      <label>Wunschtermin <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
-      <input type="text" id="n-sp-termin" placeholder="z. B. Ende August …">
-    </div>
-    <!-- Kleiner Auftrag -->
-    <div id="nf-auftrag" class="nf-cat" style="display:none">
-      <label>Was soll gemacht werden?</label>
-      <select id="n-a-art"><option>Bild aufhängen</option><option>Regal montieren</option><option>Glühbirne wechseln</option><option>Gardine aufhängen</option><option>Sonstiges</option></select>
-      <label>Wo? (Zimmer / Bereich)</label>
-      <input type="text" id="n-a-wo" placeholder="z. B. Suite 3 …">
-      <label>Details <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
-      <textarea id="n-a-details" placeholder="z. B. 3 Bilder, Haken vorhanden …"></textarea>
+
+      <!-- ⑥ PRIORITÄT + FOTO + INTERNE NOTIZ -->
+      <div class="form-section">
+        <div class="form-section-title">Abschluss</div>
+        <label>Priorität</label>
+        <select id="n-prio">
+          <option value="Hoch">🔴 Hoch — sofort erledigen</option>
+          <option value="Mittel" selected>🟡 Mittel — bald erledigen</option>
+          <option value="Niedrig">🟢 Niedrig — kann warten</option>
+        </select>
+        <label style="margin-top:14px">Interne Notiz für Hendrik <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+        <textarea id="n-notiz" rows="2" placeholder="Eigene Beobachtungen, Hinweise, Besonderheiten …"></textarea>
+        <label style="margin-top:14px">Foto <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
+        <div class="photo-zone">📷 Foto aufnehmen oder auswählen
+          <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
+        </div>
+        <div class="photo-previews" id="photo-previews"></div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Auftrag speichern</button>
     </div>
 
-    <label>Priorität</label>
-    <select id="n-prio">
-      <option value="Hoch">🔴 Hoch — sofort erledigen</option>
-      <option value="Mittel" selected>🟡 Mittel — bald erledigen</option>
-      <option value="Niedrig">🟢 Niedrig — kann warten</option>
-    </select>
-    <label>Foto <span style="text-transform:none;font-weight:400;font-size:11px">— optional</span></label>
-    <div class="photo-zone">📷 Foto aufnehmen oder auswählen
-      <input type="file" accept="image/*" multiple onchange="addPhotos(event)">
-    </div>
-    <div class="photo-previews" id="photo-previews"></div>
-    <button class="btn btn-primary" onclick="saveNew()" id="save-btn">Auftrag speichern</button>
-    <button class="btn btn-ghost" onclick="ovClose('ov-new')">Abbrechen</button>
   </div>
 </div>
 
@@ -989,7 +1109,7 @@ function openNew(kat) {
   newPhotos = [];
   document.getElementById('photo-previews').innerHTML = '';
   document.getElementById('n-prio').value = 'Mittel';
-  ['n-s-prob','n-m-was','n-m-wo','n-m-ziel','n-sp-was','n-sp-wo','n-sp-termin','n-a-wo','n-a-details'].forEach(id => {
+  ['n-s-prob','n-m-was','n-m-wo','n-m-ziel','n-sp-was','n-sp-wo','n-sp-termin','n-a-wo','n-a-details','n-notiz'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   bwClear();
@@ -999,7 +1119,6 @@ function openNew(kat) {
   document.querySelectorAll('.nf-cat').forEach(el => el.style.display = 'none');
   document.getElementById(KAT_MAP[kat]).style.display = 'block';
   document.getElementById('n-kat-icon').textContent = ICONS[kat];
-  document.getElementById('n-kat-title').textContent = kat;
   document.getElementById('n-modal-title').textContent = kat;
   ovOpen('ov-new');
   setTimeout(() => {
@@ -1121,12 +1240,53 @@ function onBwChange() {
 
 function resetOrtPicker() {
   document.querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.sicherheit-chip').forEach(c => c.classList.remove('active'));
   document.getElementById('n-s-ort').value = '';
+  document.getElementById('n-seit').value = '';
+  document.getElementById('n-sicherheit').value = '';
+  document.getElementById('n-zutritt').value = '';
+  document.getElementById('n-rueck').value = '';
   const frei = document.getElementById('n-s-ort-frei');
   frei.style.display = 'none'; frei.value = '';
   document.getElementById('n-s-prob-section').style.display = 'none';
   document.getElementById('n-s-prob').value = '';
   document.getElementById('prob-chips').innerHTML = '';
+  ['nf-seit-section','nf-sicherheit-section','nf-zutritt-section','nf-rueck-section'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  const wann = document.getElementById('n-zutritt-wann');
+  if (wann) { wann.style.display = 'none'; wann.value = ''; }
+}
+
+function selectSeit(btn) {
+  document.getElementById('seit-chips').querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('n-seit').value = btn.dataset.seit;
+}
+
+function selectSicherheit(btn) {
+  document.querySelectorAll('.sicherheit-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('n-sicherheit').value = btn.dataset.s;
+  // auto-Hoch bei Gefahr
+  if (['Stromgefahr','Brandgefahr'].includes(btn.dataset.s)) {
+    document.getElementById('n-prio').value = 'Hoch';
+  }
+}
+
+function selectZutritt(val) {
+  document.getElementById('zutritt-ja').classList.toggle('active', val === 'Ja');
+  document.getElementById('zutritt-nein').classList.toggle('active', val === 'Nein');
+  document.getElementById('n-zutritt').value = val;
+  const wann = document.getElementById('n-zutritt-wann');
+  wann.style.display = val === 'Ja' ? 'block' : 'none';
+  if (val === 'Ja') setTimeout(() => wann.focus(), 50);
+}
+
+function selectRueck(btn) {
+  document.getElementById('rueck-chips').querySelectorAll('.ort-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('n-rueck').value = btn.dataset.r;
 }
 
 function selectOrt(btn) {
@@ -1152,6 +1312,14 @@ function selectOrt(btn) {
     `<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,'${s.replace(/'/g,"\\'")}')">${s}</button>`
   ).join('') + '<button type="button" class="ort-chip prob-chip" onclick="selectProb(this,\'\')">✏️ Sonstiges</button>';
   probSection.style.display = 'block';
+  // Show follow-up sections
+  document.getElementById('nf-seit-section').style.display = 'block';
+  document.getElementById('nf-sicherheit-section').style.display = 'block';
+  const isSuite = document.getElementById('bt-suite')?.classList.contains('active');
+  if (isSuite) {
+    document.getElementById('nf-zutritt-section').style.display = 'block';
+    document.getElementById('nf-rueck-section').style.display = 'block';
+  }
   setTimeout(() => probSection.scrollIntoView({behavior:'smooth',block:'nearest'}), 80);
 }
 
@@ -1198,6 +1366,13 @@ async function saveNew() {
 
   const now = new Date();
   const datum = now.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+  const seit     = document.getElementById('n-seit')?.value || null;
+  const sicherh  = document.getElementById('n-sicherheit')?.value || null;
+  const zutritt  = document.getElementById('n-zutritt')?.value || null;
+  const zWann    = document.getElementById('n-zutritt-wann')?.value?.trim() || null;
+  const rueck    = document.getElementById('n-rueck')?.value || null;
+  const notiz    = document.getElementById('n-notiz')?.value?.trim() || null;
+
   const payload = {
     datum, ort, problem: prob,
     prio: document.getElementById('n-prio').value,
@@ -1205,7 +1380,12 @@ async function saveNew() {
     kategorie: curNewKat,
     name: bwObj?.name || null,
     zimmer: bwObj?.zimmer || null,
-    foto: newPhotos[0] || null
+    foto: newPhotos[0] || null,
+    seit_wann: seit,
+    sicherheit: sicherh,
+    zutritt: zutritt ? zutritt + (zWann ? ` · ${zWann}` : '') : null,
+    rueckmeldung: rueck,
+    notiz
   };
 
   try {
