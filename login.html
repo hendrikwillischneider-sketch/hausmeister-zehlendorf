@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1C4A2E">
+<title>Anmelden — Sidonie-Scharfe-Stiftung</title>
+<style>
+:root {
+  --green: #1C4A2E;
+  --green-mid: #2d6a4f;
+  --accent: #52b788;
+  --accent-dim: #3a8a68;
+  --bg: #F6F1E9;
+  --card: #FDFAF4;
+  --border: #D4CBB8;
+  --text: #1A1510;
+  --text-muted: #7A7168;
+  --red: #c1121f;
+  --red-pale: #ffe5e5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1810;
+    --card: #142012;
+    --border: #2A3828;
+    --text: #E4DDD0;
+    --text-muted: #8A8278;
+    --red-pale: #3a0f0f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1810;
+  --card: #142012;
+  --border: #2A3828;
+  --text: #E4DDD0;
+  --text-muted: #8A8278;
+  --red-pale: #3a0f0f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, system-ui, sans-serif;
+  background: var(--green);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.logo-wrap {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.logo-icon {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
+}
+.logo-title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+}
+.logo-sub {
+  color: rgba(255,255,255,.55);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.25);
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.card-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.field { margin-bottom: 16px; }
+.field-lbl {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 7px;
+}
+.field-in {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 16px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color .15s;
+  -webkit-appearance: none;
+}
+.field-in:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.err {
+  background: var(--red-pale);
+  color: var(--red);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+  line-height: 1.4;
+}
+.err.show { display: block; }
+
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--green-mid);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, opacity .15s;
+  margin-top: 4px;
+}
+.btn-login:hover { background: var(--green); }
+.btn-login:active { opacity: .85; }
+.btn-login:disabled { opacity: .45; cursor: default; }
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0 20px;
+}
+
+/* Role chips */
+.role-hint {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.role-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.role-chip:hover { border-color: var(--accent); color: var(--text); }
+.role-chip.active { border-color: var(--accent); background: rgba(82,183,136,.12); color: var(--green-mid); font-weight: 600; }
+
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  color: rgba(255,255,255,.35);
+  font-size: 11px;
+}
+.footer a { color: rgba(255,255,255,.5); text-decoration: none; }
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="logo-wrap">
+  <span class="logo-icon">🏡</span>
+  <div class="logo-title">Sidonie-Scharfe-Stiftung</div>
+  <div class="logo-sub">Wohnheim Zehlendorf</div>
+</div>
+
+<div class="card">
+  <div class="card-title">Anmelden</div>
+  <div class="card-sub">Interner Zugang für Team und Verwaltung</div>
+
+  <div class="err" id="err"></div>
+
+  <div class="field">
+    <div class="field-lbl">E-Mail</div>
+    <input class="field-in" id="email" type="email" placeholder="name@example.com"
+      autocomplete="email" autocapitalize="none" spellcheck="false"
+      onkeydown="if(event.key==='Enter')document.getElementById('pw').focus()">
+  </div>
+  <div class="field">
+    <div class="field-lbl">Passwort</div>
+    <input class="field-in" id="pw" type="password" placeholder="••••••••"
+      autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')doLogin()">
+  </div>
+
+  <button class="btn-login" id="btn" onclick="doLogin()">Anmelden</button>
+
+  <hr class="divider">
+
+  <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Schnellauswahl</div>
+  <div class="role-hint">
+    <button class="role-chip" onclick="prefill('hendrik')">👷 Hendrik</button>
+    <button class="role-chip" onclick="prefill('schwade')">👩‍💼 Frau Schwade</button>
+    <button class="role-chip" onclick="prefill('hv')">🏢 Hausverwaltung</button>
+  </div>
+</div>
+
+<div class="footer">
+  Sidonie-Scharfe-Stiftung · Zehlendorf &nbsp;·&nbsp;
+  <a href="portal.html">Bewohner-Portal</a>
+</div>
+
+<script>
+const SB  = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
+const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
+
+const ROUTES = {
+  'hendrikwillischneider@gmail.com':              { key: 'hm_auth', target: 'intern.html' },
+  'hendrikwillischneider+schwade@gmail.com':       { key: 'sw_auth', target: 'schwade.html' },
+  'hendrikwillischneider+reporting@gmail.com':     { key: 'rep_auth', target: 'reporting.html' },
+};
+
+const PREFILL = {
+  hendrik: 'hendrikwillischneider@gmail.com',
+  schwade: 'hendrikwillischneider+schwade@gmail.com',
+  hv:      'hendrikwillischneider+reporting@gmail.com',
+};
+
+function prefill(role) {
+  document.getElementById('email').value = PREFILL[role] || '';
+  document.getElementById('pw').focus();
+  document.querySelectorAll('.role-chip').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+async function doLogin() {
+  const email = document.getElementById('email').value.trim();
+  const pw    = document.getElementById('pw').value;
+  const btn   = document.getElementById('btn');
+  const err   = document.getElementById('err');
+
+  err.classList.remove('show');
+
+  if (!email || !pw) {
+    err.textContent = 'Bitte E-Mail und Passwort eingeben.';
+    err.classList.add('show');
+    return;
+  }
+
+  const route = ROUTES[email];
+  if (!route) {
+    err.textContent = 'Kein Zugang für diese E-Mail-Adresse.';
+    err.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Anmeldung …';
+
+  try {
+    const res = await fetch(`${SB}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { apikey: KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const d = await res.json();
+
+    if (!d.access_token) {
+      err.textContent = 'E-Mail oder Passwort falsch.';
+      err.classList.add('show');
+      document.getElementById('pw').value = '';
+      btn.disabled = false;
+      btn.textContent = 'Anmelden';
+      return;
+    }
+
+    // Token speichern — passender Key je nach Rolle
+    const exp = Date.now() + d.expires_in * 1000;
+    sessionStorage.setItem(route.key, d.access_token);
+    sessionStorage.setItem(route.key + '_exp', exp);
+
+    // Weiterleitung
+    window.location.href = route.target;
+
+  } catch {
+    err.textContent = 'Verbindungsfehler. Bitte erneut versuchen.';
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Anmelden';
+  }
+}
+
+// Auto-focus
+setTimeout(() => document.getElementById('email').focus(), 100);
+</script>
+</body>
+</html>
