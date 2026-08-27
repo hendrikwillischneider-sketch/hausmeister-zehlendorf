@@ -146,7 +146,12 @@ textarea.f-in{resize:none;height:120px;line-height:1.5}
 .s-Offen{background:var(--orange-pale);color:var(--orange)}
 .s-In-Bearbeitung{background:#dbeafe;color:#1d4ed8}
 .s-Erledigt{background:rgba(82,183,136,.15);color:var(--green)}
+.s-Abgeschlossen{background:rgba(82,183,136,.15);color:var(--green)}
+.s-Annuliert{background:#f1f5f9;color:#94a3b8}
 .meld-card-meta{font-size:11.5px;color:var(--stone);margin-bottom:5px}
+.meld-ann-btn{margin-top:10px;font-size:12px;padding:6px 14px;border:1.5px solid #e2e8f0;
+  border-radius:8px;background:transparent;color:#94a3b8;cursor:pointer;transition:all .15s}
+.meld-ann-btn:hover{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,.06)}
 .meld-card-text{font-size:13px;color:var(--stone);line-height:1.4}
 .empty-state{text-align:center;padding:44px 16px;color:var(--stone)}
 .empty-icon{font-size:44px;margin-bottom:10px}
@@ -639,14 +644,20 @@ async function loadMM() {
     } else {
       html += `<div style="font-size:12px;color:var(--stone);margin-bottom:14px">${data.length} Meldung${data.length!==1?'en':''} gefunden</div>`;
       html += data.map(s => {
-        const sc = 's-'+(s.status||'Offen').replace(/\s/g,'-');
-        return `<div class="meld-card">
+        const st = s.status || 'Offen';
+        const sc = 's-' + st.replace(/\s/g,'-');
+        const canAnnul = st === 'Offen' || st === 'In Bearbeitung';
+        const annBtn = canAnnul
+          ? `<button class="meld-ann-btn" onclick="annuliereMeldung('${s.id}')">Meldung zurückziehen</button>`
+          : (st === 'Annuliert' ? '<div style="font-size:11px;color:#94a3b8;margin-top:8px">Diese Meldung wurde zurückgezogen.</div>' : '');
+        return `<div class="meld-card" id="mc-${s.id}">
           <div class="meld-card-head">
             <div class="meld-card-title">${s.ort||'—'}</div>
-            <span class="status-pill ${sc}">${s.status||'Offen'}</span>
+            <span class="status-pill ${sc}">${st}</span>
           </div>
           <div class="meld-card-meta">${s.datum||''}</div>
           <div class="meld-card-text">${(s.problem||'').slice(0,110)}${(s.problem||'').length>110?'…':''}</div>
+          ${annBtn}
         </div>`;
       }).join('');
     }
@@ -656,6 +667,31 @@ async function loadMM() {
     document.getElementById('mm-content').innerHTML = `<div class="empty-state">
       <div class="empty-icon">⚠️</div><p>Fehler beim Laden.</p>
       <button class="btn-full" style="margin-top:14px" onclick="bwName='';renderMM()">Neu versuchen</button></div>`;
+  }
+}
+
+async function annuliereMeldung(id) {
+  if (!confirm('Meldung wirklich zurückziehen? Frau Schwade wird informiert.')) return;
+  try {
+    const res = await fetch(`${SB}/rest/v1/schaden?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY,
+        'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify({ status: 'Annuliert' })
+    });
+    if (!res.ok) throw new Error('RLS');
+    const card = document.getElementById('mc-' + id);
+    if (card) {
+      card.querySelector('.status-pill').textContent = 'Annuliert';
+      card.querySelector('.status-pill').className = 'status-pill s-Annuliert';
+      card.querySelector('.meld-ann-btn')?.remove();
+      const note = document.createElement('div');
+      note.style = 'font-size:11px;color:#94a3b8;margin-top:8px';
+      note.textContent = 'Diese Meldung wurde zurückgezogen.';
+      card.appendChild(note);
+    }
+  } catch {
+    alert('Zurückziehen nicht möglich — bitte wenden Sie sich direkt an Frau Schwade.');
   }
 }
 
