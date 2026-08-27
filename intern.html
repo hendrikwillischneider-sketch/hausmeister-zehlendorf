@@ -288,10 +288,12 @@ input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var
   <div class="pw-box">
     <h2>🌿 Hausmeister Intern</h2>
     <p>Sidonie-Scharfe-Stiftung · Zehlendorf</p>
-    <label for="pw-in" style="text-transform:none;font-size:14px;color:var(--text);margin-top:0">Passwort</label>
-    <input type="password" class="pw-input" id="pw-in" placeholder="Passwort eingeben …" onkeydown="if(event.key==='Enter')checkPw()">
-    <button class="pw-btn" onclick="checkPw()">Anmelden</button>
-    <div class="pw-err" id="pw-err">Falsches Passwort.</div>
+    <label for="pw-email" style="text-transform:none;font-size:14px;color:var(--text);margin:0 0 4px">E-Mail</label>
+    <input type="email" class="pw-input" id="pw-email" placeholder="E-Mail-Adresse" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')document.getElementById('pw-in').focus()">
+    <label for="pw-in" style="text-transform:none;font-size:14px;color:var(--text);margin:0 0 4px">Passwort</label>
+    <input type="password" class="pw-input" id="pw-in" placeholder="Passwort" onkeydown="if(event.key==='Enter')login()">
+    <button class="pw-btn" onclick="login()">Anmelden</button>
+    <div class="pw-err" id="pw-err">E-Mail oder Passwort falsch.</div>
   </div>
 </div>
 
@@ -1134,34 +1136,44 @@ const LOCAL_KEY = 'hm_v2';
 const AUTH_KEY = 'hm_auth';
 const SYNC_KEY = 'hm_last_sync';
 
-let PW = localStorage.getItem('hm_pw') || 'Zehlendorf26';
-
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-function checkPw() {
-  const val = document.getElementById('pw-in').value;
-  if (val === PW) {
-    sessionStorage.setItem(AUTH_KEY, '1');
-    document.getElementById('pw-gate').classList.add('hidden');
-    init();
-  } else {
+function getToken() {
+  const t = sessionStorage.getItem(AUTH_KEY);
+  const exp = sessionStorage.getItem(AUTH_KEY + '_exp');
+  if (!t || Date.now() > Number(exp)) return null;
+  return t;
+}
+async function login() {
+  const email = document.getElementById('pw-email').value.trim();
+  const pw = document.getElementById('pw-in').value;
+  document.getElementById('pw-err').classList.remove('show');
+  try {
+    const res = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const d = await res.json();
+    if (d.access_token) {
+      sessionStorage.setItem(AUTH_KEY, d.access_token);
+      sessionStorage.setItem(AUTH_KEY + '_exp', Date.now() + d.expires_in * 1000);
+      document.getElementById('pw-gate').classList.add('hidden');
+      init();
+    } else {
+      document.getElementById('pw-err').classList.add('show');
+      document.getElementById('pw-in').value = '';
+      document.getElementById('pw-in').focus();
+    }
+  } catch(e) {
     document.getElementById('pw-err').classList.add('show');
-    document.getElementById('pw-in').value = '';
-    document.getElementById('pw-in').focus();
   }
 }
-
 function logout() {
   sessionStorage.removeItem(AUTH_KEY);
+  sessionStorage.removeItem(AUTH_KEY + '_exp');
   location.reload();
 }
-
-function changePw() {
-  const np = prompt('Neues Passwort:');
-  if (!np || np.length < 4) { alert('Passwort muss mindestens 4 Zeichen haben.'); return; }
-  PW = np;
-  localStorage.setItem('hm_pw', np);
-  alert('Passwort geändert. Merke es dir gut!');
-}
+function changePw() { alert('Passwort bitte im Supabase-Dashboard ändern.'); }
 
 // ── DATA ──────────────────────────────────────────────────────────────────────
 let S = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null') || {schaden: [], wlog: {}, nr: 1};
@@ -1172,10 +1184,11 @@ let sbOnline = false;
 let lastSync = localStorage.getItem(SYNC_KEY) || null;
 
 async function sbReq(path, opts = {}) {
+  const bearer = getToken() || SB_KEY;
   return fetch(`${SB_URL}/rest/v1/${path}`, {
     headers: {
       'apikey': SB_KEY,
-      'Authorization': `Bearer ${SB_KEY}`,
+      'Authorization': `Bearer ${bearer}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation',
       ...opts.headers
@@ -2272,12 +2285,11 @@ function init() {
 }
 
 // Check auth on page load
-if (sessionStorage.getItem(AUTH_KEY) === '1') {
+if (getToken()) {
   document.getElementById('pw-gate').classList.add('hidden');
   init();
 } else {
-  // Show password gate; focus input
-  setTimeout(() => document.getElementById('pw-in').focus(), 200);
+  setTimeout(() => document.getElementById('pw-email').focus(), 200);
 }
 
 // ── ARTIKEL CMS ───────────────────────────────────────────────────────────────
