@@ -263,10 +263,12 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
   <div class="pw-box">
     <h2>🌿 Serviceportal Intern</h2>
     <p>Sidonie-Scharfe-Stiftung · Zehlendorf</p>
-    <label for="pw-in" style="text-transform:none;font-size:14px;color:var(--text);margin:0">Passwort</label>
-    <input type="password" class="pw-input" id="pw-in" placeholder="Passwort eingeben …" onkeydown="if(event.key==='Enter')checkPw()">
-    <button class="pw-btn" onclick="checkPw()">Anmelden</button>
-    <div class="pw-err" id="pw-err">Falsches Passwort.</div>
+    <label for="pw-email" style="text-transform:none;font-size:14px;color:var(--text);margin:0 0 4px">E-Mail</label>
+    <input type="email" class="pw-input" id="pw-email" placeholder="E-Mail-Adresse" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')document.getElementById('pw-in').focus()">
+    <label for="pw-in" style="text-transform:none;font-size:14px;color:var(--text);margin:0 0 4px">Passwort</label>
+    <input type="password" class="pw-input" id="pw-in" placeholder="Passwort" onkeydown="if(event.key==='Enter')login()">
+    <button class="pw-btn" onclick="login()">Anmelden</button>
+    <div class="pw-err" id="pw-err">E-Mail oder Passwort falsch.</div>
   </div>
 </div>
 
@@ -536,20 +538,6 @@ input[type=text]:focus,input[type=email]:focus,select:focus,textarea:focus{outli
 const SB = 'https://rzpsmvczwaeraupnhhkx.supabase.co';
 const KEY = 'sb_publishable_5EQDj7OHubzmp-xlTH98LQ_qld7wPem';
 const AUTH_KEY = 'sw_auth';
-let PW = 'Schwade26';
-
-async function loadMasterPw() {
-  try {
-    const res = await fetch(`${SB}/rest/v1/settings?key=eq.pw_schwade&select=value`, {
-      headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }
-    });
-    if (res.ok) {
-      const d = await res.json();
-      if (d[0]?.value) { PW = d[0].value; return; }
-    }
-  } catch {}
-  PW = localStorage.getItem('sw_pw') || 'Schwade26';
-}
 let auftraege = [];
 let bewohnerListe = [];
 let curFilter = 'Alle';
@@ -559,30 +547,48 @@ let curView = 'auftraege';
 let allBewohner = [];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-function checkPw() {
-  if (document.getElementById('pw-in').value === PW) {
-    sessionStorage.setItem(AUTH_KEY, '1');
-    document.getElementById('pw-gate').classList.add('hidden');
-    init();
-  } else {
+function getToken() {
+  const t = sessionStorage.getItem(AUTH_KEY);
+  const exp = sessionStorage.getItem(AUTH_KEY + '_exp');
+  if (!t || Date.now() > Number(exp)) return null;
+  return t;
+}
+async function login() {
+  const email = document.getElementById('pw-email').value.trim();
+  const pw = document.getElementById('pw-in').value;
+  document.getElementById('pw-err').classList.remove('show');
+  try {
+    const res = await fetch(`${SB}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'apikey': KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const d = await res.json();
+    if (d.access_token) {
+      sessionStorage.setItem(AUTH_KEY, d.access_token);
+      sessionStorage.setItem(AUTH_KEY + '_exp', Date.now() + d.expires_in * 1000);
+      document.getElementById('pw-gate').classList.add('hidden');
+      init();
+    } else {
+      document.getElementById('pw-err').classList.add('show');
+      document.getElementById('pw-in').value = '';
+      document.getElementById('pw-in').focus();
+    }
+  } catch(e) {
     document.getElementById('pw-err').classList.add('show');
-    document.getElementById('pw-in').value = '';
-    document.getElementById('pw-in').focus();
   }
 }
-function logout() { sessionStorage.removeItem(AUTH_KEY); location.reload(); }
-function changePw() {
-  const np = prompt('Neues Passwort (mind. 4 Zeichen):');
-  if (!np || np.length < 4) { alert('Zu kurz.'); return; }
-  PW = np; localStorage.setItem('sw_pw', np);
-  alert('Passwort geändert.');
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  sessionStorage.removeItem(AUTH_KEY + '_exp');
+  location.reload();
 }
-// Beim Öffnen immer aktuelles Passwort aus Supabase laden
-loadMasterPw();
 
-if (sessionStorage.getItem(AUTH_KEY)) {
+if (getToken()) {
   document.getElementById('pw-gate').classList.add('hidden');
   document.addEventListener('DOMContentLoaded', init);
+} else {
+  setTimeout(() => document.getElementById('pw-email').focus(), 200);
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
@@ -600,8 +606,9 @@ function ovClose(id, e) { if (!e || e.target===document.getElementById(id)) docu
 
 // ── SUPABASE ──────────────────────────────────────────────────────────────────
 async function sbReq(path, opts = {}) {
+  const bearer = getToken() || KEY;
   return fetch(`${SB}/rest/v1/${path}`, {
-    headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation', ...opts.headers },
+    headers: { apikey: KEY, Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json', Prefer: 'return=representation', ...opts.headers },
     ...opts
   });
 }
